@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "AppGasto"
 include(":app")
+include(":benchmark")
