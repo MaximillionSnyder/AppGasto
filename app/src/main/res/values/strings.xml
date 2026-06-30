@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AppGasto</string>
+
+    <!-- Screens -->
+    <string name="home_title">Inicio</string>
+    <string name="list_title">Lista</string>
+    <string name="add_title">Agregar Gasto</string>
+    <string name="edit_title">Editar Gasto</string>
+    <string name="stats_title">Estadísticas</string>
+    <string name="settings_title">Ajustes</string>
+
+    <!-- Fields -->
+    <string name="amount">Monto</string>
+    <string name="category">Categoría</string>
+    <string name="note">Nota</string>
+    <string name="date">Fecha</string>
+    <string name="amount_hint">Ej: 25.50</string>
+    <string name="note_hint">¿En qué gastaste?</string>
+
+    <!-- Actions -->
+    <string name="save">Guardar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="edit">Editar</string>
+    <string name="delete">Eliminar</string>
+    <string name="export">Exportar</string>
+    <string name="import">Restaurar</string>
+    <string name="close">Cerrar</string>
+
+    <!-- Messages -->
+    <string name="expense_saved">Gasto guardado</string>
+    <string name="expense_deleted">Gasto eliminado</string>
+    <string name="no_expenses">Sin gastos registrados</string>
+    <string name="no_expenses_today">Sin gastos hoy</string>
+    <string name="confirm_delete">¿Eliminar este gasto?</string>
+    <string name="confirm">Confirmar</string>
+    <string name="backup_success">Respaldo exportado correctamente</string>
+    <string name="restore_success">Datos restaurados correctamente</string>
+    <string name="error_save">Error al guardar</string>
+
+    <!-- Categories -->
+    <string name="cat_food">Comida</string>
+    <string name="cat_transport">Transporte</string>
+    <string name="cat_leisure">Ocio</string>
+    <string name="cat_home">Hogar</string>
+    <string name="cat_health">Salud</string>
+    <string name="cat_clothing">Ropa</string>
+    <string name="cat_other">Otros</string>
+
+    <!-- Summary -->
+    <string name="total_today">Total hoy</string>
+    <string name="total_week">Esta semana</string>
+    <string name="total_month">Este mes</string>
+    <string name="total">Total</string>
+    <string name="all_time">Todos los gastos</string>
+
+    <!-- Stats -->
+    <string name="by_category">Por categoría</string>
+    <string name="by_day">Por día</string>
+    <string name="daily">Diario</string>
+    <string name="weekly">Semanal</string>
+    <string name="monthly">Mensual</string>
+
+    <!-- Settings -->
+    <string name="monthly_budget">Presupuesto mensual</string>
+    <string name="set_budget">Definir presupuesto</string>
+    <string name="budget_enabled">Activar presupuesto</string>
+    <string name="budget_alert_80">Has alcanzado el 80% de tu presupuesto mensual</string>
+    <string name="budget_alert_100">¡Has alcanzado el límite de tu presupuesto mensual!</string>
+    <string name="appearance">Apariencia</string>
+    <string name="theme">Tema</string>
+    <string name="language">Idioma</string>
+    <string name="backup">Respaldo</string>
+    <string name="export_data">Exportar datos</string>
+    <string name="import_data">Restaurar datos</string>
+    <string name="about">Acerca de</string>
+
+    <!-- Theme -->
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="theme_system">Sistema</string>
+
+    <!-- Language -->
+    <string name="lang_system">Sistema</string>
+    <string name="lang_es">Español</string>
+    <string name="lang_en">English</string>
+    <string name="lang_pt">Português</string>
+    <string name="lang_it">Italiano</string>
+    <string name="lang_de">Deutsch</string>
+    <string name="lang_ja">日本語</string>
+    <string name="lang_ko">한국어</string>
+    <string name="lang_qu">Runasimi</string>
+
+    <!-- Widget -->
+    <string name="widget_title">Gastos del día</string>
+    <string name="widget_add_expense">+</string>
+    <string name="widget_no_expenses">Sin gastos hoy</string>
+    <string name="widget_loading">Cargando…</string>
+
+    <!-- Week days (abbreviated) -->
+    <string name="day_mon">Lun</string>
+    <string name="day_tue">Mar</string>
+    <string name="day_wed">Mié</string>
+    <string name="day_thu">Jue</string>
+    <string name="day_fri">Vie</string>
+    <string name="day_sat">Sáb</string>
+    <string name="day_sun">Dom</string>
+
+    <!-- Months (abbreviated) -->
+    <string name="month_jan">Ene</string>
+    <string name="month_feb">Feb</string>
+    <string name="month_mar">Mar</string>
+    <string name="month_apr">Abr</string>
+    <string name="month_may">May</string>
+    <string name="month_jun">Jun</string>
+    <string name="month_jul">Jul</string>
+    <string name="month_aug">Ago</string>
+    <string name="month_sep">Sep</string>
+    <string name="month_oct">Oct</string>
+    <string name="month_nov">Nov</string>
+    <string name="month_dec">Dic</string>
+
+    <!-- Filters -->
+    <string name="filter_all">Todas</string>
+    <string name="filter_date">Filtrar por fecha</string>
+    <string name="filter_category">Filtrar por categoría</string>
+    <string name="filter_none">Sin filtro</string>
+    <string name="from">Desde</string>
+    <string name="to">Hasta</string>
+    <string name="apply">Aplicar</string>
+    <string name="clear">Limpiar</string>
+</resources>

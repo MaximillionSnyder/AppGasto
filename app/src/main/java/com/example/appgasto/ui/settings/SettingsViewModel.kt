@@ -1,0 +1,110 @@
+package com.example.appgasto.ui.settings
+
+import android.content.Context
+import android.net.Uri
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.appgasto.data.backup.BackupManager
+import com.example.appgasto.data.repository.PreferencesRepository
+import com.example.appgasto.domain.model.AppLanguage
+import com.example.appgasto.domain.model.ThemeMode
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import java.io.File
+import javax.inject.Inject
+
+data class SettingsUiState(
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
+    val language: AppLanguage = AppLanguage.SYSTEM,
+    val monthlyBudget: Double = 0.0,
+    val budgetEnabled: Boolean = false
+)
+
+@HiltViewModel
+class SettingsViewModel @Inject constructor(
+    private val preferencesRepository: PreferencesRepository,
+    private val backupManager: BackupManager
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(SettingsUiState())
+    val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            preferencesRepository.preferencesFlow.collect { prefs ->
+                _uiState.value = SettingsUiState(
+                    themeMode = prefs.themeMode,
+                    language = prefs.language,
+                    monthlyBudget = prefs.monthlyBudget,
+                    budgetEnabled = prefs.budgetEnabled
+                )
+            }
+        }
+    }
+
+    fun setThemeMode(mode: ThemeMode) {
+        viewModelScope.launch {
+            preferencesRepository.setThemeMode(mode)
+        }
+    }
+
+    fun setLanguage(language: AppLanguage) {
+        viewModelScope.launch {
+            preferencesRepository.setLanguage(language)
+            val localeTag = when (language) {
+                AppLanguage.SPANISH -> "es"
+                AppLanguage.ENGLISH -> "en"
+                AppLanguage.PORTUGUESE -> "pt"
+                AppLanguage.ITALIAN -> "it"
+                AppLanguage.GERMAN -> "de"
+                AppLanguage.JAPANESE -> "ja"
+                AppLanguage.KOREAN -> "ko"
+                AppLanguage.QUECHUA -> "qu"
+                AppLanguage.SYSTEM -> ""
+            }
+            val localeList = if (localeTag.isNotEmpty())
+                LocaleListCompat.forLanguageTags(localeTag)
+            else
+                LocaleListCompat.getEmptyLocaleList()
+            AppCompatDelegate.setApplicationLocales(localeList)
+        }
+    }
+
+    fun setMonthlyBudget(budget: Double) {
+        viewModelScope.launch {
+            preferencesRepository.setMonthlyBudget(budget)
+            preferencesRepository.setBudgetEnabled(true)
+        }
+    }
+
+    fun setBudgetEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.setBudgetEnabled(enabled)
+        }
+    }
+
+    suspend fun exportData(context: Context): Result<java.io.File> {
+        return backupManager.exportToJson()
+    }
+
+    suspend fun importData(context: Context, uri: Uri) {
+        val file = uriToFile(context, uri)
+        backupManager.importFromJson(file)
+    }
+
+    private fun uriToFile(context: Context, uri: Uri): File {
+        val inputStream = context.contentResolver.openInputStream(uri)
+        val tempFile = File(context.cacheDir, "import_temp.json")
+        inputStream?.use { input ->
+            tempFile.outputStream().use { output ->
+                input.copyTo(output)
+            }
+        }
+        return tempFile
+    }
+}

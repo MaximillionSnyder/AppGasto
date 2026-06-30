@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AppGasto</string>
+
+    <!-- Screens -->
+    <string name="home_title">Home</string>
+    <string name="list_title">History</string>
+    <string name="add_title">Add Expense</string>
+    <string name="edit_title">Edit Expense</string>
+    <string name="stats_title">Statistics</string>
+    <string name="settings_title">Settings</string>
+
+    <!-- Fields -->
+    <string name="amount">Amount</string>
+    <string name="category">Category</string>
+    <string name="note">Note</string>
+    <string name="date">Date</string>
+    <string name="amount_hint">e.g. 25.50</string>
+    <string name="note_hint">What did you spend on?</string>
+
+    <!-- Actions -->
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="export">Export</string>
+    <string name="import">Restore</string>
+    <string name="close">Close</string>
+
+    <!-- Messages -->
+    <string name="expense_saved">Expense saved</string>
+    <string name="expense_deleted">Expense deleted</string>
+    <string name="no_expenses">No expenses recorded</string>
+    <string name="no_expenses_today">No expenses today</string>
+    <string name="confirm_delete">Delete this expense?</string>
+    <string name="confirm">Confirm</string>
+    <string name="backup_success">Backup exported successfully</string>
+    <string name="restore_success">Data restored successfully</string>
+    <string name="error_save">Error saving expense</string>
+
+    <!-- Categories -->
+    <string name="cat_food">Food</string>
+    <string name="cat_transport">Transport</string>
+    <string name="cat_leisure">Leisure</string>
+    <string name="cat_home">Home</string>
+    <string name="cat_health">Health</string>
+    <string name="cat_clothing">Clothing</string>
+    <string name="cat_other">Other</string>
+
+    <!-- Summary -->
+    <string name="total_today">Today\'s total</string>
+    <string name="total_week">This week</string>
+    <string name="total_month">This month</string>
+    <string name="total">Total</string>
+    <string name="all_time">All expenses</string>
+
+    <!-- Stats -->
+    <string name="by_category">By category</string>
+    <string name="by_day">By day</string>
+    <string name="daily">Daily</string>
+    <string name="weekly">Weekly</string>
+    <string name="monthly">Monthly</string>
+
+    <!-- Settings -->
+    <string name="monthly_budget">Monthly budget</string>
+    <string name="set_budget">Set budget</string>
+    <string name="budget_enabled">Enable budget</string>
+    <string name="budget_alert_80">You\'ve reached 80% of your monthly budget</string>
+    <string name="budget_alert_100">You\'ve reached your monthly budget limit!</string>
+    <string name="appearance">Appearance</string>
+    <string name="theme">Theme</string>
+    <string name="language">Language</string>
+    <string name="backup">Backup</string>
+    <string name="export_data">Export data</string>
+    <string name="import_data">Restore data</string>
+    <string name="about">About</string>
+
+    <!-- Theme -->
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_system">System</string>
+
+    <!-- Language -->
+    <string name="lang_system">System</string>
+    <string name="lang_es">Español</string>
+    <string name="lang_en">English</string>
+    <string name="lang_pt">Português</string>
+    <string name="lang_it">Italiano</string>
+    <string name="lang_de">Deutsch</string>
+    <string name="lang_ja">日本語</string>
+    <string name="lang_ko">한국어</string>
+    <string name="lang_qu">Runasimi</string>
+
+    <!-- Widget -->
+    <string name="widget_title">Today\'s expenses</string>
+    <string name="widget_add_expense">+</string>
+    <string name="widget_no_expenses">No expenses today</string>
+    <string name="widget_loading">Loading…</string>
+
+    <!-- Week days (abbreviated) -->
+    <string name="day_mon">Mon</string>
+    <string name="day_tue">Tue</string>
+    <string name="day_wed">Wed</string>
+    <string name="day_thu">Thu</string>
+    <string name="day_fri">Fri</string>
+    <string name="day_sat">Sat</string>
+    <string name="day_sun">Sun</string>
+
+    <!-- Months (abbreviated) -->
+    <string name="month_jan">Jan</string>
+    <string name="month_feb">Feb</string>
+    <string name="month_mar">Mar</string>
+    <string name="month_apr">Apr</string>
+    <string name="month_may">May</string>
+    <string name="month_jun">Jun</string>
+    <string name="month_jul">Jul</string>
+    <string name="month_aug">Aug</string>
+    <string name="month_sep">Sep</string>
+    <string name="month_oct">Oct</string>
+    <string name="month_nov">Nov</string>
+    <string name="month_dec">Dec</string>
+
+    <!-- Filters -->
+    <string name="filter_all">All</string>
+    <string name="filter_date">Filter by date</string>
+    <string name="filter_category">Filter by category</string>
+    <string name="filter_none">No filter</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
+    <string name="apply">Apply</string>
+    <string name="clear">Clear</string>
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="food">#FF5722</color>
+    <color name="transport">#2196F3</color>
+    <color name="leisure">#9C27B0</color>
+    <color name="home">#4CAF50</color>
+    <color name="health">#F44336</color>
+    <color name="clothing">#FFC107</color>
+    <color name="other">#9E9E9E</color>
+
+    <color name="surface_dark">#1C1B1F</color>
+    <color name="on_surface_dark">#E6E1E5</color>
+    <color name="background_dark">#141218</color>
+</resources>

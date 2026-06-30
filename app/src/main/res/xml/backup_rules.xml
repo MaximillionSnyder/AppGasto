@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <include domain="database" path="appgasto_database" />
+    <include domain="sharedpref" path="com.example.appgasto_preferences.xml" />
+    <include domain="file" path="backups/" />
+</full-backup-content>
