@@ -321,7 +321,7 @@ fun SettingsScreen(
                     Column(modifier = Modifier.weight(1f)) {
                         Text(stringResource(R.string.app_name), style = MaterialTheme.typography.bodyLarge)
                         Text(
-                            text = "Versión 1.0",
+                            text = "Versión 0.2",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -336,7 +336,10 @@ fun SettingsScreen(
         if (showThemeDialog) {
             ThemeSettingsDialog(
                 currentTheme = state.themeMode,
-                onSelect = { viewModel.setThemeMode(it) },
+                onSelect = {
+                    viewModel.setThemeMode(it)
+                    showThemeDialog = false
+                },
                 onDismiss = { showThemeDialog = false }
             )
         }
@@ -344,7 +347,10 @@ fun SettingsScreen(
         if (showLanguageDialog) {
             LanguageSettingsDialog(
                 currentLanguage = state.language,
-                onSelect = { viewModel.setLanguage(it) },
+                onSelect = {
+                    viewModel.setLanguage(it)
+                    showLanguageDialog = false
+                },
                 onDismiss = { showLanguageDialog = false }
             )
         }
