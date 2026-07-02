@@ -24,7 +24,7 @@
     <string name="edit">Editar</string>
     <string name="delete">Eliminar</string>
     <string name="export">Exportar</string>
-    <string name="import">Restaurar</string>
+    <string name="import_action">Restaurar</string>
     <string name="close">Cerrar</string>
     <string name="ok">OK</string>
     <string name="save_changes">Guardar cambios</string>

@@ -24,7 +24,7 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="export">Export</string>
-    <string name="import">Restore</string>
+    <string name="import_action">Restore</string>
     <string name="close">Close</string>
     <string name="ok">OK</string>
     <string name="save_changes">Save changes</string>

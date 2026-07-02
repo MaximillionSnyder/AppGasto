@@ -18,7 +18,7 @@
     <string name="edit">Allichay</string>
     <string name="delete">Qulluchiy</string>
     <string name="export">Apachiy</string>
-    <string name="import">Apamuy</string>
+    <string name="import_action">Apamuy</string>
     <string name="close">Wisq\'ay</string>
     <string name="ok">OK</string>
     <string name="save_changes">Tukuy tiqllachiykunata waqaychay</string>
