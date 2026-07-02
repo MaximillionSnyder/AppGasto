@@ -1,16 +1,17 @@
 package com.example.appgasto.data.backup
 
 import android.content.Context
-import android.os.Environment
+import androidx.room.withTransaction
+import com.example.appgasto.data.local.AppDatabase
 import com.example.appgasto.data.local.Category
 import com.example.appgasto.data.local.Expense
-import com.example.appgasto.data.repository.ExpenseRepository
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.io.File
-import java.io.FileReader
-import java.io.FileWriter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.InputStream
+import java.io.OutputStream
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -20,7 +21,7 @@ import javax.inject.Singleton
 @Singleton
 class BackupManager @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val expenseRepository: ExpenseRepository
+    private val database: AppDatabase
 ) {
     private val gson = Gson()
 
@@ -31,54 +32,51 @@ class BackupManager @Inject constructor(
         val expenses: List<Expense>
     )
 
-    suspend fun exportToJson(): Result<File> {
-        return try {
-            val categories = expenseRepository.getAllCategories()
-            val expenses = expenseRepository.getAllExpenses()
+    suspend fun exportToJson(outputStream: OutputStream): Result<String> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val categories = database.categoryDao().getAll().first()
+                val expenses = database.expenseDao().getAll().first()
 
-            val backupData = BackupData(
-                categories = categories,
-                expenses = expenses
-            )
+                val backupData = BackupData(
+                    categories = categories,
+                    expenses = expenses
+                )
 
-            val json = gson.toJson(backupData)
-            val downloadsDir = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DOWNLOADS
-            )
-            val appDir = File(downloadsDir, "AppGasto")
-            if (!appDir.exists()) appDir.mkdirs()
+                val json = gson.toJson(backupData)
+                outputStream.use { it.write(json.toByteArray(Charsets.UTF_8)) }
 
-            val dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
-            val file = File(appDir, "backup_$dateStr.json")
-            FileWriter(file).use { it.write(json) }
-
-            Result.success(file)
-        } catch (e: Exception) {
-            Result.failure(e)
+                val dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
+                Result.success("appgasto_backup_$dateStr.json")
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
         }
     }
 
-    suspend fun importFromJson(fileUri: File): Result<Int> {
-        return try {
-            val json = FileReader(fileUri).use { it.readText() }
-            val type = object : TypeToken<BackupData>() {}.type
-            val backupData: BackupData = gson.fromJson(json, type)
+    suspend fun importFromJson(inputStream: InputStream): Result<Int> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val json = inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
+                val type = object : TypeToken<BackupData>() {}.type
+                val backupData: BackupData = gson.fromJson(json, type)
 
-            expenseRepository.deleteAllCategories()
-            expenseRepository.deleteAllExpenses()
+                database.withTransaction {
+                    database.categoryDao().deleteAll()
+                    database.expenseDao().deleteAll()
 
-            var count = 0
-            for (category in backupData.categories) {
-                expenseRepository.insertCategory(category)
+                    for (category in backupData.categories) {
+                        database.categoryDao().insert(category)
+                    }
+                    for (expense in backupData.expenses) {
+                        database.expenseDao().insert(expense)
+                    }
+                }
+
+                Result.success(backupData.expenses.size)
+            } catch (e: Exception) {
+                Result.failure(e)
             }
-            for (expense in backupData.expenses) {
-                expenseRepository.insertExpense(expense)
-                count++
-            }
-
-            Result.success(count)
-        } catch (e: Exception) {
-            Result.failure(e)
         }
     }
 }

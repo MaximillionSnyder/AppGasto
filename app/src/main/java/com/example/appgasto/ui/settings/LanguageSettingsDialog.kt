@@ -14,7 +14,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.appgasto.R
 import com.example.appgasto.domain.model.AppLanguage
 
 @Composable
@@ -25,31 +27,31 @@ fun LanguageSettingsDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Idioma") },
+        title = { Text(stringResource(R.string.language)) },
         text = {
             Column {
-                LanguageOption(AppLanguage.SYSTEM, "Sistema", currentLanguage, onSelect)
+                LanguageOption(AppLanguage.SYSTEM, R.string.lang_system, currentLanguage, onSelect)
                 Spacer(modifier = Modifier.height(4.dp))
-                LanguageOption(AppLanguage.SPANISH, "Español", currentLanguage, onSelect)
+                LanguageOption(AppLanguage.SPANISH, R.string.lang_es, currentLanguage, onSelect)
                 Spacer(modifier = Modifier.height(4.dp))
-                LanguageOption(AppLanguage.ENGLISH, "English", currentLanguage, onSelect)
+                LanguageOption(AppLanguage.ENGLISH, R.string.lang_en, currentLanguage, onSelect)
                 Spacer(modifier = Modifier.height(4.dp))
-                LanguageOption(AppLanguage.PORTUGUESE, "Português", currentLanguage, onSelect)
+                LanguageOption(AppLanguage.PORTUGUESE, R.string.lang_pt, currentLanguage, onSelect)
                 Spacer(modifier = Modifier.height(4.dp))
-                LanguageOption(AppLanguage.ITALIAN, "Italiano", currentLanguage, onSelect)
+                LanguageOption(AppLanguage.ITALIAN, R.string.lang_it, currentLanguage, onSelect)
                 Spacer(modifier = Modifier.height(4.dp))
-                LanguageOption(AppLanguage.GERMAN, "Deutsch", currentLanguage, onSelect)
+                LanguageOption(AppLanguage.GERMAN, R.string.lang_de, currentLanguage, onSelect)
                 Spacer(modifier = Modifier.height(4.dp))
-                LanguageOption(AppLanguage.JAPANESE, "日本語", currentLanguage, onSelect)
+                LanguageOption(AppLanguage.JAPANESE, R.string.lang_ja, currentLanguage, onSelect)
                 Spacer(modifier = Modifier.height(4.dp))
-                LanguageOption(AppLanguage.KOREAN, "한국어", currentLanguage, onSelect)
+                LanguageOption(AppLanguage.KOREAN, R.string.lang_ko, currentLanguage, onSelect)
                 Spacer(modifier = Modifier.height(4.dp))
-                LanguageOption(AppLanguage.QUECHUA, "Runasimi", currentLanguage, onSelect)
+                LanguageOption(AppLanguage.QUECHUA, R.string.lang_qu, currentLanguage, onSelect)
             }
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cerrar")
+                Text(stringResource(R.string.close))
             }
         }
     )
@@ -58,7 +60,7 @@ fun LanguageSettingsDialog(
 @Composable
 private fun LanguageOption(
     language: AppLanguage,
-    label: String,
+    labelRes: Int,
     current: AppLanguage,
     onSelect: (AppLanguage) -> Unit
 ) {
@@ -74,7 +76,7 @@ private fun LanguageOption(
             onClick = { onSelect(language) }
         )
         Text(
-            text = label,
+            text = stringResource(labelRes),
             modifier = Modifier.padding(start = 8.dp)
         )
     }

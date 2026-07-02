@@ -37,9 +37,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.appgasto.R
 import com.example.appgasto.ui.components.CategorySelector
 import java.time.Instant
 import java.time.LocalDate
@@ -78,7 +80,7 @@ fun AddEditScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(if (state.isEditing) "Editar Gasto" else "Agregar Gasto")
+                    Text(stringResource(if (state.isEditing) R.string.edit_title else R.string.add_title))
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
@@ -110,8 +112,8 @@ fun AddEditScreen(
                 OutlinedTextField(
                     value = state.amount,
                     onValueChange = viewModel::updateAmount,
-                    label = { Text("Monto") },
-                    placeholder = { Text("Ej: 25.50") },
+                    label = { Text(stringResource(R.string.amount)) },
+                    placeholder = { Text(stringResource(R.string.amount_hint)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
@@ -120,7 +122,7 @@ fun AddEditScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Categoría",
+                    text = stringResource(R.string.category),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -137,8 +139,8 @@ fun AddEditScreen(
                 OutlinedTextField(
                     value = state.note,
                     onValueChange = viewModel::updateNote,
-                    label = { Text("Nota") },
-                    placeholder = { Text("¿En qué gastaste?") },
+                    label = { Text(stringResource(R.string.note)) },
+                    placeholder = { Text(stringResource(R.string.note_hint)) },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 2
                 )
@@ -149,7 +151,7 @@ fun AddEditScreen(
                     onClick = { showDatePicker = true },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Fecha: ${state.date}")
+                    Text("${stringResource(R.string.date)}: ${state.date}")
                 }
 
                 if (showDatePicker) {
@@ -171,12 +173,12 @@ fun AddEditScreen(
                                 }
                                 showDatePicker = false
                             }) {
-                                Text("OK")
+                                Text(stringResource(R.string.ok))
                             }
                         },
                         dismissButton = {
                             TextButton(onClick = { showDatePicker = false }) {
-                                Text("Cancelar")
+                                Text(stringResource(R.string.cancel))
                             }
                         }
                     ) {
@@ -197,7 +199,7 @@ fun AddEditScreen(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text(if (state.isEditing) "Guardar cambios" else "Guardar")
+                        Text(stringResource(if (state.isEditing) R.string.save_changes else R.string.save))
                     }
                 }
 

@@ -33,11 +33,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.appgasto.R
 import com.example.appgasto.ui.components.ExpenseItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,7 +58,7 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("AppGasto") },
+                title = { Text(stringResource(R.string.app_name)) },
                 actions = {
                     IconButton(onClick = onNavigateToStats) {
                         Icon(Icons.Default.BarChart, contentDescription = null)
@@ -106,17 +108,17 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         SummaryCard(
-                            title = "Hoy",
+                            title = stringResource(R.string.total_today),
                             amount = state.todayTotal,
                             modifier = Modifier.weight(1f)
                         )
                         SummaryCard(
-                            title = "Semana",
+                            title = stringResource(R.string.total_week),
                             amount = state.weekTotal,
                             modifier = Modifier.weight(1f)
                         )
                         SummaryCard(
-                            title = "Mes",
+                            title = stringResource(R.string.total_month),
                             amount = state.monthTotal,
                             modifier = Modifier.weight(1f)
                         )
@@ -125,7 +127,7 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Gastos de hoy",
+                        text = stringResource(R.string.today_expenses),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -142,7 +144,7 @@ fun HomeScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = "Sin gastos hoy",
+                                text = stringResource(R.string.no_expenses_today),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 textAlign = TextAlign.Center

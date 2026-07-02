@@ -13,6 +13,7 @@ import com.example.appgasto.domain.model.ThemeMode
 import com.example.appgasto.domain.model.UserPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,12 +29,14 @@ class PreferencesRepository @Inject constructor(
         val LANGUAGE = stringPreferencesKey("language")
         val MONTHLY_BUDGET = doublePreferencesKey("monthly_budget")
         val BUDGET_ENABLED = booleanPreferencesKey("budget_enabled")
+        val BUDGET_ALERT_80_MONTH = stringPreferencesKey("budget_alert_80_month")
+        val BUDGET_ALERT_100_MONTH = stringPreferencesKey("budget_alert_100_month")
     }
 
     val preferencesFlow: Flow<UserPreferences> = context.dataStore.data.map { prefs ->
         UserPreferences(
             themeMode = prefs[Keys.THEME_MODE]?.let { safeValueOf<ThemeMode>(it) } ?: ThemeMode.SYSTEM,
-            language = prefs[Keys.LANGUAGE]?.let { safeValueOfLanguage(it) } ?: AppLanguage.SYSTEM,
+            language = prefs[Keys.LANGUAGE]?.let { safeValueOf<AppLanguage>(it) } ?: AppLanguage.SYSTEM,
             monthlyBudget = prefs[Keys.MONTHLY_BUDGET] ?: 0.0,
             budgetEnabled = prefs[Keys.BUDGET_ENABLED] ?: false
         )
@@ -63,17 +66,31 @@ class PreferencesRepository @Inject constructor(
         }
     }
 
-    private inline fun <reified T : Enum<T>> safeValueOf(value: String): T? {
-        return try {
-            java.lang.Enum.valueOf(T::class.java, value)
-        } catch (e: IllegalArgumentException) {
-            null
+    suspend fun setBudgetAlertSent(level: Int) {
+        context.dataStore.edit { prefs ->
+            val month = java.time.YearMonth.now().toString()
+            when (level) {
+                80 -> prefs[Keys.BUDGET_ALERT_80_MONTH] = month
+                100 -> prefs[Keys.BUDGET_ALERT_100_MONTH] = month
+            }
         }
     }
 
-    private fun safeValueOfLanguage(value: String): AppLanguage? {
+    suspend fun wasBudgetAlertSentThisMonth(level: Int): Boolean {
+        val currentMonth = java.time.YearMonth.now().toString()
+        return context.dataStore.data.first().let { prefs ->
+            val stored = when (level) {
+                80 -> prefs[Keys.BUDGET_ALERT_80_MONTH]
+                100 -> prefs[Keys.BUDGET_ALERT_100_MONTH]
+                else -> null
+            }
+            stored == currentMonth
+        }
+    }
+
+    private inline fun <reified T : Enum<T>> safeValueOf(value: String): T? {
         return try {
-            AppLanguage.valueOf(value)
+            java.lang.Enum.valueOf(T::class.java, value)
         } catch (e: IllegalArgumentException) {
             null
         }

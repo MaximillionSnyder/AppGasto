@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.appgasto.data.local.Category
+import com.example.appgasto.data.local.localizedName
 import com.example.appgasto.ui.theme.CategoryColors
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -65,7 +66,7 @@ fun CategorySelector(
                                 .background(catColor)
                         )
                         Text(
-                            text = category.name,
+                            text = category.localizedName(),
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                             color = if (isSelected) catColor else MaterialTheme.colorScheme.onSurfaceVariant,

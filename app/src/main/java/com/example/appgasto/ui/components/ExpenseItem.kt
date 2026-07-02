@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.appgasto.data.local.Category
 import com.example.appgasto.data.local.Expense
+import com.example.appgasto.data.local.localizedName
 import com.example.appgasto.ui.theme.CategoryColors
 import java.time.format.DateTimeFormatter
 
@@ -68,7 +69,7 @@ fun ExpenseItem(
 
                 Column {
                     Text(
-                        text = category?.name ?: "—",
+                        text = category?.localizedName() ?: "—",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )

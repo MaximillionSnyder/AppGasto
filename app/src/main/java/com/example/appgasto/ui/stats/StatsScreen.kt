@@ -36,10 +36,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.appgasto.R
+import com.example.appgasto.data.local.localizedName
 import com.example.appgasto.ui.theme.CategoryColors
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,7 +57,7 @@ fun StatsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Estadísticas") },
+                title = { Text(stringResource(R.string.stats_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
@@ -93,9 +96,9 @@ fun StatsScreen(
                             label = {
                                 Text(
                                     when (period) {
-                                        StatsPeriod.DAILY -> "Hoy"
-                                        StatsPeriod.WEEKLY -> "Semana"
-                                        StatsPeriod.MONTHLY -> "Mes"
+                                        StatsPeriod.DAILY -> stringResource(R.string.daily)
+                                        StatsPeriod.WEEKLY -> stringResource(R.string.weekly)
+                                        StatsPeriod.MONTHLY -> stringResource(R.string.monthly)
                                     }
                                 )
                             }
@@ -119,7 +122,7 @@ fun StatsScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Total",
+                            text = stringResource(R.string.total),
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -136,7 +139,7 @@ fun StatsScreen(
 
                 // Category breakdown
                 Text(
-                    text = "Por categoría",
+                    text = stringResource(R.string.by_category),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -162,7 +165,7 @@ fun StatsScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = catTotal.category.name,
+                            text = catTotal.category.localizedName(),
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.weight(1f)
                         )

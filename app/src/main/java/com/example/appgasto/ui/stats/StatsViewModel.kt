@@ -3,11 +3,14 @@ package com.example.appgasto.ui.stats
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appgasto.data.local.Category
+import com.example.appgasto.data.local.Expense
 import com.example.appgasto.data.repository.ExpenseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -37,42 +40,51 @@ class StatsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(StatsUiState())
     val uiState: StateFlow<StatsUiState> = _uiState.asStateFlow()
 
+    private var observeJob: Job? = null
+
     init {
         loadStats(StatsPeriod.MONTHLY)
     }
 
     fun loadStats(period: StatsPeriod) {
         _uiState.value = _uiState.value.copy(period = period, isLoading = true)
-        viewModelScope.launch {
+        observeJob?.cancel()
+        observeJob = viewModelScope.launch {
             try {
-                val categories = expenseRepository.getAllCategories()
-                val today = LocalDate.now()
+                combine(
+                    expenseRepository.getAllExpenses(),
+                    expenseRepository.getAllCategories()
+                ) { expenses, categories -> expenses to categories }
+                    .collect { (expenses, categories) ->
+                        val startDate = when (period) {
+                            StatsPeriod.DAILY -> LocalDate.now()
+                            StatsPeriod.WEEKLY -> LocalDate.now()
+                                .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+                            StatsPeriod.MONTHLY -> LocalDate.now().withDayOfMonth(1)
+                        }
 
-                val (startDate, _) = when (period) {
-                    StatsPeriod.DAILY -> today to today
-                    StatsPeriod.WEEKLY -> {
-                        val start = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-                        start to today
+                        val filtered = expenses.filter {
+                            !it.createdAt.toLocalDate().isBefore(startDate)
+                        }
+
+                        val categoryMap = categories.associateBy { it.id }
+                        val categoryTotals = categories.map { cat ->
+                            val total = filtered
+                                .filter { it.categoryId == cat.id }
+                                .sumOf { it.amount }
+                            CategoryTotal(cat, total)
+                        }.sortedByDescending { it.total }
+
+                        val totalExpenses = categoryTotals.sumOf { it.total }
+
+                        _uiState.value = StatsUiState(
+                            period = period,
+                            categoryTotals = categoryTotals,
+                            dailyTotals = emptyList(),
+                            totalExpenses = totalExpenses,
+                            isLoading = false
+                        )
                     }
-                    StatsPeriod.MONTHLY -> {
-                        today.withDayOfMonth(1) to today
-                    }
-                }
-
-                val categoryTotals = categories.map { cat ->
-                    val total = expenseRepository.getTotalByCategorySince(cat.id, startDate)
-                    CategoryTotal(cat, total)
-                }.sortedByDescending { it.total }
-
-                val totalExpenses = categoryTotals.sumOf { it.total }
-
-                _uiState.value = StatsUiState(
-                    period = period,
-                    categoryTotals = categoryTotals,
-                    dailyTotals = emptyList(),
-                    totalExpenses = totalExpenses,
-                    isLoading = false
-                )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false)
             }

@@ -10,6 +10,7 @@ import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.example.appgasto.R
 import com.example.appgasto.notifications.BudgetWorker
 import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
@@ -36,10 +37,10 @@ class AppGastoApplication : Application(), Configuration.Provider {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 "budget_alerts",
-                "Alertas de presupuesto",
+                getString(R.string.budget_channel_name),
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Notificaciones cuando te acerques al límite de presupuesto"
+                description = getString(R.string.budget_channel_description)
             }
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(channel)

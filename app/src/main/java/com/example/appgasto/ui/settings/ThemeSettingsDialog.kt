@@ -12,7 +12,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.appgasto.R
 import com.example.appgasto.domain.model.ThemeMode
 
 @Composable
@@ -23,7 +25,7 @@ fun ThemeSettingsDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Tema") },
+        title = { Text(stringResource(R.string.theme)) },
         text = {
             Column {
                 ThemeMode.entries.forEach { mode ->
@@ -40,9 +42,9 @@ fun ThemeSettingsDialog(
                         )
                         Text(
                             text = when (mode) {
-                                ThemeMode.LIGHT -> "Claro"
-                                ThemeMode.DARK -> "Oscuro"
-                                ThemeMode.SYSTEM -> "Sistema"
+                                ThemeMode.LIGHT -> stringResource(R.string.theme_light)
+                                ThemeMode.DARK -> stringResource(R.string.theme_dark)
+                                ThemeMode.SYSTEM -> stringResource(R.string.theme_system)
                             },
                             modifier = Modifier.padding(start = 8.dp)
                         )
@@ -52,7 +54,7 @@ fun ThemeSettingsDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cerrar")
+                Text(stringResource(R.string.close))
             }
         }
     )

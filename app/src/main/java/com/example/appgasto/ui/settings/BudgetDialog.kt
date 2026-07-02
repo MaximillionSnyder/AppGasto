@@ -15,8 +15,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.appgasto.R
 
 @Composable
 fun BudgetDialog(
@@ -32,16 +34,16 @@ fun BudgetDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Presupuesto mensual") },
+        title = { Text(stringResource(R.string.monthly_budget)) },
         text = {
             Column {
-                Text("Define un límite de gasto mensual:")
+                Text(stringResource(R.string.set_budget_description))
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = budgetText,
                     onValueChange = { budgetText = it },
-                    label = { Text("Monto") },
-                    placeholder = { Text("Ej: 500") },
+                    label = { Text(stringResource(R.string.amount)) },
+                    placeholder = { Text(stringResource(R.string.budget_hint)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
@@ -53,12 +55,12 @@ fun BudgetDialog(
                 budgetText.toDoubleOrNull()?.let { onSave(it) }
                 onDismiss()
             }) {
-                Text("Guardar")
+                Text(stringResource(R.string.save))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancel))
             }
         }
     )
