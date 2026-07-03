@@ -15,8 +15,8 @@ android {
         applicationId = "com.example.appgasto"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -85,14 +85,11 @@ dependencies {
     implementation(libs.androidx.hilt.work)
     ksp(libs.androidx.hilt.compiler)
 
-    implementation(libs.androidx.glance)
-    implementation(libs.androidx.glance.appwidget)
 
-    implementation(libs.vico.core)
-    implementation(libs.vico.compose.m3)
 
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.gson)
+    implementation(libs.androidx.appcompat)
 
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
