@@ -3,21 +3,21 @@ package com.example.appgasto.ui.theme
 import androidx.compose.ui.graphics.Color
 
 object CategoryColors {
-    val food = Color(0xFFFF5722)
-    val transport = Color(0xFF2196F3)
-    val leisure = Color(0xFF9C27B0)
-    val home = Color(0xFF4CAF50)
-    val health = Color(0xFFF44336)
-    val clothing = Color(0xFFFFC107)
-    val other = Color(0xFF9E9E9E)
+    val food = Color(0xFFFF6D00)
+    val transport = Color(0xFF2979FF)
+    val leisure = Color(0xFFAA00FF)
+    val home = Color(0xFF00C853)
+    val health = Color(0xFFFF1744)
+    val clothing = Color(0xFFFFAB00)
+    val other = Color(0xFF78909C)
 
-    val foodDark = Color(0xFFFF8A65)
+    val foodDark = Color(0xFFFF9E40)
     val transportDark = Color(0xFF64B5F6)
     val leisureDark = Color(0xFFCE93D8)
-    val homeDark = Color(0xFF81C784)
-    val healthDark = Color(0xFFE57373)
-    val clothingDark = Color(0xFFFFD54F)
-    val otherDark = Color(0xFFBDBDBD)
+    val homeDark = Color(0xFF69F0AE)
+    val healthDark = Color(0xFFFF5252)
+    val clothingDark = Color(0xFFFFD740)
+    val otherDark = Color(0xFFB0BEC5)
 
     fun getById(categoryId: Long, isDark: Boolean = false): Color {
         val colors = if (isDark) darkMap() else map()
