@@ -5,7 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.appgasto.data.local.Category
 import com.example.appgasto.data.local.Expense
 import com.example.appgasto.data.repository.ExpenseRepository
+import com.example.appgasto.widget.ExpenseWidget
+import android.content.Context
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,7 +34,8 @@ data class AddEditUiState(
 
 @HiltViewModel
 class AddEditViewModel @Inject constructor(
-    private val expenseRepository: ExpenseRepository
+    private val expenseRepository: ExpenseRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddEditUiState())
@@ -105,6 +109,7 @@ class AddEditViewModel @Inject constructor(
                     expenseRepository.insertExpense(expense)
                 }
                 _uiState.value = _uiState.value.copy(isSaving = false, isSaved = true)
+                ExpenseWidget.updateAll(context)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
