@@ -1,5 +1,6 @@
 package com.example.appgasto.ui.stats
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,12 +37,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.appgasto.R
+import com.example.appgasto.data.local.localizedName
 import com.example.appgasto.ui.theme.CategoryColors
+import com.example.appgasto.ui.theme.GradientEnd
+import com.example.appgasto.ui.theme.GradientStart
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,7 +66,13 @@ fun StatsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Estadísticas") },
+                title = {
+                    Text(
+                        text = stringResource(R.string.stats_title),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
@@ -81,7 +99,6 @@ fun StatsScreen(
                     .padding(horizontal = 16.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                // Period selector
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -93,108 +110,187 @@ fun StatsScreen(
                             label = {
                                 Text(
                                     when (period) {
-                                        StatsPeriod.DAILY -> "Hoy"
-                                        StatsPeriod.WEEKLY -> "Semana"
-                                        StatsPeriod.MONTHLY -> "Mes"
+                                        StatsPeriod.DAILY -> stringResource(R.string.daily)
+                                        StatsPeriod.WEEKLY -> stringResource(R.string.weekly)
+                                        StatsPeriod.MONTHLY -> stringResource(R.string.monthly)
                                     }
                                 )
-                            }
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                            )
                         )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Total card
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
-                    )
+                    shape = MaterialTheme.shapes.large,
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Column(
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                            .background(
+                                Brush.horizontalGradient(
+                                    colors = listOf(GradientStart, GradientEnd)
+                                )
+                            )
+                            .padding(24.dp)
                     ) {
-                        Text(
-                            text = "Total",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                        Text(
-                            text = String.format("%.2f", state.totalExpenses),
-                            style = MaterialTheme.typography.displayLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
+                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                            Text(
+                                text = stringResource(R.string.total),
+                                style = MaterialTheme.typography.labelLarge,
+                                color = Color.White.copy(alpha = 0.8f)
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = String.format("%.2f", state.totalExpenses),
+                                style = MaterialTheme.typography.displayLarge,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = Color.White
+                            )
+                        }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-                // Category breakdown
                 Text(
-                    text = "Por categoría",
+                    text = stringResource(R.string.by_category),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                state.categoryTotals.forEach { catTotal ->
-                    val catColor = CategoryColors.getById(catTotal.category.id, isDark)
-                    val percentage = if (state.totalExpenses > 0)
-                        (catTotal.total / state.totalExpenses * 100).toFloat() else 0f
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                if (state.categoryTotals.isNotEmpty() && state.totalExpenses > 0) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                        )
                     ) {
-                        Box(
+                        Column(
                             modifier = Modifier
-                                .size(10.dp)
-                                .clip(CircleShape)
-                                .background(catColor)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = catTotal.category.name,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Text(
-                            text = String.format("%.2f", catTotal.total),
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
+                                .fillMaxWidth()
+                                .padding(20.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            DonutChart(
+                                categoryTotals = state.categoryTotals.map { catTotal ->
+                                    DonutSlice(
+                                        color = CategoryColors.getById(catTotal.category.id, isDark),
+                                        percentage = (catTotal.total / state.totalExpenses * 100).toFloat()
+                                    )
+                                },
+                                modifier = Modifier.size(180.dp)
+                            )
 
-                    // Progress bar
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(8.dp)
-                            .clip(MaterialTheme.shapes.small)
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth(percentage / 100f)
-                                .height(8.dp)
-                                .clip(MaterialTheme.shapes.small)
-                                .background(catColor)
-                        )
-                    }
+                            Spacer(modifier = Modifier.height(20.dp))
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                            state.categoryTotals.forEach { catTotal ->
+                                val catColor = CategoryColors.getById(catTotal.category.id, isDark)
+                                val percentage = if (state.totalExpenses > 0)
+                                    (catTotal.total / state.totalExpenses * 100).toFloat() else 0f
+
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 6.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(12.dp)
+                                            .clip(CircleShape)
+                                            .background(catColor)
+                                    )
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Text(
+                                        text = catTotal.category.localizedName(),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    Text(
+                                        text = "${String.format("%.1f", percentage)}%",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.padding(end = 8.dp)
+                                    )
+                                    Text(
+                                        text = String.format("%.2f", catTotal.total),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
+
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(6.dp)
+                                        .clip(MaterialTheme.shapes.extraSmall)
+                                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth(percentage / 100f)
+                                            .height(6.dp)
+                                            .clip(MaterialTheme.shapes.extraSmall)
+                                            .background(
+                                                Brush.horizontalGradient(
+                                                    colors = listOf(catColor, catColor.copy(alpha = 0.6f))
+                                                )
+                                            )
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(4.dp))
+                            }
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
             }
+        }
+    }
+}
+
+data class DonutSlice(
+    val color: Color,
+    val percentage: Float
+)
+
+@Composable
+private fun DonutChart(
+    categoryTotals: List<DonutSlice>,
+    modifier: Modifier = Modifier
+) {
+    Canvas(modifier = modifier) {
+        val strokeWidth = 32.dp.toPx()
+        val radius = (size.minDimension - strokeWidth) / 2f
+        val center = Offset(size.width / 2f, size.height / 2f)
+        var startAngle = -90f
+
+        categoryTotals.forEach { slice ->
+            val sweepAngle = (slice.percentage / 100f) * 360f
+            drawArc(
+                color = slice.color,
+                startAngle = startAngle,
+                sweepAngle = sweepAngle,
+                useCenter = false,
+                topLeft = Offset(center.x - radius, center.y - radius),
+                size = Size(radius * 2, radius * 2),
+                style = Stroke(width = strokeWidth, cap = StrokeCap.Butt)
+            )
+            startAngle += sweepAngle
         }
     }
 }

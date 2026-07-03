@@ -23,7 +23,8 @@ class BudgetWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, workerParams) {
 
     companion object {
-        const val NOTIFICATION_ID = 1001
+        const val NOTIFICATION_ID_80 = 1001
+        const val NOTIFICATION_ID_100 = 1002
     }
 
     override suspend fun doWork(): Result {
@@ -40,14 +41,26 @@ class BudgetWorker @AssistedInject constructor(
             val percentage = (currentTotal / preferences.monthlyBudget) * 100
 
             when {
-                percentage >= 100 -> sendNotification(
-                    "Presupuesto agotado",
-                    "Has alcanzado el límite de tu presupuesto mensual"
-                )
-                percentage >= 80 -> sendNotification(
-                    "Presupuesto al 80%",
-                    "Has alcanzado el 80% de tu presupuesto mensual"
-                )
+                percentage >= 100 -> {
+                    if (!preferencesRepository.wasBudgetAlertSentThisMonth(100)) {
+                        sendNotification(
+                            NOTIFICATION_ID_100,
+                            applicationContext.getString(R.string.budget_alert_title_100),
+                            applicationContext.getString(R.string.budget_alert_100)
+                        )
+                        preferencesRepository.setBudgetAlertSent(100)
+                    }
+                }
+                percentage >= 80 -> {
+                    if (!preferencesRepository.wasBudgetAlertSentThisMonth(80)) {
+                        sendNotification(
+                            NOTIFICATION_ID_80,
+                            applicationContext.getString(R.string.budget_alert_title_80),
+                            applicationContext.getString(R.string.budget_alert_80)
+                        )
+                        preferencesRepository.setBudgetAlertSent(80)
+                    }
+                }
             }
 
             Result.success()
@@ -56,7 +69,7 @@ class BudgetWorker @AssistedInject constructor(
         }
     }
 
-    private fun sendNotification(title: String, message: String) {
+    private fun sendNotification(notificationId: Int, title: String, message: String) {
         val notificationManager = applicationContext
             .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -68,6 +81,6 @@ class BudgetWorker @AssistedInject constructor(
             .setAutoCancel(true)
             .build()
 
-        notificationManager.notify(NOTIFICATION_ID, notification)
+        notificationManager.notify(notificationId, notification)
     }
 }

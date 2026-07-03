@@ -24,8 +24,10 @@
     <string name="edit">Editar</string>
     <string name="delete">Eliminar</string>
     <string name="export">Exportar</string>
-    <string name="import">Restaurar</string>
+    <string name="import_action">Restaurar</string>
     <string name="close">Cerrar</string>
+    <string name="ok">OK</string>
+    <string name="save_changes">Guardar cambios</string>
 
     <!-- Messages -->
     <string name="expense_saved">Gasto guardado</string>
@@ -35,8 +37,15 @@
     <string name="confirm_delete">¿Eliminar este gasto?</string>
     <string name="confirm">Confirmar</string>
     <string name="backup_success">Respaldo exportado correctamente</string>
+    <string name="import_success">Importación completada</string>
+    <string name="import_error">Error al importar</string>
+    <string name="export_success">Respaldo exportado</string>
+    <string name="export_error">Error al exportar</string>
     <string name="restore_success">Datos restaurados correctamente</string>
     <string name="error_save">Error al guardar</string>
+    <string name="error_invalid_amount">Ingresa un monto válido</string>
+    <string name="error_select_category">Selecciona una categoría</string>
+    <string name="error_save_detail">Error al guardar: %1$s</string>
 
     <!-- Categories -->
     <string name="cat_food">Comida</string>
@@ -49,6 +58,7 @@
 
     <!-- Summary -->
     <string name="total_today">Total hoy</string>
+    <string name="today_expenses">Gastos de hoy</string>
     <string name="total_week">Esta semana</string>
     <string name="total_month">Este mes</string>
     <string name="total">Total</string>
@@ -64,15 +74,24 @@
     <!-- Settings -->
     <string name="monthly_budget">Presupuesto mensual</string>
     <string name="set_budget">Definir presupuesto</string>
+    <string name="set_budget_description">Define un límite de gasto mensual:</string>
+    <string name="budget_hint">Ej: 500</string>
+    <string name="change_amount">Cambiar monto</string>
     <string name="budget_enabled">Activar presupuesto</string>
+    <string name="budget_channel_name">Alertas de presupuesto</string>
+    <string name="budget_channel_description">Notificaciones cuando te acerques al límite de presupuesto</string>
+    <string name="budget_alert_title_80">Presupuesto al 80%</string>
     <string name="budget_alert_80">Has alcanzado el 80% de tu presupuesto mensual</string>
+    <string name="budget_alert_title_100">Presupuesto agotado</string>
     <string name="budget_alert_100">¡Has alcanzado el límite de tu presupuesto mensual!</string>
     <string name="appearance">Apariencia</string>
     <string name="theme">Tema</string>
     <string name="language">Idioma</string>
     <string name="backup">Respaldo</string>
     <string name="export_data">Exportar datos</string>
+    <string name="export_description">Guardar copia en un archivo JSON</string>
     <string name="import_data">Restaurar datos</string>
+    <string name="import_description">Importar desde un archivo</string>
     <string name="about">Acerca de</string>
 
     <!-- Theme -->

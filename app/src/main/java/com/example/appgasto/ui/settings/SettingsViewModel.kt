@@ -1,7 +1,5 @@
 package com.example.appgasto.ui.settings
 
-import android.content.Context
-import android.net.Uri
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
@@ -15,7 +13,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.io.File
+import java.io.InputStream
+import java.io.OutputStream
 import javax.inject.Inject
 
 data class SettingsUiState(
@@ -88,23 +87,11 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    suspend fun exportData(context: Context): Result<java.io.File> {
-        return backupManager.exportToJson()
+    suspend fun exportData(outputStream: OutputStream): Result<String> {
+        return backupManager.exportToJson(outputStream)
     }
 
-    suspend fun importData(context: Context, uri: Uri) {
-        val file = uriToFile(context, uri)
-        backupManager.importFromJson(file)
-    }
-
-    private fun uriToFile(context: Context, uri: Uri): File {
-        val inputStream = context.contentResolver.openInputStream(uri)
-        val tempFile = File(context.cacheDir, "import_temp.json")
-        inputStream?.use { input ->
-            tempFile.outputStream().use { output ->
-                input.copyTo(output)
-            }
-        }
-        return tempFile
+    suspend fun importData(inputStream: InputStream): Result<Int> {
+        return backupManager.importFromJson(inputStream)
     }
 }

@@ -5,24 +5,25 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="12dp"
+    android:padding="16dp"
     android:background="@drawable/widget_background">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/widget_title"
-        android:textSize="14sp"
-        android:textColor="@color/white" />
+        android:textSize="13sp"
+        android:textColor="#CCFFFFFF"
+        android:letterSpacing="0.05" />
 
     <TextView
         android:id="@+id/widget_total"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="0.00"
-        android:textSize="28sp"
+        android:textSize="32sp"
         android:textStyle="bold"
         android:textColor="@color/white"
-        android:layout_marginTop="4dp" />
+        android:layout_marginTop="6dp" />
 
 </LinearLayout>

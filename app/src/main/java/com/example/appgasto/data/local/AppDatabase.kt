@@ -4,16 +4,15 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Database(
     entities = [Expense::class, Category::class],
     version = 1,
     exportSchema = false
 )
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun expenseDao(): ExpenseDao
@@ -29,7 +28,6 @@ abstract class AppDatabase : RoomDatabase() {
                 DATABASE_NAME
             )
                 .addCallback(SeedCallback())
-                .fallbackToDestructiveMigration()
                 .build()
         }
 
@@ -38,14 +36,14 @@ abstract class AppDatabase : RoomDatabase() {
                 super.onCreate(db)
                 db.execSQL(
                     """
-                    INSERT INTO categories (name, colorHex, iconName) VALUES
-                    ('Comida', '#FF5722', 'restaurant'),
-                    ('Transporte', '#2196F3', 'directions_car'),
-                    ('Ocio', '#9C27B0', 'sports_esports'),
-                    ('Hogar', '#4CAF50', 'home'),
-                    ('Salud', '#F44336', 'local_pharmacy'),
-                    ('Ropa', '#FFC107', 'checkroom'),
-                    ('Otros', '#9E9E9E', 'more_horiz')
+                    INSERT INTO categories (name, colorHex, iconName, stringKey) VALUES
+                    ('Food', '#FF5722', 'restaurant', 'cat_food'),
+                    ('Transport', '#2196F3', 'directions_car', 'cat_transport'),
+                    ('Leisure', '#9C27B0', 'sports_esports', 'cat_leisure'),
+                    ('Home', '#4CAF50', 'home', 'cat_home'),
+                    ('Health', '#F44336', 'local_pharmacy', 'cat_health'),
+                    ('Clothing', '#FFC107', 'checkroom', 'cat_clothing'),
+                    ('Other', '#9E9E9E', 'more_horiz', 'cat_other')
                     """.trimIndent()
                 )
             }

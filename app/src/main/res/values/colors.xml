@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="food">#FF5722</color>
-    <color name="transport">#2196F3</color>
-    <color name="leisure">#9C27B0</color>
-    <color name="home">#4CAF50</color>
-    <color name="health">#F44336</color>
-    <color name="clothing">#FFC107</color>
-    <color name="other">#9E9E9E</color>
+    <color name="food">#FF6D00</color>
+    <color name="transport">#2979FF</color>
+    <color name="leisure">#AA00FF</color>
+    <color name="home">#00C853</color>
+    <color name="health">#FF1744</color>
+    <color name="clothing">#FFAB00</color>
+    <color name="other">#78909C</color>
 
-    <color name="surface_dark">#1C1B1F</color>
-    <color name="on_surface_dark">#E6E1E5</color>
-    <color name="background_dark">#141218</color>
+    <color name="surface_dark">#1B1B1F</color>
+    <color name="on_surface_dark">#E4E1E6</color>
+    <color name="background_dark">#131316</color>
+    <color name="white">#FFFFFF</color>
 </resources>

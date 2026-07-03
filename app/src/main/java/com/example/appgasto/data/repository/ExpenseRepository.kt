@@ -3,6 +3,8 @@ package com.example.appgasto.data.repository
 import com.example.appgasto.data.local.AppDatabase
 import com.example.appgasto.data.local.Category
 import com.example.appgasto.data.local.Expense
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -26,15 +28,15 @@ class ExpenseRepository @Inject constructor(
 
     suspend fun getExpenseById(id: Long) = expenseDao.getById(id)
 
-    suspend fun getAllExpenses() = expenseDao.getAll()
+    fun getAllExpenses(): Flow<List<Expense>> = expenseDao.getAll()
 
-    suspend fun getTodayExpenses(): List<Expense> {
+    fun getTodayExpenses(): Flow<List<Expense>> {
         val start = LocalDateTime.of(LocalDate.now(), LocalTime.MIN)
         val end = LocalDateTime.of(LocalDate.now(), LocalTime.MAX)
         return expenseDao.getByDateRange(start, end)
     }
 
-    suspend fun getExpensesByDateRange(start: LocalDate, end: LocalDate): List<Expense> {
+    fun getExpensesByDateRange(start: LocalDate, end: LocalDate): Flow<List<Expense>> {
         return expenseDao.getByDateRange(
             LocalDateTime.of(start, LocalTime.MIN),
             LocalDateTime.of(end, LocalTime.MAX)
@@ -71,15 +73,13 @@ class ExpenseRepository @Inject constructor(
         ) ?: 0.0
     }
 
-    suspend fun getExpensesSince(date: LocalDate): List<Expense> {
-        return expenseDao.getExpensesSince(LocalDateTime.of(date, LocalTime.MIN))
-    }
-
     suspend fun deleteAllExpenses() = expenseDao.deleteAll()
 
     // -- Categories --
 
-    suspend fun getAllCategories() = categoryDao.getAll()
+    fun getAllCategories(): Flow<List<Category>> = categoryDao.getAll()
+
+    suspend fun getAllCategoriesSnapshot(): List<Category> = categoryDao.getAll().first()
 
     suspend fun getCategoryById(id: Long) = categoryDao.getById(id)
 

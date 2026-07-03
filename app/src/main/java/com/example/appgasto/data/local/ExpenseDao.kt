@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
 
 @Dao
@@ -21,19 +22,19 @@ interface ExpenseDao {
     suspend fun delete(expense: Expense)
 
     @Query("SELECT * FROM expenses ORDER BY createdAt DESC")
-    suspend fun getAll(): List<Expense>
+    fun getAll(): Flow<List<Expense>>
 
     @Query("SELECT * FROM expenses WHERE id = :id")
     suspend fun getById(id: Long): Expense?
 
     @Query("SELECT * FROM expenses WHERE createdAt >= :start AND createdAt <= :end ORDER BY createdAt DESC")
-    suspend fun getByDateRange(start: LocalDateTime, end: LocalDateTime): List<Expense>
+    fun getByDateRange(start: LocalDateTime, end: LocalDateTime): Flow<List<Expense>>
 
     @Query("SELECT * FROM expenses WHERE categoryId = :categoryId ORDER BY createdAt DESC")
-    suspend fun getByCategory(categoryId: Long): List<Expense>
+    fun getByCategory(categoryId: Long): Flow<List<Expense>>
 
     @Query("SELECT * FROM expenses WHERE categoryId = :categoryId AND createdAt >= :start AND createdAt <= :end ORDER BY createdAt DESC")
-    suspend fun getByCategoryAndDateRange(categoryId: Long, start: LocalDateTime, end: LocalDateTime): List<Expense>
+    fun getByCategoryAndDateRange(categoryId: Long, start: LocalDateTime, end: LocalDateTime): Flow<List<Expense>>
 
     @Query("SELECT SUM(amount) FROM expenses WHERE createdAt >= :start AND createdAt <= :end")
     suspend fun getTotalForPeriod(start: LocalDateTime, end: LocalDateTime): Double?
@@ -48,7 +49,7 @@ interface ExpenseDao {
     suspend fun getDailyTotals(start: LocalDateTime, end: LocalDateTime): List<Double>
 
     @Query("SELECT * FROM expenses WHERE createdAt >= :start ORDER BY createdAt DESC")
-    suspend fun getExpensesSince(start: LocalDateTime): List<Expense>
+    fun getExpensesSince(start: LocalDateTime): Flow<List<Expense>>
 
     @Query("DELETE FROM expenses")
     suspend fun deleteAll()

@@ -1,17 +1,19 @@
 package com.example.appgasto.ui.add
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.appgasto.R
 import com.example.appgasto.data.local.Category
 import com.example.appgasto.data.local.Expense
 import com.example.appgasto.data.repository.ExpenseRepository
 import com.example.appgasto.widget.ExpenseWidget
-import android.content.Context
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -24,6 +26,7 @@ data class AddEditUiState(
     val selectedCategoryId: Long? = null,
     val note: String = "",
     val date: LocalDate = LocalDate.now(),
+    val originalCreatedAt: LocalDateTime? = null,
     val isEditing: Boolean = false,
     val expenseId: Long? = null,
     val isLoading: Boolean = true,
@@ -35,8 +38,8 @@ data class AddEditUiState(
 
 @HiltViewModel
 class AddEditViewModel @Inject constructor(
-    private val expenseRepository: ExpenseRepository,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val expenseRepository: ExpenseRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddEditUiState())
@@ -44,7 +47,7 @@ class AddEditViewModel @Inject constructor(
 
     fun loadExpense(expenseId: Long?) {
         viewModelScope.launch {
-            val categories = expenseRepository.getAllCategories()
+            val categories = expenseRepository.getAllCategories().first()
             _uiState.value = _uiState.value.copy(categories = categories, isLoading = false)
 
             if (expenseId != null) {
@@ -58,6 +61,7 @@ class AddEditViewModel @Inject constructor(
                         selectedCategoryId = expense.categoryId,
                         note = expense.note ?: "",
                         date = expense.createdAt.toLocalDate(),
+                        originalCreatedAt = expense.createdAt,
                         isEditing = true,
                         expenseId = expense.id,
                         originalCreatedAt = expense.createdAt
@@ -87,22 +91,21 @@ class AddEditViewModel @Inject constructor(
         val state = _uiState.value
         val amount = state.amount.toDoubleOrNull()
         if (amount == null || amount <= 0) {
-            _uiState.value = state.copy(error = "Ingresa un monto válido")
+            _uiState.value = state.copy(error = context.getString(R.string.error_invalid_amount))
             return
         }
         if (state.selectedCategoryId == null) {
-            _uiState.value = state.copy(error = "Selecciona una categoría")
+            _uiState.value = state.copy(error = context.getString(R.string.error_select_category))
             return
         }
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSaving = true, error = null)
             try {
-                val createdAt = if (state.isEditing && state.originalCreatedAt != null) {
-                    state.originalCreatedAt
-                } else {
-                    LocalDateTime.of(state.date, LocalTime.now())
-                }
+                val createdAt = state.originalCreatedAt?.let { original ->
+                    LocalDateTime.of(state.date, original.toLocalTime())
+                } ?: LocalDateTime.of(state.date, LocalTime.now())
+
                 val expense = Expense(
                     id = state.expenseId ?: 0,
                     amount = amount,
@@ -115,12 +118,13 @@ class AddEditViewModel @Inject constructor(
                 } else {
                     expenseRepository.insertExpense(expense)
                 }
+                ExpenseWidget.updateAll(context)
                 _uiState.value = _uiState.value.copy(isSaving = false, isSaved = true)
                 ExpenseWidget.updateAll(context)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
-                    error = "Error al guardar: ${e.message}"
+                    error = context.getString(R.string.error_save_detail, e.message ?: "")
                 )
             }
         }

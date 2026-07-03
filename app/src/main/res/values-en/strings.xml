@@ -24,8 +24,10 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="export">Export</string>
-    <string name="import">Restore</string>
+    <string name="import_action">Restore</string>
     <string name="close">Close</string>
+    <string name="ok">OK</string>
+    <string name="save_changes">Save changes</string>
 
     <!-- Messages -->
     <string name="expense_saved">Expense saved</string>
@@ -35,8 +37,15 @@
     <string name="confirm_delete">Delete this expense?</string>
     <string name="confirm">Confirm</string>
     <string name="backup_success">Backup exported successfully</string>
+    <string name="import_success">Import completed</string>
+    <string name="import_error">Error importing</string>
+    <string name="export_success">Backup exported</string>
+    <string name="export_error">Error exporting</string>
     <string name="restore_success">Data restored successfully</string>
     <string name="error_save">Error saving expense</string>
+    <string name="error_invalid_amount">Enter a valid amount</string>
+    <string name="error_select_category">Select a category</string>
+    <string name="error_save_detail">Error saving: %1$s</string>
 
     <!-- Categories -->
     <string name="cat_food">Food</string>
@@ -49,6 +58,7 @@
 
     <!-- Summary -->
     <string name="total_today">Today\'s total</string>
+    <string name="today_expenses">Today\'s expenses</string>
     <string name="total_week">This week</string>
     <string name="total_month">This month</string>
     <string name="total">Total</string>
@@ -64,15 +74,24 @@
     <!-- Settings -->
     <string name="monthly_budget">Monthly budget</string>
     <string name="set_budget">Set budget</string>
+    <string name="set_budget_description">Set a monthly spending limit:</string>
+    <string name="budget_hint">Ex: 500</string>
+    <string name="change_amount">Change amount</string>
     <string name="budget_enabled">Enable budget</string>
+    <string name="budget_alert_title_80">Budget at 80%</string>
+    <string name="budget_channel_name">Budget alerts</string>
+    <string name="budget_channel_description">Notifications when you approach your budget limit</string>
     <string name="budget_alert_80">You\'ve reached 80% of your monthly budget</string>
+    <string name="budget_alert_title_100">Budget exhausted</string>
     <string name="budget_alert_100">You\'ve reached your monthly budget limit!</string>
     <string name="appearance">Appearance</string>
     <string name="theme">Theme</string>
     <string name="language">Language</string>
     <string name="backup">Backup</string>
     <string name="export_data">Export data</string>
+    <string name="export_description">Save a copy as JSON file</string>
     <string name="import_data">Restore data</string>
+    <string name="import_description">Import from a file</string>
     <string name="about">About</string>
 
     <!-- Theme -->

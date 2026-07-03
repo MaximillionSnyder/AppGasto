@@ -1,5 +1,7 @@
 package com.example.appgasto.ui.add
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,11 +9,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -21,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -36,11 +42,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.appgasto.R
 import com.example.appgasto.ui.components.CategorySelector
+import com.example.appgasto.ui.theme.GradientEnd
+import com.example.appgasto.ui.theme.GradientStart
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -78,7 +93,10 @@ fun AddEditScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(if (state.isEditing) "Editar Gasto" else "Agregar Gasto")
+                    Text(
+                        text = stringResource(if (state.isEditing) R.string.edit_title else R.string.add_title),
+                        style = MaterialTheme.typography.titleLarge
+                    )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
@@ -93,9 +111,9 @@ fun AddEditScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
         if (state.isLoading) {
-            androidx.compose.foundation.layout.Box(
+            Box(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = androidx.compose.ui.Alignment.Center
+                contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
             }
@@ -107,24 +125,64 @@ fun AddEditScreen(
                     .padding(horizontal = 16.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                OutlinedTextField(
-                    value = state.amount,
-                    onValueChange = viewModel::updateAmount,
-                    label = { Text("Monto") },
-                    placeholder = { Text("Ej: 25.50") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
-                )
+                Spacer(modifier = Modifier.height(8.dp))
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            brush = Brush.horizontalGradient(
+                                colors = listOf(GradientStart, GradientEnd)
+                            ),
+                            shape = RoundedCornerShape(20.dp)
+                        )
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = stringResource(R.string.amount),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = Color.White.copy(alpha = 0.8f)
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        OutlinedTextField(
+                            value = state.amount,
+                            onValueChange = viewModel::updateAmount,
+                            placeholder = {
+                                Text(
+                                    stringResource(R.string.amount_hint),
+                                    color = Color.White.copy(alpha = 0.5f),
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            textStyle = MaterialTheme.typography.displayMedium.copy(
+                                color = Color.White,
+                                textAlign = TextAlign.Center
+                            ),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color.White,
+                                unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                                cursorColor = Color.White,
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent
+                            )
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
 
                 Text(
-                    text = "Categoría",
-                    style = MaterialTheme.typography.labelLarge,
+                    text = stringResource(R.string.category),
+                    style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(10.dp))
                 CategorySelector(
                     categories = state.categories,
                     selectedCategoryId = state.selectedCategoryId,
@@ -132,24 +190,31 @@ fun AddEditScreen(
                     onCategorySelected = viewModel::updateCategory
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 OutlinedTextField(
                     value = state.note,
                     onValueChange = viewModel::updateNote,
-                    label = { Text("Nota") },
-                    placeholder = { Text("¿En qué gastaste?") },
+                    label = { Text(stringResource(R.string.note)) },
+                    placeholder = { Text(stringResource(R.string.note_hint)) },
                     modifier = Modifier.fillMaxWidth(),
-                    minLines = 2
+                    minLines = 2,
+                    shape = MaterialTheme.shapes.medium
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedButton(
                     onClick = { showDatePicker = true },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.medium
                 ) {
-                    Text("Fecha: ${state.date}")
+                    Icon(
+                        Icons.Default.CalendarMonth,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text("${stringResource(R.string.date)}: ${state.date}")
                 }
 
                 if (showDatePicker) {
@@ -171,12 +236,12 @@ fun AddEditScreen(
                                 }
                                 showDatePicker = false
                             }) {
-                                Text("OK")
+                                Text(stringResource(R.string.ok))
                             }
                         },
                         dismissButton = {
                             TextButton(onClick = { showDatePicker = false }) {
-                                Text("Cancelar")
+                                Text(stringResource(R.string.cancel))
                             }
                         }
                     ) {
@@ -184,20 +249,31 @@ fun AddEditScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(28.dp))
 
                 Button(
                     onClick = viewModel::save,
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = !state.isSaving
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    enabled = !state.isSaving,
+                    shape = MaterialTheme.shapes.medium,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
                 ) {
                     if (state.isSaving) {
                         CircularProgressIndicator(
                             modifier = Modifier.height(20.dp),
-                            strokeWidth = 2.dp
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     } else {
-                        Text(if (state.isEditing) "Guardar cambios" else "Guardar")
+                        Text(
+                            text = stringResource(if (state.isEditing) R.string.save_changes else R.string.save),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontSize = 16.sp
+                        )
                     }
                 }
 
