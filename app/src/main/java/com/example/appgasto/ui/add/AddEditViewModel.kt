@@ -29,7 +29,8 @@ data class AddEditUiState(
     val isLoading: Boolean = true,
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val originalCreatedAt: LocalDateTime? = null
 )
 
 @HiltViewModel
@@ -58,7 +59,8 @@ class AddEditViewModel @Inject constructor(
                         note = expense.note ?: "",
                         date = expense.createdAt.toLocalDate(),
                         isEditing = true,
-                        expenseId = expense.id
+                        expenseId = expense.id,
+                        originalCreatedAt = expense.createdAt
                     )
                 }
             }
@@ -96,12 +98,17 @@ class AddEditViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSaving = true, error = null)
             try {
+                val createdAt = if (state.isEditing && state.originalCreatedAt != null) {
+                    state.originalCreatedAt
+                } else {
+                    LocalDateTime.of(state.date, LocalTime.now())
+                }
                 val expense = Expense(
                     id = state.expenseId ?: 0,
                     amount = amount,
                     categoryId = state.selectedCategoryId!!,
                     note = state.note.ifBlank { null },
-                    createdAt = LocalDateTime.of(state.date, LocalTime.now())
+                    createdAt = createdAt
                 )
                 if (state.isEditing) {
                     expenseRepository.updateExpense(expense)
