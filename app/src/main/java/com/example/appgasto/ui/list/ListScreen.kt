@@ -49,6 +49,7 @@ import com.example.appgasto.ui.components.ExpenseItem
 @Composable
 fun ListScreen(
     isDark: Boolean,
+    isMatrix: Boolean = false,
     onNavigateToEdit: (Long) -> Unit,
     onNavigateBack: () -> Unit,
     viewModel: ListViewModel = hiltViewModel()
@@ -184,6 +185,7 @@ fun ListScreen(
                             expense = expense,
                             category = state.categories[expense.categoryId],
                             isDark = isDark,
+                            isMatrix = isMatrix,
                             onEdit = { onNavigateToEdit(expense.id) },
                             onDelete = { viewModel.deleteExpense(expense) }
                         )

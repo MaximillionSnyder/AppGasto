@@ -65,6 +65,7 @@ import java.time.ZoneId
 fun AddEditScreen(
     expenseId: Long?,
     isDark: Boolean,
+    isMatrix: Boolean = false,
     onNavigateBack: () -> Unit,
     viewModel: AddEditViewModel = hiltViewModel()
 ) {
@@ -187,6 +188,7 @@ fun AddEditScreen(
                     categories = state.categories,
                     selectedCategoryId = state.selectedCategoryId,
                     isDark = isDark,
+                    isMatrix = isMatrix,
                     onCategorySelected = viewModel::updateCategory
                 )
 

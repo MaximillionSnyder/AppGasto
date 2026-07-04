@@ -59,6 +59,7 @@ import com.example.appgasto.ui.theme.GradientTertiary
 @Composable
 fun HomeScreen(
     isDark: Boolean,
+    isMatrix: Boolean = false,
     onNavigateToAdd: () -> Unit,
     onNavigateToEdit: (Long) -> Unit,
     onNavigateToList: () -> Unit,
@@ -222,6 +223,7 @@ fun HomeScreen(
                             expense = expense,
                             category = state.categories[expense.categoryId],
                             isDark = isDark,
+                            isMatrix = isMatrix,
                             onEdit = { onNavigateToEdit(expense.id) },
                             onDelete = { viewModel.deleteExpense(expense) }
                         )

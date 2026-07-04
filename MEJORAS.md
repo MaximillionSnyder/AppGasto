@@ -41,9 +41,26 @@
 
 ---
 
+## Versión 3 — 2026-07-04
+
+### 3.1 Nuevo tema Matrix (Verde Neon Glow)
+- **Archivos:** `ThemeMode.kt`, `Color.kt`, `Theme.kt`, `CategoryColors.kt`, `ThemeSettingsDialog.kt`, `strings.xml`, `MainActivity.kt`, `AppNavigation.kt`, `HomeScreen.kt`, `ListScreen.kt`, `StatsScreen.kt`, `AddEditScreen.kt`, `ExpenseItem.kt`, `CategorySelector.kt`
+- **Problema:** Solo existían temas claro y oscuro, sin opciones estilizadas.
+- **Solución:** Agregado tema "Matrix" con paleta de verde neon sobre fondo negro:
+  - Primary: `#00FF41` (verde neon), Secondary: `#00E676`, Tertiary: `#00FFFF` (cian)
+  - Background: `#050A05` (negro puro), Surface: `#0A0F0A`
+  - Gradientes de verde oscuro a verde neon
+  - Colores de categorías en variantes neon para que destaquen sobre fondo oscuro
+  - Icono `Terminal` en el selector de temas
+  - El tema Matrix es siempre oscuro (`isDark = true`)
+  - Se propagó `isMatrix` a través de la navegación y componentes para colores de categoría
+
+---
+
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
 |:-------:|:-----:|:--------|
 | 1 | 2026-07-04 | Fix declarations, LetterSpacing, FilterChips overflow, README redesign |
 | 2 | 2026-07-04 | Tope de 4 decimales con soporte punto/coma |
+| 3 | 2026-07-04 | Nuevo tema Matrix (verde neon glow) |

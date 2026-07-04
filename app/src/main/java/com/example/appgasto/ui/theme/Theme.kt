@@ -63,6 +63,30 @@ private val DarkColorScheme = darkColorScheme(
     outline = DarkOutline
 )
 
+private val MatrixColorScheme = darkColorScheme(
+    primary = MatrixPrimary,
+    onPrimary = MatrixOnPrimary,
+    primaryContainer = MatrixPrimaryContainer,
+    onPrimaryContainer = MatrixOnPrimaryContainer,
+    secondary = MatrixSecondary,
+    onSecondary = MatrixOnSecondary,
+    secondaryContainer = MatrixSecondaryContainer,
+    onSecondaryContainer = MatrixOnSecondaryContainer,
+    tertiary = MatrixTertiary,
+    onTertiary = MatrixOnTertiary,
+    tertiaryContainer = MatrixTertiaryContainer,
+    onTertiaryContainer = MatrixOnTertiaryContainer,
+    surface = MatrixSurface,
+    onSurface = MatrixOnSurface,
+    background = MatrixBackground,
+    onBackground = MatrixOnBackground,
+    surfaceVariant = MatrixSurfaceVariant,
+    onSurfaceVariant = MatrixOnSurfaceVariant,
+    error = MatrixError,
+    onError = MatrixOnError,
+    outline = MatrixOutline
+)
+
 val AppShapes = Shapes(
     extraSmall = RoundedCornerShape(8.dp),
     small = RoundedCornerShape(12.dp),
@@ -80,9 +104,14 @@ fun AppGastoTheme(
         ThemeMode.LIGHT -> false
         ThemeMode.DARK -> true
         ThemeMode.SYSTEM -> isSystemInDarkTheme()
+        ThemeMode.MATRIX -> true
     }
 
-    val colorScheme = if (isDark) DarkColorScheme else LightColorScheme
+    val colorScheme = when (themeMode) {
+        ThemeMode.MATRIX -> MatrixColorScheme
+        ThemeMode.DARK, ThemeMode.SYSTEM -> if (isDark) DarkColorScheme else LightColorScheme
+        ThemeMode.LIGHT -> LightColorScheme
+    }
 
     val view = LocalView.current
     if (!view.isInEditMode) {

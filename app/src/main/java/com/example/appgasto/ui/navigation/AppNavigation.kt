@@ -28,7 +28,8 @@ object Routes {
 @Composable
 fun AppNavigation(
     navController: NavHostController,
-    isDark: Boolean
+    isDark: Boolean,
+    isMatrix: Boolean = false
 ) {
     NavHost(
         navController = navController,
@@ -37,6 +38,7 @@ fun AppNavigation(
         composable(Routes.HOME) {
             HomeScreen(
                 isDark = isDark,
+                isMatrix = isMatrix,
                 onNavigateToAdd = { navController.navigate(Routes.addExpense()) },
                 onNavigateToEdit = { expenseId -> navController.navigate(Routes.editExpense(expenseId)) },
                 onNavigateToList = { navController.navigate(Routes.LIST) },
@@ -58,6 +60,7 @@ fun AppNavigation(
             AddEditScreen(
                 expenseId = if (expenseId == -1L) null else expenseId,
                 isDark = isDark,
+                isMatrix = isMatrix,
                 onNavigateBack = { navController.popBackStack() }
             )
         }
@@ -65,6 +68,7 @@ fun AppNavigation(
         composable(Routes.LIST) {
             ListScreen(
                 isDark = isDark,
+                isMatrix = isMatrix,
                 onNavigateToEdit = { expenseId -> navController.navigate(Routes.editExpense(expenseId)) },
                 onNavigateBack = { navController.popBackStack() }
             )
@@ -73,6 +77,7 @@ fun AppNavigation(
         composable(Routes.STATS) {
             StatsScreen(
                 isDark = isDark,
+                isMatrix = isMatrix,
                 onNavigateBack = { navController.popBackStack() }
             )
         }

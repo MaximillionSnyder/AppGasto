@@ -56,12 +56,13 @@ fun ExpenseItem(
     expense: Expense,
     category: Category?,
     isDark: Boolean,
+    isMatrix: Boolean = false,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val catColor = category?.let {
-        CategoryColors.getById(category.id, isDark)
+        CategoryColors.getById(category.id, isDark, isMatrix)
     } ?: Color.Gray
 
     Surface(

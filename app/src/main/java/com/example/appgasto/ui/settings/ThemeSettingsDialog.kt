@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.SettingsBrightness
+import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -69,6 +70,13 @@ fun ThemeSettingsDialog(
                     label = stringResource(R.string.theme_system),
                     isSelected = currentTheme == ThemeMode.SYSTEM,
                     onClick = { onSelect(ThemeMode.SYSTEM) }
+                )
+                ThemeOption(
+                    icon = Icons.Default.Terminal,
+                    iconColor = Color(0xFF00FF41),
+                    label = stringResource(R.string.theme_matrix),
+                    isSelected = currentTheme == ThemeMode.MATRIX,
+                    onClick = { onSelect(ThemeMode.MATRIX) }
                 )
             }
         },

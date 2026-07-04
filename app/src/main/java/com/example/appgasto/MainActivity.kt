@@ -38,8 +38,11 @@ class MainActivity : AppCompatActivity() {
             val isDark = when (preferences?.themeMode) {
                 ThemeMode.LIGHT -> false
                 ThemeMode.DARK -> true
+                ThemeMode.MATRIX -> true
                 else -> isSystemInDarkTheme()
             }
+
+            val isMatrix = preferences?.themeMode == ThemeMode.MATRIX
 
             AppGastoTheme(
                 themeMode = preferences?.themeMode ?: ThemeMode.SYSTEM
@@ -51,7 +54,8 @@ class MainActivity : AppCompatActivity() {
                     val navController = rememberNavController()
                     AppNavigation(
                         navController = navController,
-                        isDark = isDark
+                        isDark = isDark,
+                        isMatrix = isMatrix
                     )
                 }
             }

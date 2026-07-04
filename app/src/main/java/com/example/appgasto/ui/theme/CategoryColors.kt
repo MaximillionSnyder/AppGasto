@@ -19,8 +19,20 @@ object CategoryColors {
     val clothingDark = Color(0xFFFFD740)
     val otherDark = Color(0xFFB0BEC5)
 
-    fun getById(categoryId: Long, isDark: Boolean = false): Color {
-        val colors = if (isDark) darkMap() else map()
+    val foodMatrix = Color(0xFFFF6D00)
+    val transportMatrix = Color(0xFF448AFF)
+    val leisureMatrix = Color(0xFFD500F9)
+    val homeMatrix = Color(0xFF00E676)
+    val healthMatrix = Color(0xFFFF1744)
+    val clothingMatrix = Color(0xFFFFD740)
+    val otherMatrix = Color(0xFF90A4AE)
+
+    fun getById(categoryId: Long, isDark: Boolean = false, isMatrix: Boolean = false): Color {
+        val colors = when {
+            isMatrix -> matrixMap()
+            isDark -> darkMap()
+            else -> map()
+        }
         return colors[categoryId] ?: other
     }
 
@@ -42,5 +54,15 @@ object CategoryColors {
         5L to healthDark,
         6L to clothingDark,
         7L to otherDark
+    )
+
+    private fun matrixMap() = mapOf(
+        1L to foodMatrix,
+        2L to transportMatrix,
+        3L to leisureMatrix,
+        4L to homeMatrix,
+        5L to healthMatrix,
+        6L to clothingMatrix,
+        7L to otherMatrix
     )
 }

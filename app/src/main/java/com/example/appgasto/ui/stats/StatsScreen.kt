@@ -58,6 +58,7 @@ import com.example.appgasto.ui.theme.GradientStart
 @Composable
 fun StatsScreen(
     isDark: Boolean,
+    isMatrix: Boolean = false,
     onNavigateBack: () -> Unit,
     viewModel: StatsViewModel = hiltViewModel()
 ) {
@@ -185,7 +186,7 @@ fun StatsScreen(
                             DonutChart(
                                 categoryTotals = state.categoryTotals.map { catTotal ->
                                     DonutSlice(
-                                        color = CategoryColors.getById(catTotal.category.id, isDark),
+                                        color = CategoryColors.getById(catTotal.category.id, isDark, isMatrix),
                                         percentage = (catTotal.total / state.totalExpenses * 100).toFloat()
                                     )
                                 },
@@ -195,7 +196,7 @@ fun StatsScreen(
                             Spacer(modifier = Modifier.height(20.dp))
 
                             state.categoryTotals.forEach { catTotal ->
-                                val catColor = CategoryColors.getById(catTotal.category.id, isDark)
+                                val catColor = CategoryColors.getById(catTotal.category.id, isDark, isMatrix)
                                 val percentage = if (state.totalExpenses > 0)
                                     (catTotal.total / state.totalExpenses * 100).toFloat() else 0f
 

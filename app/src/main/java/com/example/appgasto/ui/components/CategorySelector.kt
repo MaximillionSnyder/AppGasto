@@ -58,6 +58,7 @@ fun CategorySelector(
     categories: List<Category>,
     selectedCategoryId: Long?,
     isDark: Boolean,
+    isMatrix: Boolean = false,
     onCategorySelected: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -68,7 +69,7 @@ fun CategorySelector(
     ) {
         categories.forEach { category ->
             val isSelected = category.id == selectedCategoryId
-            val catColor = CategoryColors.getById(category.id, isDark)
+            val catColor = CategoryColors.getById(category.id, isDark, isMatrix)
 
             val containerColor by animateColorAsState(
                 targetValue = if (isSelected) catColor.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
