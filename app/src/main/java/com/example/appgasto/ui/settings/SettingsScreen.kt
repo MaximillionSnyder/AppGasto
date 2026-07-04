@@ -211,6 +211,7 @@ fun SettingsScreen(
                         com.example.appgasto.domain.model.ThemeMode.LIGHT -> stringResource(R.string.theme_light)
                         com.example.appgasto.domain.model.ThemeMode.DARK -> stringResource(R.string.theme_dark)
                         com.example.appgasto.domain.model.ThemeMode.SYSTEM -> stringResource(R.string.theme_system)
+                        com.example.appgasto.domain.model.ThemeMode.MATRIX -> stringResource(R.string.theme_matrix)
                     },
                     onClick = { showThemeDialog = true }
                 )
