@@ -53,7 +53,13 @@ fun BudgetDialog(
                 Spacer(modifier = Modifier.height(16.dp))
                 OutlinedTextField(
                     value = budgetText,
-                    onValueChange = { budgetText = it },
+                    onValueChange = { input ->
+                        val normalized = input.replace(',', '.')
+                        if (normalized.count { it == '.' } > 1) return@OutlinedTextField
+                        val parts = normalized.split('.')
+                        if (parts.size == 2 && parts[1].length > 4) return@OutlinedTextField
+                        budgetText = normalized
+                    },
                     label = { Text(stringResource(R.string.amount)) },
                     placeholder = { Text(stringResource(R.string.budget_hint)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),

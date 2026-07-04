@@ -70,7 +70,11 @@ class AddEditViewModel @Inject constructor(
     }
 
     fun updateAmount(amount: String) {
-        _uiState.value = _uiState.value.copy(amount = amount)
+        val normalized = amount.replace(',', '.')
+        if (normalized.count { it == '.' } > 1) return
+        val parts = normalized.split('.')
+        if (parts.size == 2 && parts[1].length > 4) return
+        _uiState.value = _uiState.value.copy(amount = normalized)
     }
 
     fun updateCategory(categoryId: Long) {
