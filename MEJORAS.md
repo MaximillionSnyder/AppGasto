@@ -28,8 +28,22 @@
 
 ---
 
+## Versión 2 — 2026-07-04
+
+### 2.1 Mejora: Tope de 4 decimales en campo de monto
+- **Archivos:** `AddEditViewModel.kt`, `BudgetDialog.kt`
+- **Problema:** El campo de monto no tenía límite de decimales y las comas no se convertían a puntos, causando errores al guardar.
+- **Solución:** `updateAmount()` y `onValueChange` del BudgetDialog ahora:
+  - Normalizan comas a puntos automáticamente
+  - Rechazan múltiples puntos
+  - Limitan la entrada a máximo 4 decimales
+  - Validación silenciosa en tiempo real (sin mensajes de error)
+
+---
+
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
 |:-------:|:-----:|:--------|
 | 1 | 2026-07-04 | Fix declarations, LetterSpacing, FilterChips overflow, README redesign |
+| 2 | 2026-07-04 | Tope de 4 decimales con soporte punto/coma |
