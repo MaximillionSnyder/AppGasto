@@ -32,8 +32,7 @@ data class AddEditUiState(
     val isLoading: Boolean = true,
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
-    val error: String? = null,
-    val originalCreatedAt: LocalDateTime? = null
+    val error: String? = null
 )
 
 @HiltViewModel
@@ -63,8 +62,7 @@ class AddEditViewModel @Inject constructor(
                         date = expense.createdAt.toLocalDate(),
                         originalCreatedAt = expense.createdAt,
                         isEditing = true,
-                        expenseId = expense.id,
-                        originalCreatedAt = expense.createdAt
+                        expenseId = expense.id
                     )
                 }
             }
