@@ -51,22 +51,40 @@
   - Botón manual "Actualizar tasas" en Settings
 - **Modelo (`Expense.kt`):**
   - `[ ]` Nuevo campo `currency: String` (código ISO 4217, default `"PEN"`)
-  - `[ ]` Nuevo campo `amountInPEN: Double?` (convertido automáticamente al guardar)
-  - `[ ]` Migración Room: `ALTER TABLE expenses ADD COLUMN currency TEXT NOT NULL DEFAULT 'PEN'`
+  - `[ ]` Nuevo campo `amountInPEN: Double` (convertido automáticamente al guardar)
+  - `[ ]` Nuevo campo `exchangeRateUsed: Double` (tasa usada al momento de guardar)
+  - `[ ]` **REGLA:** `amountInPEN` e `exchangeRateUsed` son **INMUTABLES** una vez guardados. Tasas futuras NO afectan gastos pasados.
+  - `[ ]` Migración Room v1→v2:
+    ```sql
+    ALTER TABLE expenses ADD COLUMN currency TEXT NOT NULL DEFAULT 'PEN';
+    ALTER TABLE expenses ADD COLUMN amountInPEN REAL NOT NULL DEFAULT 0;
+    ALTER TABLE expenses ADD COLUMN exchangeRateUsed REAL NOT NULL DEFAULT 1.0;
+    ```
 - **Conversión:**
   - `[ ]` `ExchangeRateApi.kt` — Retrofit a `pen.json` del CDN
   - `[ ]` `ExchangeRateEntity.kt` + `ExchangeRateDao.kt` — cache local
   - `[ ]` `ExchangeRateRepository.kt` — lógica de refresh (24h) + fetch
   - `[ ]` `CurrencyConverter.kt` — convierte cualquier monto a PEN usando rates cacheados
   - `[ ]` `CurrencyModule.kt` — Hilt module para proveer servicios
+  - **REGLA CRÍTICA:** Al guardar un gasto, se calcula `amountInPEN = amount * currentRate` y `exchangeRateUsed = currentRate`. Ambos campos se guardan y **NUNCA se recalculan** posteriormente. Tasas futuras NO afectan gastos históricos.
 - **UI:**
-  - `[ ]` `AddEditScreen.kt` — dropdown selector de moneda al lado del monto
+  - `[ ]` `AddEditScreen.kt` — dropdown selector de moneda al lado del monto + campo monto original
   - `[ ]` `ExpenseItem.kt` — mostrar símbolo de moneda (ej: `$100.00`, `¥10,000`)
   - `[ ]` `HomeScreen.kt` — total del mes convertido a PEN + desglose por moneda
   - `[ ]` `StatsScreen.kt` — montos con moneda y total convertido
   - `[ ]` `SettingsScreen.kt` — botón "Actualizar tasas" + timestamp última actualización
+- **Queries DAO actualizadas (CRÍTICO):**
+  - `[ ]` `getTotalForPeriod()` — `SUM(amountInPEN)` en lugar de `SUM(amount)`
+  - `[ ]` `getTotalSince()` — `SUM(amountInPEN)` en lugar de `SUM(amount)`
+  - `[ ]` `getTotalByCategorySince()` — `SUM(amountInPEN)` en lugar de `SUM(amount)`
+  - `[ ]` Nueva query: `getTotalByCurrencySince()` para desglose por moneda
 - **Presupuesto:**
   - `[ ]` Compara contra `amountInPEN` de TODOS los gastos (incluye convertidos)
+- **Migración de Backups:**
+  - `[ ]` `BackupData.version` se incrementa a `2`
+  - `[ ]` Al importar backup v1 (sin currency/amountInPEN): asignar currency="PEN", amountInPEN=amount, exchangeRateUsed=1.0
+  - `[ ]` Al importar backup v2 (con campos): validar y insertar directamente
+  - `[ ]` No exportar ExchangeRateEntity (se reconstruye con refresh)
 - **Archivos a crear:**
   - `data/currency/ExchangeRateApi.kt`
   - `data/currency/ExchangeRateRepository.kt`
@@ -75,15 +93,31 @@
   - `data/local/ExchangeRateDao.kt`
   - `di/CurrencyModule.kt`
 - **Archivos a modificar:**
-  - `data/local/Expense.kt` — +currency, +amountInPEN
-  - `data/local/ExpenseDao.kt` — queries actualizadas
-  - `data/local/AppDatabase.kt` — +ExchangeRateEntity, +migration
-  - `data/backup/BackupManager.kt` — exportar currency y amountInPEN
+  - `data/local/Expense.kt` — +currency, +amountInPEN, +exchangeRateUsed
+  - `data/local/ExpenseDao.kt` — queries SUM(amount) → SUM(amountInPEN)
+  - `data/local/AppDatabase.kt` — +ExchangeRateEntity, +migration v1→v2, +exchangeRateDao(), exportSchema=true
+  - `data/repository/ExpenseRepository.kt` — métodos de totales usan amountInPEN
+  - `data/backup/BackupManager.kt` — exportar currency, amountInPEN, exchangeRateUsed + versionar backup a v2
   - `di/DatabaseModule.kt` — +ExchangeRateDao
-  - `ui/*/...` — todas las pantallas que muestran montos
+  - `ui/add/AddEditScreen.kt` — dropdown selector de moneda
+  - `ui/add/AddEditViewModel.kt` — +currency state, +conversión
+  - `ui/home/HomeScreen.kt` — total mes en PEN + desglose por moneda
+  - `ui/home/HomeViewModel.kt` — usa amountInPEN
+  - `ui/stats/StatsScreen.kt` — montos con moneda
+  - `ui/stats/StatsViewModel.kt` — usa amountInPEN (línea 74 hardcodeada)
+  - `ui/components/ExpenseItem.kt` — símbolo de moneda
+  - `ui/settings/SettingsScreen.kt` — botón "Actualizar tasas"
+  - `ui/settings/SettingsViewModel.kt` — +ExchangeRateRepository
+  - `notifications/BudgetWorker.kt` — compara contra amountInPEN
+  - `widget/ExpenseWidget.kt` — usa amountInPEN
   - `app/build.gradle.kts` — +Retrofit +OkHttp
   - `gradle/libs.versions.toml` — +retrofit +okhttp
-  - `app/src/main/AndroidManifest.xml` — +INTERNET (WorkManager)
+  - `app/src/main/AndroidManifest.xml` — +INTERNET
+- **Archivos NO mencionados en el plan (AGREGADOS):**
+  - `widget/ExpenseWidget.kt` — usa SUM(amount), debe cambiar a SUM(amountInPEN)
+  - `notifications/BudgetWorker.kt` — compara contra SUM(amount), debe usar SUM(amountInPEN)
+  - `ui/stats/StatsViewModel.kt` — suma it.amount en memoria, debe usar amountInPEN
+  - `data/repository/ExpenseRepository.kt` — 6 métodos que retornan totales usando SUM(amount)
 
 ### 2.2 Receipt Scanning — Integración con multi-moneda
 
