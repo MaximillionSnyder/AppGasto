@@ -22,7 +22,7 @@
 - **Qué NO incluir (V1):**
   - `[x]` Items/líneas del recibo — descartado por complejidad de layouts variables
   - `[x]` Guardar imagen del recibo — descartado por impacto en almacenamiento, backup y migración DB
-  - `[x]` Multi-moneda en totales/sumas — la UI principal sigue en S/. por ahora
+  - `[x]` Multi-moneda en totales — pospuesto a V2
 - **Archivos a modificar/crear:**
   - `gradle/libs.versions.toml` — agregar versiones de dependencias ML Kit
   - `app/build.gradle.kts` — agregar dependencias
@@ -37,8 +37,67 @@
 
 ---
 
+## Versión 2 — 2026-07-05
+
+### 2.1 Multi-moneda con tasas de cambio
+
+- **Estado:** `[ ]` Pendiente
+- **Objetivo:** Soportar múltiples monedas en los gastos (USD, JPY, EUR, etc.) con conversión automática a PEN usando tasas de cambio en tiempo real.
+- **API de tasas:** `fawazahmed0/currency-api` — gratis, sin API key, sin rate limits, 200+ monedas, actualizado diario, servido por CDN jsDelivr
+- **Stack técnico:**
+  - Retrofit + OkHttp para llamar a la API
+  - Room para cachear tasas localmente (`ExchangeRateEntity`)
+  - WorkManager para refrescar tasas cada 24h automáticamente
+  - Botón manual "Actualizar tasas" en Settings
+- **Modelo (`Expense.kt`):**
+  - `[ ]` Nuevo campo `currency: String` (código ISO 4217, default `"PEN"`)
+  - `[ ]` Nuevo campo `amountInPEN: Double?` (convertido automáticamente al guardar)
+  - `[ ]` Migración Room: `ALTER TABLE expenses ADD COLUMN currency TEXT NOT NULL DEFAULT 'PEN'`
+- **Conversión:**
+  - `[ ]` `ExchangeRateApi.kt` — Retrofit a `pen.json` del CDN
+  - `[ ]` `ExchangeRateEntity.kt` + `ExchangeRateDao.kt` — cache local
+  - `[ ]` `ExchangeRateRepository.kt` — lógica de refresh (24h) + fetch
+  - `[ ]` `CurrencyConverter.kt` — convierte cualquier monto a PEN usando rates cacheados
+  - `[ ]` `CurrencyModule.kt` — Hilt module para proveer servicios
+- **UI:**
+  - `[ ]` `AddEditScreen.kt` — dropdown selector de moneda al lado del monto
+  - `[ ]` `ExpenseItem.kt` — mostrar símbolo de moneda (ej: `$100.00`, `¥10,000`)
+  - `[ ]` `HomeScreen.kt` — total del mes convertido a PEN + desglose por moneda
+  - `[ ]` `StatsScreen.kt` — montos con moneda y total convertido
+  - `[ ]` `SettingsScreen.kt` — botón "Actualizar tasas" + timestamp última actualización
+- **Presupuesto:**
+  - `[ ]` Compara contra `amountInPEN` de TODOS los gastos (incluye convertidos)
+- **Archivos a crear:**
+  - `data/currency/ExchangeRateApi.kt`
+  - `data/currency/ExchangeRateRepository.kt`
+  - `data/currency/CurrencyConverter.kt`
+  - `data/local/ExchangeRateEntity.kt`
+  - `data/local/ExchangeRateDao.kt`
+  - `di/CurrencyModule.kt`
+- **Archivos a modificar:**
+  - `data/local/Expense.kt` — +currency, +amountInPEN
+  - `data/local/ExpenseDao.kt` — queries actualizadas
+  - `data/local/AppDatabase.kt` — +ExchangeRateEntity, +migration
+  - `data/backup/BackupManager.kt` — exportar currency y amountInPEN
+  - `di/DatabaseModule.kt` — +ExchangeRateDao
+  - `ui/*/...` — todas las pantallas que muestran montos
+  - `app/build.gradle.kts` — +Retrofit +OkHttp
+  - `gradle/libs.versions.toml` — +retrofit +okhttp
+  - `app/src/main/AndroidManifest.xml` — +INTERNET (WorkManager)
+
+### 2.2 Receipt Scanning — Integración con multi-moneda
+
+- **Estado:** `[ ]` Pendiente (depende de 2.1)
+- **Objetivo:** El parser del receipt scanner detecta la moneda del recibo y auto-selecciona en el dropdown de moneda.
+- **Cambios:**
+  - El parser reconoce símbolos: `S/.` → PEN, `$` → USD, `€` → EUR, `¥` → JPY, `£` → GBP, `R$` → BRL
+  - Auto-llena el campo moneda en AddEditScreen según lo detectado
+
+---
+
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
 |:-------:|:-----:|:--------|
 | 1 | 2026-07-05 | Receipt Scanning con ML Kit Document Scanner + Text Recognition + Parser |
+| 2 | 2026-07-05 | Multi-moneda con tasas de cambio + Receipt Scanning multi-moneda |
