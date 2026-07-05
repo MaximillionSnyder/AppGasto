@@ -21,8 +21,6 @@ object Routes {
 
     fun addExpense(expenseId: Long? = null) =
         if (expenseId != null) "add?expenseId=$expenseId" else "add"
-
-    fun editExpense(expenseId: Long) = "add?expenseId=$expenseId"
 }
 
 @Composable
@@ -40,7 +38,7 @@ fun AppNavigation(
                 isDark = isDark,
                 isMatrix = isMatrix,
                 onNavigateToAdd = { navController.navigate(Routes.addExpense()) },
-                onNavigateToEdit = { expenseId -> navController.navigate(Routes.editExpense(expenseId)) },
+                onNavigateToEdit = { expenseId -> navController.navigate(Routes.addExpense(expenseId)) },
                 onNavigateToList = { navController.navigate(Routes.LIST) },
                 onNavigateToStats = { navController.navigate(Routes.STATS) },
                 onNavigateToSettings = { navController.navigate(Routes.SETTINGS) }
@@ -69,7 +67,7 @@ fun AppNavigation(
             ListScreen(
                 isDark = isDark,
                 isMatrix = isMatrix,
-                onNavigateToEdit = { expenseId -> navController.navigate(Routes.editExpense(expenseId)) },
+                onNavigateToEdit = { expenseId -> navController.navigate(Routes.addExpense(expenseId)) },
                 onNavigateBack = { navController.popBackStack() }
             )
         }

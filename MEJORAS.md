@@ -58,6 +58,20 @@
 
 ---
 
+## Versión 4 — 2026-07-05
+
+### 4.1 Limpieza de código muerto
+- **Archivos:** `LocaleHelper.kt`, `AppModule.kt`, `ExpenseDao.kt`, `CategoryDao.kt`, `AppNavigation.kt`
+- **Problema:** Varios archivos, métodos y funciones no se usaban en ningún lado, aumentando el mantenimiento sin beneficio.
+- **Solución:**
+  - Eliminado `LocaleHelper.kt` (código muerto, el cambio de idioma se hace inline en `SettingsViewModel`)
+  - Eliminado `AppModule.kt` (módulo Hilt vacío sin `@Provides`)
+  - Eliminados 4 métodos no usados de `ExpenseDao` (`getByCategory`, `getByCategoryAndDateRange`, `getDailyTotals`, `getExpensesSince`)
+  - Eliminados 2 métodos no usados de `CategoryDao` (`update`, `delete`)
+  - Eliminada función duplicada `Routes.editExpense()`, consolidada en `Routes.addExpense()`
+
+---
+
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
@@ -65,3 +79,4 @@
 | 1 | 2026-07-04 | Fix declarations, LetterSpacing, FilterChips overflow, README redesign |
 | 2 | 2026-07-04 | Tope de 4 decimales con soporte punto/coma |
 | 3 | 2026-07-04 | Nuevo tema Matrix (verde neon glow) |
+| 4 | 2026-07-05 | Limpieza de código muerto (LocaleHelper, AppModule, DAOs, Routes) |

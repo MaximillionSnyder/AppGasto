@@ -30,12 +30,6 @@ interface ExpenseDao {
     @Query("SELECT * FROM expenses WHERE createdAt >= :start AND createdAt <= :end ORDER BY createdAt DESC")
     fun getByDateRange(start: LocalDateTime, end: LocalDateTime): Flow<List<Expense>>
 
-    @Query("SELECT * FROM expenses WHERE categoryId = :categoryId ORDER BY createdAt DESC")
-    fun getByCategory(categoryId: Long): Flow<List<Expense>>
-
-    @Query("SELECT * FROM expenses WHERE categoryId = :categoryId AND createdAt >= :start AND createdAt <= :end ORDER BY createdAt DESC")
-    fun getByCategoryAndDateRange(categoryId: Long, start: LocalDateTime, end: LocalDateTime): Flow<List<Expense>>
-
     @Query("SELECT SUM(amount) FROM expenses WHERE createdAt >= :start AND createdAt <= :end")
     suspend fun getTotalForPeriod(start: LocalDateTime, end: LocalDateTime): Double?
 
@@ -44,12 +38,6 @@ interface ExpenseDao {
 
     @Query("SELECT SUM(amount) FROM expenses WHERE createdAt >= :start AND categoryId = :categoryId")
     suspend fun getTotalByCategorySince(categoryId: Long, start: LocalDateTime): Double?
-
-    @Query("SELECT CAST(SUM(amount) AS REAL) FROM expenses WHERE createdAt >= :start AND createdAt <= :end GROUP BY CAST(createdAt AS DATE) ORDER BY createdAt")
-    suspend fun getDailyTotals(start: LocalDateTime, end: LocalDateTime): List<Double>
-
-    @Query("SELECT * FROM expenses WHERE createdAt >= :start ORDER BY createdAt DESC")
-    fun getExpensesSince(start: LocalDateTime): Flow<List<Expense>>
 
     @Query("DELETE FROM expenses")
     suspend fun deleteAll()
