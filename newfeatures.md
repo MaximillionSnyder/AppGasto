@@ -41,7 +41,7 @@
 
 ### 2.1 Multi-moneda con tasas de cambio
 
-- **Estado:** `[ ]` Pendiente
+- **Estado:** `[x]` Implementado
 - **Objetivo:** Soportar múltiples monedas en los gastos (USD, JPY, EUR, etc.) con conversión automática a PEN usando tasas de cambio en tiempo real.
 - **API de tasas:** `fawazahmed0/currency-api` — gratis, sin API key, sin rate limits, 200+ monedas, actualizado diario, servido por CDN jsDelivr
 - **Stack técnico:**
@@ -50,41 +50,42 @@
   - WorkManager para refrescar tasas cada 24h automáticamente
   - Botón manual "Actualizar tasas" en Settings
 - **Modelo (`Expense.kt`):**
-  - `[ ]` Nuevo campo `currency: String` (código ISO 4217, default `"PEN"`)
-  - `[ ]` Nuevo campo `amountInPEN: Double` (convertido automáticamente al guardar)
-  - `[ ]` Nuevo campo `exchangeRateUsed: Double` (tasa usada al momento de guardar)
-  - `[ ]` **REGLA:** `amountInPEN` e `exchangeRateUsed` son **INMUTABLES** una vez guardados. Tasas futuras NO afectan gastos pasados.
-  - `[ ]` Migración Room v1→v2:
+  - `[x]` Nuevo campo `currency: String` (código ISO 4217, default `"PEN"`)
+  - `[x]` Nuevo campo `amountInPEN: Double` (convertido automáticamente al guardar)
+  - `[x]` Nuevo campo `exchangeRateUsed: Double` (tasa usada al momento de guardar)
+  - `[x]` **REGLA:** `amountInPEN` e `exchangeRateUsed` son **INMUTABLES** una vez guardados. Tasas futuras NO afectan gastos pasados.
+  - `[x]` Migración Room v1→v2:
     ```sql
     ALTER TABLE expenses ADD COLUMN currency TEXT NOT NULL DEFAULT 'PEN';
     ALTER TABLE expenses ADD COLUMN amountInPEN REAL NOT NULL DEFAULT 0;
     ALTER TABLE expenses ADD COLUMN exchangeRateUsed REAL NOT NULL DEFAULT 1.0;
     ```
 - **Conversión:**
-  - `[ ]` `ExchangeRateApi.kt` — Retrofit a `pen.json` del CDN
-  - `[ ]` `ExchangeRateEntity.kt` + `ExchangeRateDao.kt` — cache local
-  - `[ ]` `ExchangeRateRepository.kt` — lógica de refresh (24h) + fetch
-  - `[ ]` `CurrencyConverter.kt` — convierte cualquier monto a PEN usando rates cacheados
-  - `[ ]` `CurrencyModule.kt` — Hilt module para proveer servicios
-  - **REGLA CRÍTICA:** Al guardar un gasto, se calcula `amountInPEN = amount * currentRate` y `exchangeRateUsed = currentRate`. Ambos campos se guardan y **NUNCA se recalculan** posteriormente. Tasas futuras NO afectan gastos históricos.
+  - `[x]` `ExchangeRateApi.kt` — Retrofit a `pen.json` del CDN
+  - `[x]` `ExchangeRateEntity.kt` + `ExchangeRateDao.kt` — cache local
+  - `[x]` `ExchangeRateRepository.kt` — lógica de refresh (24h) + fetch
+  - `[x]` `CurrencyConverter.kt` — convierte cualquier monto a PEN usando rates cacheados
+  - `[x]` `CurrencyModule.kt` — Hilt module para proveer servicios
+  - `[x]` `ExchangeRateWorker.kt` — WorkManager para refrescar tasas cada 24h
+  - **REGLA CRÍTICA:** Al guardar un gasto, se calcula `amountInPEN = amount / currentRate` (donde `currentRate` es "1 PEN = X [moneda]" devuelto por la API) y `exchangeRateUsed = currentRate`. Ambos campos se guardan y **NUNCA se recalculan** posteriormente. Tasas futuras NO afectan gastos históricos.
 - **UI:**
-  - `[ ]` `AddEditScreen.kt` — dropdown selector de moneda al lado del monto + campo monto original
-  - `[ ]` `ExpenseItem.kt` — mostrar símbolo de moneda (ej: `$100.00`, `¥10,000`)
-  - `[ ]` `HomeScreen.kt` — total del mes convertido a PEN + desglose por moneda
-  - `[ ]` `StatsScreen.kt` — montos con moneda y total convertido
-  - `[ ]` `SettingsScreen.kt` — botón "Actualizar tasas" + timestamp última actualización
+  - `[x]` `AddEditScreen.kt` — dropdown selector de moneda al lado del monto + campo monto original
+  - `[x]` `ExpenseItem.kt` — mostrar símbolo de moneda (ej: `$100.00`, `¥10,000`)
+  - `[x]` `HomeScreen.kt` — total del mes convertido a PEN + desglose por moneda
+  - `[x]` `StatsScreen.kt` — montos con moneda y total convertido
+  - `[x]` `SettingsScreen.kt` — botón "Actualizar tasas" + timestamp última actualización
 - **Queries DAO actualizadas (CRÍTICO):**
-  - `[ ]` `getTotalForPeriod()` — `SUM(amountInPEN)` en lugar de `SUM(amount)`
-  - `[ ]` `getTotalSince()` — `SUM(amountInPEN)` en lugar de `SUM(amount)`
-  - `[ ]` `getTotalByCategorySince()` — `SUM(amountInPEN)` en lugar de `SUM(amount)`
-  - `[ ]` Nueva query: `getTotalByCurrencySince()` para desglose por moneda
+  - `[x]` `getTotalForPeriod()` — `SUM(amountInPEN)` en lugar de `SUM(amount)`
+  - `[x]` `getTotalSince()` — `SUM(amountInPEN)` en lugar de `SUM(amount)`
+  - `[x]` `getTotalByCategorySince()` — `SUM(amountInPEN)` en lugar de `SUM(amount)`
+  - `[x]` Nueva query: `getTotalByCurrencySince()` para desglose por moneda
 - **Presupuesto:**
-  - `[ ]` Compara contra `amountInPEN` de TODOS los gastos (incluye convertidos)
+  - `[x]` Compara contra `amountInPEN` de TODOS los gastos (incluye convertidos)
 - **Migración de Backups:**
-  - `[ ]` `BackupData.version` se incrementa a `2`
-  - `[ ]` Al importar backup v1 (sin currency/amountInPEN): asignar currency="PEN", amountInPEN=amount, exchangeRateUsed=1.0
-  - `[ ]` Al importar backup v2 (con campos): validar y insertar directamente
-  - `[ ]` No exportar ExchangeRateEntity (se reconstruye con refresh)
+  - `[x]` `BackupData.version` se incrementa a `2`
+  - `[x]` Al importar backup v1 (sin currency/amountInPEN): asignar currency="PEN", amountInPEN=amount, exchangeRateUsed=1.0
+  - `[x]` Al importar backup v2 (con campos): validar y insertar directamente
+  - `[x]` No exportar ExchangeRateEntity (se reconstruye con refresh)
 - **Archivos a crear:**
   - `data/currency/ExchangeRateApi.kt`
   - `data/currency/ExchangeRateRepository.kt`

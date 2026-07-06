@@ -25,9 +25,12 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.CloudDownload
+import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -238,6 +241,63 @@ fun SettingsScreen(
                     },
                     onClick = { showLanguageDialog = true }
                 )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            SettingsSection(
+                title = stringResource(R.string.currency),
+                icon = Icons.Default.CurrencyExchange,
+                iconColor = MaterialTheme.colorScheme.primary
+            ) {
+                Column {
+                    Text(
+                        text = stringResource(R.string.base_currency_description),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        onClick = {
+                            viewModel.refreshRates { success ->
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(
+                                        context.getString(
+                                            if (success) R.string.rates_updated else R.string.rates_error
+                                        )
+                                    )
+                                }
+                            }
+                        },
+                        enabled = !state.isRefreshingRates,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        if (state.isRefreshingRates) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        } else {
+                            Text(stringResource(R.string.refresh_rates))
+                        }
+                    }
+                    if (state.ratesUpdatedAt > 0) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = stringResource(
+                                R.string.last_update,
+                                java.text.SimpleDateFormat(
+                                    "dd/MM/yyyy HH:mm",
+                                    java.util.Locale.getDefault()
+                                ).format(java.util.Date(state.ratesUpdatedAt))
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(12.dp))

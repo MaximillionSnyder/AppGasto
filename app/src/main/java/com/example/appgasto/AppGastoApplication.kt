@@ -11,6 +11,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.appgasto.R
+import com.example.appgasto.data.currency.ExchangeRateWorker
 import com.example.appgasto.notifications.BudgetWorker
 import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
@@ -26,6 +27,7 @@ class AppGastoApplication : Application(), Configuration.Provider {
         super.onCreate()
         createNotificationChannel()
         scheduleBudgetCheck()
+        scheduleExchangeRateRefresh()
     }
 
     override val workManagerConfiguration: Configuration
@@ -60,6 +62,25 @@ class AppGastoApplication : Application(), Configuration.Provider {
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             "budget_check",
+            ExistingPeriodicWorkPolicy.KEEP,
+            workRequest
+        )
+    }
+
+    private fun scheduleExchangeRateRefresh() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(androidx.work.NetworkType.CONNECTED)
+            .setRequiresBatteryNotLow(true)
+            .build()
+
+        val workRequest = PeriodicWorkRequestBuilder<ExchangeRateWorker>(
+            24, TimeUnit.HOURS
+        )
+            .setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            ExchangeRateWorker.WORK_NAME,
             ExistingPeriodicWorkPolicy.KEEP,
             workRequest
         )

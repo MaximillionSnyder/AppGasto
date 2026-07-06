@@ -5,6 +5,7 @@ import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appgasto.data.backup.BackupManager
+import com.example.appgasto.data.currency.ExchangeRateRepository
 import com.example.appgasto.data.repository.PreferencesRepository
 import com.example.appgasto.domain.model.AppLanguage
 import com.example.appgasto.domain.model.ThemeMode
@@ -21,13 +22,16 @@ data class SettingsUiState(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val language: AppLanguage = AppLanguage.SYSTEM,
     val monthlyBudget: Double = 0.0,
-    val budgetEnabled: Boolean = false
+    val budgetEnabled: Boolean = false,
+    val ratesUpdatedAt: Long = 0L,
+    val isRefreshingRates: Boolean = false
 )
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val preferencesRepository: PreferencesRepository,
-    private val backupManager: BackupManager
+    private val backupManager: BackupManager,
+    private val exchangeRateRepository: ExchangeRateRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -40,7 +44,8 @@ class SettingsViewModel @Inject constructor(
                     themeMode = prefs.themeMode,
                     language = prefs.language,
                     monthlyBudget = prefs.monthlyBudget,
-                    budgetEnabled = prefs.budgetEnabled
+                    budgetEnabled = prefs.budgetEnabled,
+                    ratesUpdatedAt = prefs.ratesUpdatedAt
                 )
             }
         }
@@ -84,6 +89,15 @@ class SettingsViewModel @Inject constructor(
     fun setBudgetEnabled(enabled: Boolean) {
         viewModelScope.launch {
             preferencesRepository.setBudgetEnabled(enabled)
+        }
+    }
+
+    fun refreshRates(onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isRefreshingRates = true)
+            val result = exchangeRateRepository.refreshRates()
+            _uiState.value = _uiState.value.copy(isRefreshingRates = false)
+            onResult(result.isSuccess)
         }
     }
 

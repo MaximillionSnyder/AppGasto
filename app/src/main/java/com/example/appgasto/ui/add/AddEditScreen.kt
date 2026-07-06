@@ -1,13 +1,16 @@
 package com.example.appgasto.ui.add
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -19,6 +22,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -53,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.appgasto.R
+import com.example.appgasto.domain.model.Currency
 import com.example.appgasto.ui.components.CategorySelector
 import com.example.appgasto.ui.theme.GradientEnd
 import com.example.appgasto.ui.theme.GradientStart
@@ -72,6 +78,7 @@ fun AddEditScreen(
     val state by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     var showDatePicker by remember { mutableStateOf(false) }
+    var currencyMenuExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(expenseId) {
         viewModel.loadExpense(expenseId)
@@ -137,15 +144,50 @@ fun AddEditScreen(
                             ),
                             shape = RoundedCornerShape(20.dp)
                         )
-                        .padding(24.dp),
-                    contentAlignment = Alignment.Center
+                        .padding(24.dp)
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = stringResource(R.string.amount),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = Color.White.copy(alpha = 0.8f)
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.amount),
+                                style = MaterialTheme.typography.labelLarge,
+                                color = Color.White.copy(alpha = 0.8f)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Box {
+                                OutlinedButton(
+                                    onClick = { currencyMenuExpanded = true },
+                                    border = null,
+                                    colors = ButtonDefaults.outlinedButtonColors(
+                                        containerColor = Color.White.copy(alpha = 0.15f)
+                                    )
+                                ) {
+                                    Text(
+                                        text = state.currency,
+                                        color = Color.White,
+                                        style = MaterialTheme.typography.labelLarge
+                                    )
+                                }
+                                DropdownMenu(
+                                    expanded = currencyMenuExpanded,
+                                    onDismissRequest = { currencyMenuExpanded = false }
+                                ) {
+                                    Currency.entries.forEach { currency ->
+                                        DropdownMenuItem(
+                                            text = { Text(currency.code) },
+                                            onClick = {
+                                                viewModel.updateCurrency(currency.code)
+                                                currencyMenuExpanded = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
                         Spacer(modifier = Modifier.height(4.dp))
                         OutlinedTextField(
                             value = state.amount,

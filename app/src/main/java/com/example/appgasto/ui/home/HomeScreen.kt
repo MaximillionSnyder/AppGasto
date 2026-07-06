@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BarChart
@@ -32,6 +34,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -50,12 +53,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.appgasto.R
+import com.example.appgasto.domain.model.Currency
 import com.example.appgasto.ui.components.ExpenseItem
 import com.example.appgasto.ui.theme.GradientEnd
 import com.example.appgasto.ui.theme.GradientStart
 import com.example.appgasto.ui.theme.GradientTertiary
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun HomeScreen(
     isDark: Boolean,
@@ -155,6 +159,36 @@ fun HomeScreen(
                                     style = MaterialTheme.typography.displayMedium,
                                     fontWeight = FontWeight.ExtraBold,
                                     color = androidx.compose.ui.graphics.Color.White
+                                )
+                            }
+                        }
+                    }
+
+                    if (state.monthCurrencyBreakdown.size > 1 ||
+                        (state.monthCurrencyBreakdown.isNotEmpty() && state.monthCurrencyBreakdown.first().currency != Currency.PEN.code)
+                    ) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(R.string.currency_breakdown),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        FlowRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            state.monthCurrencyBreakdown.forEach { tuple ->
+                                val symbol = Currency.fromCode(tuple.currency).symbol
+                                SuggestionChip(
+                                    onClick = { },
+                                    label = {
+                                        Text(
+                                            text = "$symbol${String.format("%.2f", tuple.totalOriginal)} = S/.${String.format("%.2f", tuple.totalInPEN)}",
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+                                    }
                                 )
                             }
                         }

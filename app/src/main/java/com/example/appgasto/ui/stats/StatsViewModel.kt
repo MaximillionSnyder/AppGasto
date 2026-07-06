@@ -71,7 +71,7 @@ class StatsViewModel @Inject constructor(
                         val categoryTotals = categories.map { cat ->
                             val total = filtered
                                 .filter { it.categoryId == cat.id }
-                                .sumOf { it.amount }
+                                .sumOf { it.amountInPEN }
                             CategoryTotal(cat, total)
                         }.sortedByDescending { it.total }
 

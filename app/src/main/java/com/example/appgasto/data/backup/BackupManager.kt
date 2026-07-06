@@ -5,6 +5,7 @@ import androidx.room.withTransaction
 import com.example.appgasto.data.local.AppDatabase
 import com.example.appgasto.data.local.Category
 import com.example.appgasto.data.local.Expense
+import com.example.appgasto.domain.model.Currency
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -27,7 +28,7 @@ class BackupManager @Inject constructor(
     private val gson = Gson()
 
     data class BackupData(
-        val version: Int = 1,
+        val version: Int = 2,
         val exportedAt: String = LocalDateTime.now().toString(),
         val categories: List<Category>,
         val expenses: List<Expense>
@@ -70,7 +71,15 @@ class BackupManager @Inject constructor(
                         database.categoryDao().insert(category)
                     }
                     for (expense in backupData.expenses) {
-                        database.expenseDao().insert(expense)
+                        val migrated = when (backupData.version) {
+                            1 -> expense.copy(
+                                currency = Currency.PEN.code,
+                                amountInPEN = expense.amount,
+                                exchangeRateUsed = 1.0
+                            )
+                            else -> expense
+                        }
+                        database.expenseDao().insert(migrated)
                     }
                 }
 

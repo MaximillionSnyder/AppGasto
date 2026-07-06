@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appgasto.data.local.Category
+import com.example.appgasto.data.local.CurrencyTotalTuple
 import com.example.appgasto.data.local.Expense
 import com.example.appgasto.data.repository.ExpenseRepository
 import com.example.appgasto.widget.ExpenseWidget
@@ -20,6 +21,7 @@ data class HomeUiState(
     val todayTotal: Double = 0.0,
     val weekTotal: Double = 0.0,
     val monthTotal: Double = 0.0,
+    val monthCurrencyBreakdown: List<CurrencyTotalTuple> = emptyList(),
     val todayExpenses: List<Expense> = emptyList(),
     val categories: Map<Long, Category> = emptyMap(),
     val isLoading: Boolean = true
@@ -50,11 +52,14 @@ class HomeViewModel @Inject constructor(
                         val todayTotal = expenseRepository.getTodayTotal()
                         val weekTotal = expenseRepository.getCurrentWeekTotal()
                         val monthTotal = expenseRepository.getCurrentMonthTotal()
+                        val monthStart = java.time.LocalDate.now().withDayOfMonth(1)
+                        val monthCurrencyBreakdown = expenseRepository.getTotalByCurrencySince(monthStart)
 
                         _uiState.value = HomeUiState(
                             todayTotal = todayTotal,
                             weekTotal = weekTotal,
                             monthTotal = monthTotal,
+                            monthCurrencyBreakdown = monthCurrencyBreakdown,
                             todayExpenses = expenses,
                             categories = categories.associateBy { it.id },
                             isLoading = false

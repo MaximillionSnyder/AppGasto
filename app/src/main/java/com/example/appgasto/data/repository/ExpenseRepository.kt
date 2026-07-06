@@ -2,6 +2,7 @@ package com.example.appgasto.data.repository
 
 import com.example.appgasto.data.local.AppDatabase
 import com.example.appgasto.data.local.Category
+import com.example.appgasto.data.local.CurrencyTotalTuple
 import com.example.appgasto.data.local.Expense
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -71,6 +72,12 @@ class ExpenseRepository @Inject constructor(
             categoryId,
             LocalDateTime.of(start, LocalTime.MIN)
         ) ?: 0.0
+    }
+
+    suspend fun getTotalByCurrencySince(start: LocalDate): List<CurrencyTotalTuple> {
+        return expenseDao.getTotalByCurrencySince(
+            LocalDateTime.of(start, LocalTime.MIN)
+        )
     }
 
     suspend fun deleteAllExpenses() = expenseDao.deleteAll()

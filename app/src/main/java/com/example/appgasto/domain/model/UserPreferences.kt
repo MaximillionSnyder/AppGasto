@@ -4,5 +4,6 @@ data class UserPreferences(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val language: AppLanguage = AppLanguage.SYSTEM,
     val monthlyBudget: Double = 0.0,
-    val budgetEnabled: Boolean = false
+    val budgetEnabled: Boolean = false,
+    val ratesUpdatedAt: Long = 0L
 )

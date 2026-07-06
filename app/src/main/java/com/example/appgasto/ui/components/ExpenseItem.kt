@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.example.appgasto.data.local.Category
 import com.example.appgasto.data.local.Expense
 import com.example.appgasto.data.local.localizedName
+import com.example.appgasto.domain.model.Currency
 import com.example.appgasto.ui.theme.CategoryColors
 import java.time.format.DateTimeFormatter
 
@@ -117,8 +118,9 @@ fun ExpenseItem(
             }
 
             Column(horizontalAlignment = Alignment.End) {
+                val currencySymbol = Currency.fromCode(expense.currency).symbol
                 Text(
-                    text = String.format("%.2f", expense.amount),
+                    text = "$currencySymbol${String.format("%.2f", expense.amount)}",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface

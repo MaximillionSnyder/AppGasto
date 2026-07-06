@@ -4,9 +4,11 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appgasto.R
+import com.example.appgasto.data.currency.ExchangeRateRepository
 import com.example.appgasto.data.local.Category
 import com.example.appgasto.data.local.Expense
 import com.example.appgasto.data.repository.ExpenseRepository
+import com.example.appgasto.domain.model.Currency
 import com.example.appgasto.widget.ExpenseWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -23,10 +25,15 @@ import javax.inject.Inject
 data class AddEditUiState(
     val categories: List<Category> = emptyList(),
     val amount: String = "",
+    val currency: String = Currency.PEN.code,
     val selectedCategoryId: Long? = null,
     val note: String = "",
     val date: LocalDate = LocalDate.now(),
     val originalCreatedAt: LocalDateTime? = null,
+    val originalAmount: Double? = null,
+    val originalCurrency: String? = null,
+    val originalAmountInPEN: Double? = null,
+    val originalExchangeRateUsed: Double? = null,
     val isEditing: Boolean = false,
     val expenseId: Long? = null,
     val isLoading: Boolean = true,
@@ -38,7 +45,8 @@ data class AddEditUiState(
 @HiltViewModel
 class AddEditViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val expenseRepository: ExpenseRepository
+    private val expenseRepository: ExpenseRepository,
+    private val exchangeRateRepository: ExchangeRateRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddEditUiState())
@@ -57,10 +65,15 @@ class AddEditViewModel @Inject constructor(
                             expense.amount.toLong().toString()
                         else
                             expense.amount.toString(),
+                        currency = expense.currency,
                         selectedCategoryId = expense.categoryId,
                         note = expense.note ?: "",
                         date = expense.createdAt.toLocalDate(),
                         originalCreatedAt = expense.createdAt,
+                        originalAmount = expense.amount,
+                        originalCurrency = expense.currency,
+                        originalAmountInPEN = expense.amountInPEN,
+                        originalExchangeRateUsed = expense.exchangeRateUsed,
                         isEditing = true,
                         expenseId = expense.id
                     )
@@ -79,6 +92,10 @@ class AddEditViewModel @Inject constructor(
 
     fun updateCategory(categoryId: Long) {
         _uiState.value = _uiState.value.copy(selectedCategoryId = categoryId)
+    }
+
+    fun updateCurrency(currencyCode: String) {
+        _uiState.value = _uiState.value.copy(currency = currencyCode.uppercase())
     }
 
     fun updateNote(note: String) {
@@ -108,9 +125,37 @@ class AddEditViewModel @Inject constructor(
                     LocalDateTime.of(state.date, original.toLocalTime())
                 } ?: LocalDateTime.of(state.date, LocalTime.now())
 
+                val currency = state.currency.uppercase()
+
+                // Preserve immutable conversion for existing expenses unless amount or currency changed.
+                val conversionChanged = state.isEditing && (
+                    amount != state.originalAmount || currency != state.originalCurrency
+                )
+
+                val (amountInPEN, exchangeRateUsed) = if (currency == Currency.PEN.code) {
+                    amount to 1.0
+                } else if (state.isEditing && !conversionChanged &&
+                    state.originalAmountInPEN != null && state.originalExchangeRateUsed != null
+                ) {
+                    state.originalAmountInPEN to state.originalExchangeRateUsed
+                } else {
+                    val rate = exchangeRateRepository.getRateToPen(currency)
+                    if (rate == null || rate <= 0) {
+                        _uiState.value = _uiState.value.copy(
+                            isSaving = false,
+                            error = context.getString(R.string.error_missing_rate, currency)
+                        )
+                        return@launch
+                    }
+                    exchangeRateRepository.convertToPEN(amount, currency) to rate
+                }
+
                 val expense = Expense(
                     id = state.expenseId ?: 0,
                     amount = amount,
+                    currency = currency,
+                    amountInPEN = amountInPEN,
+                    exchangeRateUsed = exchangeRateUsed,
                     categoryId = state.selectedCategoryId!!,
                     note = state.note.ifBlank { null },
                     createdAt = createdAt
@@ -122,7 +167,6 @@ class AddEditViewModel @Inject constructor(
                 }
                 ExpenseWidget.updateAll(context)
                 _uiState.value = _uiState.value.copy(isSaving = false, isSaved = true)
-                ExpenseWidget.updateAll(context)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,

@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.appgasto.domain.model.AppLanguage
@@ -31,6 +32,7 @@ class PreferencesRepository @Inject constructor(
         val BUDGET_ENABLED = booleanPreferencesKey("budget_enabled")
         val BUDGET_ALERT_80_MONTH = stringPreferencesKey("budget_alert_80_month")
         val BUDGET_ALERT_100_MONTH = stringPreferencesKey("budget_alert_100_month")
+        val RATES_UPDATED_AT = longPreferencesKey("rates_updated_at")
     }
 
     val preferencesFlow: Flow<UserPreferences> = context.dataStore.data.map { prefs ->
@@ -38,7 +40,8 @@ class PreferencesRepository @Inject constructor(
             themeMode = prefs[Keys.THEME_MODE]?.let { safeValueOf<ThemeMode>(it) } ?: ThemeMode.SYSTEM,
             language = prefs[Keys.LANGUAGE]?.let { safeValueOf<AppLanguage>(it) } ?: AppLanguage.SYSTEM,
             monthlyBudget = prefs[Keys.MONTHLY_BUDGET] ?: 0.0,
-            budgetEnabled = prefs[Keys.BUDGET_ENABLED] ?: false
+            budgetEnabled = prefs[Keys.BUDGET_ENABLED] ?: false,
+            ratesUpdatedAt = prefs[Keys.RATES_UPDATED_AT] ?: 0L
         )
     }
 
@@ -73,6 +76,12 @@ class PreferencesRepository @Inject constructor(
                 80 -> prefs[Keys.BUDGET_ALERT_80_MONTH] = month
                 100 -> prefs[Keys.BUDGET_ALERT_100_MONTH] = month
             }
+        }
+    }
+
+    suspend fun setRatesUpdatedAt(timestamp: Long) {
+        context.dataStore.edit { prefs ->
+            prefs[Keys.RATES_UPDATED_AT] = timestamp
         }
     }
 
