@@ -9,6 +9,7 @@
 ![API](https://img.shields.io/badge/API-26%2B-brightgreen)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 ![Build](https://img.shields.io/badge/Build-Passing-brightgreen)
+![Themes](https://img.shields.io/badge/Themes-3-00FF41?logo=matrix)
 
 <br>
 
@@ -35,7 +36,7 @@ App Android para registrar gastos pequeños del día a día, con widget, dark mo
 <td width="50%">
 
 #### 🌟 Funcionalidades
-- 🌙 **Dark mode** — Claro, Oscuro o Sistema
+- 🌙 **3 temas** — Claro, Oscuro y Matrix (verde neón)
 - 🏷️ **7 categorías** — Comida, Transporte, Ocio, Hogar, Salud, Ropa, Otros
 - 💸 **Presupuesto mensual** — Alertas al 80% y 100%
 - 📊 **Gráficas** — Resumen visual por categoría
@@ -88,7 +89,7 @@ Español • English • Português • Italiano • Deutsch • 日本語 • �
 | 💉 DI | Hilt |
 | 📱 Widget | Glance |
 | 🧭 Navegación | Navigation Compose |
-| 📈 Gráficas | Vico |
+| 📈 Gráficas | Canvas custom (donut chart) |
 | ⏰ Background | WorkManager |
 | 💾 Respaldo | Auto Backup + JSON |
 | 🌍 Multi-idioma | Android Resources |
