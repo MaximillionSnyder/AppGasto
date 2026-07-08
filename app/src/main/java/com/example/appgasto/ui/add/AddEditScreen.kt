@@ -164,6 +164,13 @@ fun AddEditScreen(
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             },
+                            prefix = {
+                                Text(
+                                    "S/",
+                                    color = Color.White.copy(alpha = 0.8f),
+                                    style = MaterialTheme.typography.displayMedium
+                                )
+                            },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
