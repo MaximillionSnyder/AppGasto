@@ -72,6 +72,20 @@
 
 ---
 
+## Versión 5 — 2026-07-05
+
+### 5.1 Campo de nota colapsable en AddEditScreen
+- **Archivo:** `app/src/main/java/com/example/appgasto/ui/add/AddEditScreen.kt`
+- **Problema:** El campo de nota con `minLines = 2` siempre estaba visible, occupando espacio. Cuando el teclado numérico se abría para ingresar el monto, cubría el botón de guardar.
+- **Solución:** El campo de nota ahora es colapsable:
+  - Por defecto se muestra un botón "Nota" con ícono `Notes`
+  - Al tocarlo, se expande con animación `expandVertically()` y aparece el campo de texto
+  - Tiene un ícono de cerrar (X) con `shrinkVertically()` para contraerlo de nuevo
+  - Ahorra ~60dp de espacio cuando el teclado está abierto
+- **Nuevos imports:** `AnimatedVisibility`, `expandVertically`, `shrinkVertically`, `Icons.Default.Notes`, `Icons.Default.Close`
+
+---
+
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
@@ -80,3 +94,4 @@
 | 2 | 2026-07-04 | Tope de 4 decimales con soporte punto/coma |
 | 3 | 2026-07-04 | Nuevo tema Matrix (verde neon glow) |
 | 4 | 2026-07-05 | Limpieza de código muerto (LocaleHelper, AppModule, DAOs, Routes) |
+| 5 | 2026-07-05 | Campo de nota colapsable en AddEditScreen (ahorra espacio con teclado abierto) |

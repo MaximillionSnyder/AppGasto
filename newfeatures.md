@@ -129,9 +129,117 @@
 
 ---
 
+## Versión 3 — 2026-07-05
+
+### 3.1 Transiciones y animaciones entre pantallas
+
+- **Estado:** `[ ]` Pendiente
+- **Objetivo:** Mejorar la experiencia visual al navegar entre pantallas con animaciones fluidas.
+- **Cambios:**
+  - `[ ]` Agregar `enterTransition` / `exitTransition` en `NavHost` (fade + slide)
+  - `[ ]` Animaciones de entrada/salida en `TopAppBar` al cambiar de pantalla
+  - `[ ]` Animación de expansión/contracción en el panel de filtros de `ListScreen`
+  - `[ ]` Animación de carga del `DonutChart` en `StatsScreen` (dibujar arcos progresivamente)
+  - `[ ]` Transición suave del FAB en `HomeScreen` al hacer scroll
+
+### 3.2 Confirmación antes de eliminar gasto
+
+- **Estado:** `[ ]` Pendiente
+- **Objetivo:** Evitar eliminaciones accidentales mostrando un diálogo de confirmación.
+- **Cambios:**
+  - `[ ]` `ExpenseItem.kt` — al presionar el ícono de eliminar, mostrar `AlertDialog` con:
+    - Título: "Eliminar gasto"
+    - Mensaje: "¿Estás seguro de que deseas eliminar este gasto?"
+    - Botones: "Cancelar" (dismiss) + "Eliminar" (confirmar, color rojo)
+  - `[ ]` Animación de eliminación del item de la lista (slide out + fade)
+
+### 3.3 Pull-to-refresh en listas
+
+- **Estado:** `[ ]` Pendiente
+- **Objetivo:** Permitir actualizar los datos con un gesto de deslizar hacia abajo.
+- **Cambios:**
+  - `[ ]` `HomeScreen.kt` — pull-to-refresh para recalcular totales
+  - `[ ]` `ListScreen.kt` — pull-to-refresh para recargar la lista de gastos
+  - `[ ]` `StatsScreen.kt` — pull-to-refresh para recalcular estadísticas
+  - `[ ]` Indicador de progreso circular con animación Material 3
+
+### 3.4 Empty states mejorados
+
+- **Estado:** `[ ]` Pendiente
+- **Objetivo:** Mostrar estados vacíos más informativos y atractivos con acciones sugeridas.
+- **Cambios:**
+  - `[ ]` `HomeScreen.kt` — empty state con ilustración + botón "Agregar primer gasto"
+  - `[ ]` `ListScreen.kt` — empty state diferenciado: sin gastos vs. sin resultados de filtro
+  - `[ ]` `StatsScreen.kt` — empty state cuando no hay datos para el período seleccionado
+  - `[ ]` Agregar íconos ilustrativos más grandes y coloridos en cada empty state
+
+### 3.5 Feedback visual mejorado
+
+- **Estado:** `[ ]` Pendiente
+- **Objetivo:** Dar retroalimentación clara al usuario en cada acción.
+- **Cambios:**
+  - `[ ]` `AddEditScreen.kt` — animación de éxito al guardar (checkmark animado + color verde temporal)
+  - `[ ]` `ExpenseItem.kt` — feedback visual al deslizar para eliminar (fondo rojo渐进)
+  - `[ ]` `SettingsScreen.kt` — snackackbar mejorado con icono al exportar/importar backup
+  - `[ ]` Agregar `HapticFeedback` en acciones clave (guardar, eliminar)
+  - `[ ]` `BudgetWorker.kt` — notificación mejorada con progress bar al enviar alerta de presupuesto
+
+### 3.6 Mejoras de accesibilidad
+
+- **Estado:** `[ ]` Pendiente
+- **Objetivo:** Hacer la app usable por personas con discapacidades visuales y motoras.
+- **Cambios:**
+  - `[ ]` Agregar `contentDescription` a todos los `Icon` composables que no lo tengan
+  - `[ ]` Tamaño mínimo de toque 48dp en todos los botones e íconos interactivos
+  - `[ ]` `ExpenseItem.kt` — expandir área de toque del ícono de editar/eliminar
+  - `[ ]` `CategorySelector.kt` — asegurar contraste mínimo 4.5:1 en todos los chips
+  - `[ ]` Navegación completa por TalkBack (orden lógico de lectura)
+  - `[ ]` `OutlinedTextField` — labels persistentes y hints descriptivos
+
+### 3.7 Navegación mejorada (Bottom Navigation Bar)
+
+- **Estado:** `[ ]` Pendiente
+- **Objetivo:** Mejorar la navegación principal con una barra inferior fija.
+- **Cambios:**
+  - `[ ]` `AppNavigation.kt` — agregar `NavigationBar` con 4 destinos:
+    - Home (ícono Home, ruta principal)
+    - Lista (ícono List, historial)
+    - Estadísticas (ícono BarChart, stats)
+    - Ajustes (ícono Settings, configuración)
+  - `[ ]` `HomeScreen.kt` — remover `TopAppBar` acciones de navegación (se mueven a bottom nav)
+  - `[ ]` Animación de selección con `NavigationBarItem` indicator
+  - `[ ]` Ocultar/mostrar bottom nav con animación al hacer scroll (hide on scroll)
+  - `[ ]` `AddEditScreen` — bottom nav oculto (es una pantalla temporal)
+
+### 3.8 Formularios mejorados
+
+- **Estado:** `[ ]` Pendiente
+- **Objetivo:** Mejorar la experiencia de ingreso de datos en el formulario de gastos.
+- **Cambios:**
+  - `[ ]` `AddEditScreen.kt` — validación en tiempo real con mensajes de error inline (debajo del campo)
+  - `[ ]` Autocompletado de notas con gastos anteriores (sugerencias basadas en historial)
+  - `[ ]` `CategorySelector.kt` — recordar última categoría seleccionada
+  - `[ ]` Animación de teclado al abrir/cerrar el campo de monto
+  - `[ ]` Formateo automático del monto con separador de miles al perder foco
+  - `[ ]` Botón de limpiar (X) en el campo de nota cuando tiene texto
+
+### 3.9 Mejoras en el gráfico DonutChart
+
+- **Estado:** `[ ]` Pendiente
+- **Objetivo:** Hacer el gráfico de dona más interactivo e informativo.
+- **Cambios:**
+  - `[ ]` Animación de entrada: arcos se dibujan progresivamente desde 0°
+  - `[ ]` Interacción táctil: tocar un segmento resalta la categoría y muestra tooltip
+  - `[ ]` Leyenda interactiva: tocar una categoría en la lista resalta el segmento del gráfico
+  - `[ ]` Centro del donut muestra el total con animación de conteo (count-up)
+  - `[ ]` Soporte para tema Matrix con colores neon en el gráfico
+
+---
+
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
 |:-------:|:-----:|:--------|
 | 1 | 2026-07-05 | Receipt Scanning con ML Kit Document Scanner + Text Recognition + Parser |
 | 2 | 2026-07-05 | Multi-moneda con tasas de cambio + Receipt Scanning multi-moneda |
+| 3 | 2026-07-05 | UX: Transiciones, confirmación eliminar, pull-to-refresh, empty states, feedback visual, accesibilidad, bottom nav, formularios, DonutChart interactivo |

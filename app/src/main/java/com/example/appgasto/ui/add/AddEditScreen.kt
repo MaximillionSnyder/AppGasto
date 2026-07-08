@@ -14,7 +14,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Notes
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -72,6 +77,7 @@ fun AddEditScreen(
     val state by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     var showDatePicker by remember { mutableStateOf(false) }
+    var isNoteExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(expenseId) {
         viewModel.loadExpense(expenseId)
@@ -194,15 +200,43 @@ fun AddEditScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                OutlinedTextField(
-                    value = state.note,
-                    onValueChange = viewModel::updateNote,
-                    label = { Text(stringResource(R.string.note)) },
-                    placeholder = { Text(stringResource(R.string.note_hint)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    minLines = 2,
-                    shape = MaterialTheme.shapes.medium
-                )
+                AnimatedVisibility(
+                    visible = isNoteExpanded,
+                    enter = expandVertically(),
+                    exit = shrinkVertically()
+                ) {
+                    OutlinedTextField(
+                        value = state.note,
+                        onValueChange = viewModel::updateNote,
+                        label = { Text(stringResource(R.string.note)) },
+                        placeholder = { Text(stringResource(R.string.note_hint)) },
+                        trailingIcon = {
+                            IconButton(onClick = {
+                                isNoteExpanded = false
+                            }) {
+                                Icon(Icons.Default.Close, contentDescription = null)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 2,
+                        shape = MaterialTheme.shapes.medium
+                    )
+                }
+
+                if (!isNoteExpanded) {
+                    OutlinedButton(
+                        onClick = { isNoteExpanded = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        Icon(
+                            Icons.Default.Notes,
+                            contentDescription = null,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        Text(stringResource(R.string.note))
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
