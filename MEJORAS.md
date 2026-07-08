@@ -72,6 +72,29 @@
 
 ---
 
+## Versión 5 — 2026-07-08
+
+### 5.1 Sección de notas desplegable (cerrada por defecto)
+- **Archivos:** `AddEditScreen.kt`
+- **Problema:** El campo de notas siempre estaba visible, ocupando espacio innecesario en el formulario.
+- **Solución:** Convertido a sección colapsable con:
+  - `AnimatedVisibility` para animar la expansión/colapso
+  - `Row` clickeable con ícono `ExpandMore`/`ExpandLess` como indicador visual
+  - Estado `noteExpanded` (default `false`) que controla la visibilidad
+  - El campo de notas se oculta por defecto y se muestra al tocar "Notas"
+
+### 5.2 Exportación CSV de gastos
+- **Archivos:** `ExpenseCsvExporter.kt` (nuevo), `SettingsViewModel.kt`, `SettingsScreen.kt`, `strings.xml`, `strings.xml (en)`
+- **Problema:** No existía forma de exportar gastos en formato CSV para análisis externo (Excel, Google Sheets, etc.).
+- **Solución:**
+  - Creado `ExpenseCsvExporter.kt` — Genera CSV con columnas: Fecha, Monto, Moneda, Monto_PEN, Categoría, Nota
+  - Manejo de comillas y comas dentro de los campos para CSV válido
+  - Botón "Exportar CSV" en sección de Respaldo de SettingsScreen
+  - Nombre de archivo: `appgasto_YYYYMMDD_HHmmss.csv`
+  - Strings localizadas en español e inglés
+
+---
+
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
@@ -80,3 +103,4 @@
 | 2 | 2026-07-04 | Tope de 4 decimales con soporte punto/coma |
 | 3 | 2026-07-04 | Nuevo tema Matrix (verde neon glow) |
 | 4 | 2026-07-05 | Limpieza de código muerto (LocaleHelper, AppModule, DAOs, Routes) |
+| 5 | 2026-07-08 | Sección de notas desplegable + Exportación CSV de gastos |
