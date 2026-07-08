@@ -1,6 +1,8 @@
 package com.example.appgasto.ui.add
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +20,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -79,6 +83,7 @@ fun AddEditScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     var showDatePicker by remember { mutableStateOf(false) }
     var currencyMenuExpanded by remember { mutableStateOf(false) }
+    var noteExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(expenseId) {
         viewModel.loadExpense(expenseId)
@@ -236,15 +241,37 @@ fun AddEditScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                OutlinedTextField(
-                    value = state.note,
-                    onValueChange = viewModel::updateNote,
-                    label = { Text(stringResource(R.string.note)) },
-                    placeholder = { Text(stringResource(R.string.note_hint)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    minLines = 2,
-                    shape = MaterialTheme.shapes.medium
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { noteExpanded = !noteExpanded }
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.note),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Icon(
+                        imageVector = if (noteExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                AnimatedVisibility(visible = noteExpanded) {
+                    OutlinedTextField(
+                        value = state.note,
+                        onValueChange = viewModel::updateNote,
+                        label = { Text(stringResource(R.string.note)) },
+                        placeholder = { Text(stringResource(R.string.note_hint)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 2,
+                        shape = MaterialTheme.shapes.medium
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
