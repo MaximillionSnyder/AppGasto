@@ -90,6 +90,10 @@
     <string name="backup">Backup</string>
     <string name="export_data">Export data</string>
     <string name="export_description">Save a copy as JSON file</string>
+    <string name="export_csv">Export CSV</string>
+    <string name="export_csv_description">Export expenses as CSV file</string>
+    <string name="csv_export_success">CSV exported successfully</string>
+    <string name="csv_export_error">Error exporting CSV</string>
     <string name="import_data">Restore data</string>
     <string name="import_description">Import from a file</string>
     <string name="about">About</string>

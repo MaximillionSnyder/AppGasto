@@ -5,7 +5,9 @@ import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appgasto.data.backup.BackupManager
+import com.example.appgasto.data.backup.ExpenseCsvExporter
 import com.example.appgasto.data.currency.ExchangeRateRepository
+import com.example.appgasto.data.repository.ExpenseRepository
 import com.example.appgasto.data.repository.PreferencesRepository
 import com.example.appgasto.domain.model.AppLanguage
 import com.example.appgasto.domain.model.ThemeMode
@@ -13,6 +15,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.InputStream
 import java.io.OutputStream
@@ -31,7 +34,8 @@ data class SettingsUiState(
 class SettingsViewModel @Inject constructor(
     private val preferencesRepository: PreferencesRepository,
     private val backupManager: BackupManager,
-    private val exchangeRateRepository: ExchangeRateRepository
+    private val exchangeRateRepository: ExchangeRateRepository,
+    private val expenseRepository: ExpenseRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -107,5 +111,15 @@ class SettingsViewModel @Inject constructor(
 
     suspend fun importData(inputStream: InputStream): Result<Int> {
         return backupManager.importFromJson(inputStream)
+    }
+
+    suspend fun exportCsv(outputStream: OutputStream): Result<String> {
+        return try {
+            val expenses = expenseRepository.getAllExpenses().first()
+            val categories = expenseRepository.getAllCategoriesSnapshot()
+            ExpenseCsvExporter.export(expenses, categories, outputStream)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }

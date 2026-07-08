@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.TableChart
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -104,6 +105,21 @@ fun SettingsScreen(
                     val result = viewModel.exportData(outputStream)
                     snackbarHostState.showSnackbar(
                         if (result.isSuccess) context.getString(R.string.export_success) else context.getString(R.string.export_error)
+                    )
+                }
+            }
+        }
+    }
+
+    val csvExportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("text/csv")
+    ) { uri: Uri? ->
+        uri?.let {
+            scope.launch {
+                context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                    val result = viewModel.exportCsv(outputStream)
+                    snackbarHostState.showSnackbar(
+                        if (result.isSuccess) context.getString(R.string.csv_export_success) else context.getString(R.string.csv_export_error)
                     )
                 }
             }
@@ -330,6 +346,23 @@ fun SettingsScreen(
                     title = stringResource(R.string.import_data),
                     subtitle = stringResource(R.string.import_description),
                     onClick = { importLauncher.launch("application/json") }
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                )
+
+                SettingsRow(
+                    icon = Icons.Default.TableChart,
+                    iconColor = MaterialTheme.colorScheme.tertiary,
+                    title = stringResource(R.string.export_csv),
+                    subtitle = stringResource(R.string.export_csv_description),
+                    onClick = {
+                        val dateStr = java.time.LocalDateTime.now()
+                            .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
+                        csvExportLauncher.launch("appgasto_$dateStr.csv")
+                    }
                 )
             }
 

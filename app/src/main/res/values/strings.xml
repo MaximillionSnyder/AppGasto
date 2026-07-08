@@ -98,6 +98,10 @@
     <string name="backup">Respaldo</string>
     <string name="export_data">Exportar datos</string>
     <string name="export_description">Guardar copia en un archivo JSON</string>
+    <string name="export_csv">Exportar CSV</string>
+    <string name="export_csv_description">Exportar gastos como archivo CSV</string>
+    <string name="csv_export_success">CSV exportado correctamente</string>
+    <string name="csv_export_error">Error al exportar CSV</string>
     <string name="import_data">Restaurar datos</string>
     <string name="import_description">Importar desde un archivo</string>
     <string name="about">Acerca de</string>
