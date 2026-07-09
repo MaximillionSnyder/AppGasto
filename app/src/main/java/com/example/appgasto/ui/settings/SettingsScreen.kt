@@ -1,5 +1,13 @@
 package com.example.appgasto.ui.settings
 
+import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
+
+private val settingsDateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+private val backupDateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
+
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -304,10 +312,7 @@ fun SettingsScreen(
                         Text(
                             text = stringResource(
                                 R.string.last_update,
-                                java.text.SimpleDateFormat(
-                                    "dd/MM/yyyy HH:mm",
-                                    java.util.Locale.getDefault()
-                                ).format(java.util.Date(state.ratesUpdatedAt))
+                                settingsDateFormat.format(Date(state.ratesUpdatedAt))
                             ),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -330,7 +335,7 @@ fun SettingsScreen(
                     subtitle = stringResource(R.string.export_description),
                     onClick = {
                         val dateStr = java.time.LocalDateTime.now()
-                            .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
+                            .format(backupDateFormatter)
                         exportLauncher.launch("appgasto_backup_$dateStr.json")
                     }
                 )
@@ -360,7 +365,7 @@ fun SettingsScreen(
                     subtitle = stringResource(R.string.export_csv_description),
                     onClick = {
                         val dateStr = java.time.LocalDateTime.now()
-                            .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
+                            .format(backupDateFormatter)
                         csvExportLauncher.launch("appgasto_$dateStr.csv")
                     }
                 )

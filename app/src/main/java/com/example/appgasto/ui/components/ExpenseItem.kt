@@ -1,5 +1,9 @@
 package com.example.appgasto.ui.components
 
+import java.time.format.DateTimeFormatter
+
+private val itemDateFormatter = DateTimeFormatter.ofPattern("dd MMM HH:mm")
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -111,7 +115,7 @@ fun ExpenseItem(
                     )
                 }
                 Text(
-                    text = expense.createdAt.format(DateTimeFormatter.ofPattern("dd MMM HH:mm")),
+                    text = expense.createdAt.format(itemDateFormatter),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
