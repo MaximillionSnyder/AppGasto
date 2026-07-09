@@ -146,6 +146,8 @@
 
 ---
 
+## Registro de Versiones
+
 | Versión | Fecha | Cambios |
 |:-------:|:-----:|:--------|
 | 1 | 2026-07-04 | Fix declarations, LetterSpacing, FilterChips overflow, README redesign |
