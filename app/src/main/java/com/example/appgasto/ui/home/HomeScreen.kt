@@ -1,6 +1,7 @@
 package com.example.appgasto.ui.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -58,6 +59,7 @@ import com.example.appgasto.ui.components.ExpenseItem
 import com.example.appgasto.ui.theme.GradientEnd
 import com.example.appgasto.ui.theme.GradientStart
 import com.example.appgasto.ui.theme.GradientTertiary
+import com.example.appgasto.ui.stats.StatsPeriod
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -67,7 +69,7 @@ fun HomeScreen(
     onNavigateToAdd: () -> Unit,
     onNavigateToEdit: (Long) -> Unit,
     onNavigateToList: () -> Unit,
-    onNavigateToStats: () -> Unit,
+    onNavigateToStats: (StatsPeriod) -> Unit,
     onNavigateToSettings: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -84,7 +86,7 @@ fun HomeScreen(
                     )
                 },
                 actions = {
-                    IconButton(onClick = onNavigateToStats) {
+                    IconButton(onClick = { onNavigateToStats(StatsPeriod.MONTHLY) }) {
                         Icon(Icons.Default.BarChart, contentDescription = null)
                     }
                     IconButton(onClick = onNavigateToList) {
@@ -133,7 +135,9 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onNavigateToStats(StatsPeriod.MONTHLY) },
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
@@ -205,14 +209,16 @@ fun HomeScreen(
                             amount = state.todayTotal,
                             icon = Icons.Default.Today,
                             color = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            onClick = { onNavigateToStats(StatsPeriod.DAILY) }
                         )
                         MiniSummaryCard(
                             title = stringResource(R.string.total_week),
                             amount = state.weekTotal,
                             icon = Icons.Default.DateRange,
                             color = GradientTertiary,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            onClick = { onNavigateToStats(StatsPeriod.WEEKLY) }
                         )
                     }
 
@@ -276,10 +282,11 @@ private fun MiniSummaryCard(
     amount: Double,
     icon: ImageVector,
     color: androidx.compose.ui.graphics.Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
     Card(
-        modifier = modifier,
+        modifier = modifier.clickable(onClick = onClick),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)

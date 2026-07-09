@@ -10,17 +10,20 @@ import com.example.appgasto.ui.add.AddEditScreen
 import com.example.appgasto.ui.home.HomeScreen
 import com.example.appgasto.ui.list.ListScreen
 import com.example.appgasto.ui.settings.SettingsScreen
+import com.example.appgasto.ui.stats.StatsPeriod
 import com.example.appgasto.ui.stats.StatsScreen
 
 object Routes {
     const val HOME = "home"
     const val ADD = "add?expenseId={expenseId}"
     const val LIST = "list"
-    const val STATS = "stats"
+    const val STATS = "stats?period={period}"
     const val SETTINGS = "settings"
 
     fun addExpense(expenseId: Long? = null) =
         if (expenseId != null) "add?expenseId=$expenseId" else "add"
+
+    fun stats(period: StatsPeriod = StatsPeriod.MONTHLY) = "stats?period=${period.name}"
 }
 
 @Composable
@@ -40,7 +43,7 @@ fun AppNavigation(
                 onNavigateToAdd = { navController.navigate(Routes.addExpense()) },
                 onNavigateToEdit = { expenseId -> navController.navigate(Routes.addExpense(expenseId)) },
                 onNavigateToList = { navController.navigate(Routes.LIST) },
-                onNavigateToStats = { navController.navigate(Routes.STATS) },
+                onNavigateToStats = { period -> navController.navigate(Routes.stats(period)) },
                 onNavigateToSettings = { navController.navigate(Routes.SETTINGS) }
             )
         }
@@ -72,7 +75,13 @@ fun AppNavigation(
             )
         }
 
-        composable(Routes.STATS) {
+        composable(
+            route = Routes.STATS,
+            arguments = listOf(navArgument("period") {
+                type = NavType.StringType
+                defaultValue = "MONTHLY"
+            })
+        ) {
             StatsScreen(
                 isDark = isDark,
                 isMatrix = isMatrix,
