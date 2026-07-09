@@ -1,13 +1,5 @@
 package com.example.appgasto.ui.settings
 
-import java.text.SimpleDateFormat
-import java.time.format.DateTimeFormatter
-import java.util.Date
-import java.util.Locale
-
-private val settingsDateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-private val backupDateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
-
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -73,6 +65,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.appgasto.R
 import com.example.appgasto.ui.theme.GradientTertiary
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
+
+private val settingsDateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+private val backupDateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

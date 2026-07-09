@@ -1,9 +1,5 @@
 package com.example.appgasto.ui.components
 
-import java.time.format.DateTimeFormatter
-
-private val itemDateFormatter = DateTimeFormatter.ofPattern("dd MMM HH:mm")
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,6 +41,8 @@ import com.example.appgasto.data.local.localizedName
 import com.example.appgasto.domain.model.Currency
 import com.example.appgasto.ui.theme.CategoryColors
 import java.time.format.DateTimeFormatter
+
+private val itemDateFormatter = DateTimeFormatter.ofPattern("dd MMM HH:mm")
 
 private fun categoryIcon(categoryId: Long): ImageVector = when (categoryId) {
     1L -> Icons.Default.Fastfood
