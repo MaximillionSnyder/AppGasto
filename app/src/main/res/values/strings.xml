@@ -47,6 +47,8 @@
     <string name="error_select_category">Selecciona una categoría</string>
     <string name="error_missing_rate">No hay tasa de cambio para %1$s. Actualiza las tasas en ajustes.</string>
     <string name="error_save_detail">Error al guardar: %1$s</string>
+    <string name="scan_receipt">Escanear recibo</string>
+    <string name="scan_error">No se pudo leer el recibo</string>
 
     <!-- Categories -->
     <string name="cat_food">Comida</string>

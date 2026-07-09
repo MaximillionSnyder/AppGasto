@@ -8,21 +8,21 @@
 
 ### 1.1 Receipt Scanning (Escanear recibos con cámara)
 
-- **Estado:** `[ ]` Pendiente
+- **Estado:** `[x]` Implementado (2026-07-09)
 - **Objetivo:** Permitir escanear un recibo físico con la cámara y auto-llenar los campos del formulario de gasto, evitando el ingreso manual.
 - **Stack técnico:**
-  - Google ML Kit Document Scanner API (`play-services-mlkit-document-scanner:16.0.0`) — UI de escaneo con detección de bordes, corrección de perspectiva, auto-capture
+  - Google ML Kit Document Scanner API (`com.google.android.gms:play-services-mlkit-document-scanner:16.0.0`) — UI de escaneo con detección de bordes, corrección de perspectiva, auto-capture
   - Google ML Kit Text Recognition v2 (`com.google.mlkit:text-recognition:16.0.0`) — OCR on-device para extraer texto del recibo
   - ReceiptParser propio — regex para extraer total, fecha, comercio y moneda
 - **Qué extraer:**
-  - `[ ]` **Total** del recibo (patrones: `TOTAL S/. 123.45`, `SUMA`, `IMPORTE`, `VUELTO`)
-  - `[ ]` **Fecha** del recibo (formatos: dd/mm/aaaa, mm/dd/aaaa, yyyy-mm-dd, etc.)
-  - `[ ]` **Comercio** (primeras líneas del texto OCR, se guarda como nota del gasto)
-  - `[ ]` **Moneda** detectada (S/., $, €, R$, etc.)
+  - `[x]` **Total** del recibo (patrones: `TOTAL S/. 123.45`, `SUMA`, `IMPORTE`, `VUELTO`)
+  - `[x]` **Fecha** del recibo (formatos: dd/mm/aaaa, mm/dd/aaaa, yyyy-mm-dd, etc.)
+  - `[x]` **Comercio** (primeras líneas del texto OCR, se guarda como nota del gasto)
+  - `[x]` **Moneda** detectada (S/., $, €, R$, etc.)
 - **Qué NO incluir (V1):**
   - `[x]` Items/líneas del recibo — descartado por complejidad de layouts variables
   - `[x]` Guardar imagen del recibo — descartado por impacto en almacenamiento, backup y migración DB
-  - `[x]` Multi-moneda en totales — pospuesto a V2
+  - `[x]` Multi-moneda en totales — pospuesto a V2 (ya en 2.1)
 - **Archivos a modificar/crear:**
   - `gradle/libs.versions.toml` — agregar versiones de dependencias ML Kit
   - `app/build.gradle.kts` — agregar dependencias
@@ -34,6 +34,7 @@
   - `ui/add/AddEditScreen.kt` — botón "Escanear recibo" + lanzador Document Scanner
   - `ui/add/AddEditViewModel.kt` — manejar resultado del scan y auto-llenar state
   - `app/src/main/AndroidManifest.xml` — sin cambios (no requiere permiso CAMERA)
+- **Comportamiento de auto-llenado:** El escaneo **sobrescribe** los campos detectados (monto, moneda, fecha, nota). Si la detección de un campo falla, se conserva el valor actual.
 
 ---
 
@@ -122,7 +123,7 @@
 
 ### 2.2 Receipt Scanning — Integración con multi-moneda
 
-- **Estado:** `[ ]` Pendiente (depende de 2.1)
+- **Estado:** `[x]` Implementado (2026-07-09, depende de 2.1)
 - **Objetivo:** El parser del receipt scanner detecta la moneda del recibo y auto-selecciona en el dropdown de moneda.
 - **Cambios:**
   - El parser reconoce símbolos: `S/.` → PEN, `$` → USD, `€` → EUR, `¥` → JPY, `£` → GBP, `R$` → BRL

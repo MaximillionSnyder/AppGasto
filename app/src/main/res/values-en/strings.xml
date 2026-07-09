@@ -46,6 +46,8 @@
     <string name="error_invalid_amount">Enter a valid amount</string>
     <string name="error_select_category">Select a category</string>
     <string name="error_save_detail">Error saving: %1$s</string>
+    <string name="scan_receipt">Scan receipt</string>
+    <string name="scan_error">Could not read the receipt</string>
 
     <!-- Categories -->
     <string name="cat_food">Food</string>

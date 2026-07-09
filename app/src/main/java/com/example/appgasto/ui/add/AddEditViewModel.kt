@@ -1,12 +1,14 @@
 package com.example.appgasto.ui.add
 
 import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appgasto.R
 import com.example.appgasto.data.currency.ExchangeRateRepository
 import com.example.appgasto.data.local.Category
 import com.example.appgasto.data.local.Expense
+import com.example.appgasto.data.ocr.ReceiptOcrService
 import com.example.appgasto.data.repository.ExpenseRepository
 import com.example.appgasto.domain.model.Currency
 import com.example.appgasto.widget.ExpenseWidget
@@ -39,6 +41,7 @@ data class AddEditUiState(
     val isLoading: Boolean = true,
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
+    val isScanning: Boolean = false,
     val error: String? = null
 )
 
@@ -46,7 +49,8 @@ data class AddEditUiState(
 class AddEditViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val expenseRepository: ExpenseRepository,
-    private val exchangeRateRepository: ExchangeRateRepository
+    private val exchangeRateRepository: ExchangeRateRepository,
+    private val receiptOcrService: ReceiptOcrService
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddEditUiState())
@@ -104,6 +108,35 @@ class AddEditViewModel @Inject constructor(
 
     fun updateDate(date: LocalDate) {
         _uiState.value = _uiState.value.copy(date = date)
+    }
+
+    fun handleScanResult(imageUri: Uri?) {
+        if (imageUri == null) return
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isScanning = true, error = null)
+            try {
+                val data = receiptOcrService.parseReceiptImage(imageUri)
+                val current = _uiState.value
+                val scannedAmount = data.total?.let { raw ->
+                    val normalized = raw.replace(',', '.')
+                    if (normalized.toDoubleOrNull() != null) normalized else null
+                }
+                val scannedCurrency = data.currencyCode
+                    ?.takeIf { it in Currency.supportedCodes() }
+                _uiState.value = current.copy(
+                    amount = scannedAmount ?: current.amount,
+                    currency = scannedCurrency ?: current.currency,
+                    date = data.date ?: current.date,
+                    note = data.merchant ?: current.note,
+                    isScanning = false
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isScanning = false,
+                    error = context.getString(R.string.scan_error)
+                )
+            }
+        }
     }
 
     fun save() {
@@ -178,5 +211,9 @@ class AddEditViewModel @Inject constructor(
 
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
+    }
+
+    fun setScanError() {
+        _uiState.value = _uiState.value.copy(error = context.getString(R.string.scan_error))
     }
 }

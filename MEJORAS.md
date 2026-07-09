@@ -128,6 +128,24 @@
 
 ---
 
+## Versión 7 — 2026-07-09
+
+### 7.1 Escaneo de recibos (Receipt Scanning)
+- **Archivos:** `gradle/libs.versions.toml`, `app/build.gradle.kts`, `data/ocr/ReceiptData.kt`, `data/ocr/ReceiptParser.kt`, `data/ocr/ReceiptOcrService.kt`, `data/ocr/MLKitReceiptOcrService.kt`, `di/OcrModule.kt`, `ui/add/AddEditScreen.kt`, `ui/add/AddEditViewModel.kt`, `strings.xml` (+en)
+- **Objetivo:** Escanear un recibo físico y auto-llenar los campos del formulario de gasto.
+- **Solución:**
+  - Dependencias ML Kit: `play-services-mlkit-document-scanner` + `text-recognition` (versiones `16.0.0`)
+  - `GmsDocumentScanning` lanza la UI de escaneo (sin permiso CAMERA) y devuelve URI de imagen JPEG
+  - `MLKitReceiptOcrService` carga el bitmap y corre Text Recognition v2 (on-device)
+  - `ReceiptParser` extrae con regex: **Total** (líneas TOTAL/SUMA/IMPORTE, ignora VUELTO), **Fecha** (4 formatos), **Comercio** (1ª línea) y **Moneda** (símbolos → PEN/USD/EUR/JPY/GBP/BRL)
+  - `AddEditScreen`: botón "Escanear recibo" + `rememberLauncherForActivityResult(StartIntentSenderForResult)`; indicador de carga `isScanning`
+  - `AddEditViewModel.handleScanResult(uri)` auto-rellena monto/moneda/fecha/nota (sobrescribe lo detectado; conserva valor actual si un campo no se detecta)
+  - `OcrModule` (Hilt) provee `ReceiptOcrService` como singleton
+  - Strings `scan_receipt` / `scan_error` en español e inglés
+- **Nota:** Requiere Google Play Services con módulo ML Kit; OCR es heurístico y puede necesitar ajustes.
+
+---
+
 | Versión | Fecha | Cambios |
 |:-------:|:-----:|:--------|
 | 1 | 2026-07-04 | Fix declarations, LetterSpacing, FilterChips overflow, README redesign |
@@ -136,3 +154,4 @@
 | 4 | 2026-07-05 | Limpieza de código muerto (LocaleHelper, AppModule, DAOs, Routes) |
 | 5 | 2026-07-08 | Sección de notas desplegable + Exportación CSV de gastos |
 | 6 | 2026-07-09 | Fix imports, tarjetas Home conectadas a Stats, desglose moneda colapsable |
+| 7 | 2026-07-09 | Escaneo de recibos con ML Kit Document Scanner + Text Recognition + parser |

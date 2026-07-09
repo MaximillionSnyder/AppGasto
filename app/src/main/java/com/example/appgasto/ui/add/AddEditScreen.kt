@@ -20,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Button
@@ -55,17 +56,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.IntentSenderRequest
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.appgasto.R
 import com.example.appgasto.domain.model.Currency
 import com.example.appgasto.ui.components.CategorySelector
 import com.example.appgasto.ui.theme.GradientEnd
 import com.example.appgasto.ui.theme.GradientStart
+import com.google.android.gms.mlkit.vision.documentscanner.GmsDocumentScanning
+import com.google.android.gms.mlkit.vision.documentscanner.GmsDocumentScanningOptions
+import com.google.android.gms.mlkit.vision.documentscanner.GmsDocumentScanningResult
+import com.google.android.gms.tasks.addOnFailureListener
+import com.google.android.gms.tasks.addOnSuccessListener
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -84,6 +93,17 @@ fun AddEditScreen(
     var showDatePicker by remember { mutableStateOf(false) }
     var currencyMenuExpanded by remember { mutableStateOf(false) }
     var noteExpanded by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val scanLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        result.data?.let { intent ->
+            val scanResult = GmsDocumentScanningResult.fromActivityResultIntent(intent)
+            val imageUri = scanResult?.pages?.firstOrNull()?.imageUri
+            viewModel.handleScanResult(imageUri)
+        }
+    }
 
     LaunchedEffect(expenseId) {
         viewModel.loadExpense(expenseId)
@@ -220,6 +240,44 @@ fun AddEditScreen(
                                 unfocusedContainerColor = Color.Transparent
                             )
                         )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedButton(
+                    onClick = {
+                        val options = GmsDocumentScanningOptions.Builder()
+                            .setGalleryImportAllowed(true)
+                            .setResultFormats(GmsDocumentScanningResult.FORMAT_JPEG)
+                            .setScannerMode(GmsDocumentScanningOptions.SCANNER_MODE_FULL)
+                            .build()
+                        GmsDocumentScanning.getClient(options)
+                            .getStartScanIntent(context as android.app.Activity)
+                            .addOnSuccessListener { pendingIntent ->
+                                scanLauncher.launch(IntentSenderRequest.Builder(pendingIntent).build())
+                            }
+                            .addOnFailureListener {
+                                viewModel.setScanError()
+                            }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !state.isScanning,
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    if (state.isScanning) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.height(20.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    } else {
+                        Icon(
+                            Icons.Default.CameraAlt,
+                            contentDescription = null,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        Text(stringResource(R.string.scan_receipt))
                     }
                 }
 

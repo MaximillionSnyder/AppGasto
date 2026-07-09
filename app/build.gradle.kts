@@ -91,6 +91,8 @@ dependencies {
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp.core)
     implementation(libs.okhttp.logging)
+    implementation(libs.mlkit.document.scanner)
+    implementation(libs.mlkit.text.recognition)
     implementation(libs.androidx.appcompat)
 
     coreLibraryDesugaring(libs.desugar.jdk.libs)
