@@ -34,6 +34,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -183,13 +184,16 @@ fun StatsScreen(
                                 .padding(20.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            DonutChart(
-                                categoryTotals = state.categoryTotals.map { catTotal ->
+                            val donutSlices = remember(state.categoryTotals, isDark, isMatrix) {
+                                state.categoryTotals.map { catTotal ->
                                     DonutSlice(
                                         color = CategoryColors.getById(catTotal.category.id, isDark, isMatrix),
                                         percentage = (catTotal.total / state.totalExpenses * 100).toFloat()
                                     )
-                                },
+                                }
+                            }
+                            DonutChart(
+                                categoryTotals = donutSlices,
                                 modifier = Modifier.size(180.dp)
                             )
 
