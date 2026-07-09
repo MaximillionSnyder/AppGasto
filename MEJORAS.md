@@ -95,7 +95,38 @@
 
 ---
 
-## Registro de Versiones
+## Versión 6 — 2026-07-09
+
+### 6.1 Fix: Import ordering en perf commits
+- **Archivos:** `ExpenseItem.kt`, `SettingsScreen.kt`
+- **Problema:** Los commits `6a68d52` y `349cef5` colocaron declaraciones `private val` antes de los `import` en Kotlin, lo cual rompe la compilación (imports deben ir antes de cualquier declaración top-level). También había un import duplicado de `DateTimeFormatter`.
+- **Solución:** Movidos todos los imports antes de las declaraciones en ambos archivos. Eliminado import duplicado.
+
+### 6.2 Fix: Captura obsoleta de lambda en remember
+- **Archivos:** `HomeScreen.kt`, `ListScreen.kt`
+- **Problema:** `remember(expense.id) { { lambda } }` capturaba el objeto `expense` de la primera composición; si el gasto se actualizaba (mismo id, nuevo objeto), `onDelete` borraba el snapshot viejo.
+- **Solución:** Revertido a lambdas inline sin `remember`. Eliminado import `remember` no utilizado en `HomeScreen.kt`.
+
+### 6.3 Tarjetas de resumen del Home conectadas a Estadísticas
+- **Archivos:** `HomeScreen.kt`, `AppNavigation.kt`, `StatsViewModel.kt`
+- **Problema:** Las tarjetas "Total hoy", "Esta semana" y "Este mes" no tenían navegación a Estadísticas con el periodo preseleccionado.
+- **Solución:**
+  - Añadido argumento de navegación `period` a la ruta de StatsScreen (default `MONTHLY`)
+  - `StatsViewModel` usa `SavedStateHandle` para leer el periodo inicial del nav arg
+  - `HomeScreen`: `MiniSummaryCard` y tarjeta de mes ahora son clickeables
+  - Mapeo: "Total hoy" → `DAILY`, "Esta semana" → `WEEKLY`, "Este mes" → `MONTHLY`
+  - Helper `Routes.stats(period)` para navegación parametrizada
+
+### 6.4 Desglose por moneda colapsable
+- **Archivo:** `HomeScreen.kt`
+- **Problema:** El bloque de "Desglose por moneda" con `FlowRow` de chips ocupaba mucho espacio en la pantalla de inicio.
+- **Solución:** Convertido a sección colapsable con:
+  - `AnimatedVisibility` para animar expansión/colapso
+  - `Row` clickeable con ícono `ExpandMore`/`ExpandLess`
+  - Estado `currencyExpanded` (default `false`) — colapsado por defecto
+  - Mismo patrón que la sección de notas en `AddEditScreen.kt`
+
+---
 
 | Versión | Fecha | Cambios |
 |:-------:|:-----:|:--------|
@@ -104,3 +135,4 @@
 | 3 | 2026-07-04 | Nuevo tema Matrix (verde neon glow) |
 | 4 | 2026-07-05 | Limpieza de código muerto (LocaleHelper, AppModule, DAOs, Routes) |
 | 5 | 2026-07-08 | Sección de notas desplegable + Exportación CSV de gastos |
+| 6 | 2026-07-09 | Fix imports, tarjetas Home conectadas a Stats, desglose moneda colapsable |
