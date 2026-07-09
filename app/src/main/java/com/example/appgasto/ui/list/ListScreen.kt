@@ -186,8 +186,8 @@ fun ListScreen(
                             category = state.categories[expense.categoryId],
                             isDark = isDark,
                             isMatrix = isMatrix,
-                            onEdit = { onNavigateToEdit(expense.id) },
-                            onDelete = { viewModel.deleteExpense(expense) }
+                            onEdit = remember(expense.id) { { onNavigateToEdit(expense.id) } },
+                            onDelete = remember(expense.id) { { viewModel.deleteExpense(expense) } }
                         )
                     }
                     item { Spacer(modifier = Modifier.height(16.dp)) }
