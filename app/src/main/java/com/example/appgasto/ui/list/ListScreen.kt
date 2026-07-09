@@ -179,8 +179,8 @@ fun ListScreen(
                         .padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    item { Spacer(modifier = Modifier.height(4.dp)) }
-                    items(state.expenses, key = { it.id }) { expense ->
+                    item(contentType = "spacer_top") { Spacer(modifier = Modifier.height(4.dp)) }
+                    items(state.expenses, key = { it.id }, contentType = { "expense" }) { expense ->
                         ExpenseItem(
                             expense = expense,
                             category = state.categories[expense.categoryId],
@@ -190,7 +190,7 @@ fun ListScreen(
                             onDelete = remember(expense.id) { { viewModel.deleteExpense(expense) } }
                         )
                     }
-                    item { Spacer(modifier = Modifier.height(16.dp)) }
+                    item(contentType = "spacer_bottom") { Spacer(modifier = Modifier.height(16.dp)) }
                 }
             }
         }

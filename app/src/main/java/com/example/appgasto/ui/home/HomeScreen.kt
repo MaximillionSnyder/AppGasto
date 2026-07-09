@@ -130,7 +130,7 @@ fun HomeScreen(
                     .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                item {
+                item(contentType = "header") {
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Card(
@@ -228,7 +228,7 @@ fun HomeScreen(
                 }
 
                 if (state.todayExpenses.isEmpty()) {
-                    item {
+                    item(contentType = "empty") {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -253,7 +253,7 @@ fun HomeScreen(
                         }
                     }
                 } else {
-                    items(state.todayExpenses, key = { it.id }) { expense ->
+                    items(state.todayExpenses, key = { it.id }, contentType = { "expense" }) { expense ->
                         ExpenseItem(
                             expense = expense,
                             category = state.categories[expense.categoryId],
@@ -265,7 +265,7 @@ fun HomeScreen(
                     }
                 }
 
-                item { Spacer(modifier = Modifier.height(80.dp)) }
+                item(contentType = "footer") { Spacer(modifier = Modifier.height(80.dp)) }
             }
         }
     }
