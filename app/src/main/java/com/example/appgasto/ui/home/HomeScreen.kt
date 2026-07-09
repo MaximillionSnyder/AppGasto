@@ -5,6 +5,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,13 +18,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Today
@@ -39,9 +41,13 @@ import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -171,29 +177,45 @@ fun HomeScreen(
                     if (state.monthCurrencyBreakdown.size > 1 ||
                         (state.monthCurrencyBreakdown.isNotEmpty() && state.monthCurrencyBreakdown.first().currency != Currency.PEN.code)
                     ) {
+                        var currencyExpanded by remember { mutableStateOf(false) }
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = stringResource(R.string.currency_breakdown),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        FlowRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { currencyExpanded = !currencyExpanded }
+                                .padding(vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            state.monthCurrencyBreakdown.forEach { tuple ->
-                                val symbol = Currency.fromCode(tuple.currency).symbol
-                                SuggestionChip(
-                                    onClick = { },
-                                    label = {
-                                        Text(
-                                            text = "$symbol${String.format("%.2f", tuple.totalOriginal)} = S/.${String.format("%.2f", tuple.totalInPEN)}",
-                                            style = MaterialTheme.typography.labelMedium
-                                        )
-                                    }
-                                )
+                            Text(
+                                text = stringResource(R.string.currency_breakdown),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Icon(
+                                imageVector = if (currencyExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        AnimatedVisibility(visible = currencyExpanded) {
+                            FlowRow(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                state.monthCurrencyBreakdown.forEach { tuple ->
+                                    val symbol = Currency.fromCode(tuple.currency).symbol
+                                    SuggestionChip(
+                                        onClick = { },
+                                        label = {
+                                            Text(
+                                                text = "$symbol${String.format("%.2f", tuple.totalOriginal)} = S/.${String.format("%.2f", tuple.totalInPEN)}",
+                                                style = MaterialTheme.typography.labelMedium
+                                            )
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
