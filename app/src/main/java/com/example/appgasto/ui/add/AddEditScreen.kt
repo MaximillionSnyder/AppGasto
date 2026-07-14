@@ -70,9 +70,9 @@ import com.example.appgasto.domain.model.Currency
 import com.example.appgasto.ui.components.CategorySelector
 import com.example.appgasto.ui.theme.GradientEnd
 import com.example.appgasto.ui.theme.GradientStart
-import com.google.android.gms.mlkit.vision.documentscanner.GmsDocumentScanning
-import com.google.android.gms.mlkit.vision.documentscanner.GmsDocumentScanningOptions
-import com.google.android.gms.mlkit.vision.documentscanner.GmsDocumentScanningResult
+import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanning
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import androidx.activity.compose.rememberLauncherForActivityResult
 import java.time.Instant
 import java.time.LocalDate
@@ -246,10 +246,10 @@ fun AddEditScreen(
 
                 OutlinedButton(
                     onClick = {
-                        val options = GmsDocumentScanningOptions.Builder()
+                        val options = GmsDocumentScannerOptions.Builder()
                             .setGalleryImportAllowed(true)
-                            .setResultFormats(GmsDocumentScanningResult.FORMAT_JPEG)
-                            .setScannerMode(GmsDocumentScanningOptions.SCANNER_MODE_FULL)
+                            .setResultFormats(GmsDocumentScannerOptions.RESULT_FORMAT_JPEG)
+                            .setScannerMode(GmsDocumentScannerOptions.SCANNER_MODE_FULL)
                             .build()
                         GmsDocumentScanning.getClient(options)
                             .getStartScanIntent(context as android.app.Activity)
