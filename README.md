@@ -2,78 +2,79 @@
 
 # 💰 AppGasto
 
-### Control de gastos diarios para Android
-
-![Kotlin](https://img.shields.io/badge/Kotlin-100%25-7F52FF?logo=kotlin&logoColor=white)
-![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?logo=jetpackcompose&logoColor=white)
-![API](https://img.shields.io/badge/API-26%2B-brightgreen)
-![License](https://img.shields.io/badge/License-MIT-yellow)
-![Build](https://img.shields.io/badge/Build-Passing-brightgreen)
-![Themes](https://img.shields.io/badge/Themes-3-00FF41?logo=matrix)
+### Control de gastos diarios — inteligente, rápido y multi-moneda
 
 <br>
 
-App Android para registrar gastos pequeños del día a día, con widget, dark mode, soporte multi-idioma y gráficas.
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.1.0-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)](https://kotlinlang.org)
+[![Compose](https://img.shields.io/badge/Compose-BOM_2024.12-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white)](https://developer.android.com/develop/ui/compose)
+[![Material 3](https://img.shields.io/badge/Material_3-You-FF6F00?style=for-the-badge&logo=materialdesign&logoColor=white)](https://m3.material.io)
+[![API](https://img.shields.io/badge/API-26%2B-00C853?style=for-the-badge&logo=android&logoColor=white)](https://developer.android.com/about/versions/oreo)
+[![License](https://img.shields.io/badge/License-MIT-FBBC04?style=for-the-badge)](LICENSE)
+[![Build](https://img.shields.io/badge/Build-Passing-00C853?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/MaximillionSnyder/AppGasto/actions)
+
+<br>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/badge/3_Temas-00FF41?style=flat-square&logo=matrix&labelColor=0A0F0A">
+  <img alt="Themes" src="https://img.shields.io/badge/3_Temas-FF6F00?style=flat-square&logo=materialdesign&logoColor=white">
+</picture>
+&nbsp;
+<img alt="Screens" src="https://img.shields.io/badge/5_Pantallas-2196F3?style=flat-square">
+&nbsp;
+<img alt="Languages" src="https://img.shields.io/badge/8_Idiomas-FF5722?style=flat-square">
+&nbsp;
+<img alt="Currencies" src="https://img.shields.io/badge/Multi_Moneda-9C27B0?style=flat-square">
+&nbsp;
+<img alt="Receipt Scanner" src="https://img.shields.io/badge/Escanear_Recibos-00BCD4?style=flat-square">
+
+<br><br>
+
+**App Android nativa** para registrar gastos pequeños del día a día con widget, temas claro/oscuro/matrix, soporte multi-idioma, multi-moneda con tasas de cambio en tiempo real y escaneo inteligente de recibos.
+
+<br>
+
+[![Google Play](https://img.shields.io/badge/Google_Play-Disponible-414141?style=for-the-badge&logo=googleplay&logoColor=white)](https://github.com/MaximillionSnyder/AppGasto/releases)
+[![APK Debug](https://img.shields.io/badge/APK_Debug-Descargar-FF6D00?style=for-the-badge&logo=android&logoColor=white)](https://github.com/MaximillionSnyder/AppGasto/releases)
 
 </div>
 
 ---
 
-## ✨ Características
-
-<table>
-<tr>
-<td width="50%">
-
-#### 📱 5 Pantallas
-- **Inicio** — Resumen del día
-- **Lista** — Historial filtrable
-- **Agregar/Editar** — Registro rápido
-- **Estadísticas** — Gráficas por categoría
-- **Ajustes** — Configuración completa
-
-</td>
-<td width="50%">
-
-#### 🌟 Funcionalidades
-- 🌙 **3 temas** — Claro, Oscuro y Matrix (verde neón)
-- 🏷️ **7 categorías** — Comida, Transporte, Ocio, Hogar, Salud, Ropa, Otros
-- 💸 **Presupuesto mensual** — Alertas al 80% y 100%
-- 📊 **Gráficas** — Resumen visual por categoría
-
-</td>
-</tr>
-</table>
-
-<table>
-<tr>
-<td width="50%">
-
-#### 🌍 8 Idiomas
-Español • English • Português • Italiano • Deutsch • 日本語 • 한국어 • Runasimi
-
-</td>
-<td width="50%">
-
-#### 💾 Respaldo
-- Exportar/Importar JSON
-- Auto Backup a Google Drive
-
-</td>
-</tr>
-</table>
-
----
-
-## 📸 Capturas
+## ⚡ Features
 
 <div align="center">
 
-| Inicio | Lista | Estadísticas | Ajustes |
-|:------:|:-----:|:------------:|:-------:|
-| 🏠 | 📋 | 📊 | ⚙️ |
+| 📱 | 🌟 | 💰 | 🌍 |
+|:--:|:--:|:--:|:--:|
+| **5 Pantallas** | **3 Temas** | **Multi-Moneda** | **8 Idiomas** |
+| Inicio • Lista • Agregar<br>Estadísticas • Ajustes | Claro • Oscuro<br>🟢 Matrix (Neon) | PEN • USD • EUR • JPY • GBP • BRL<br>Tasas en tiempo real | Español • English • Português • Italiano<br>Deutsch • 日本語 • 한국어 • Runasimi |
+
+| 📸 | 💾 | 📊 | 🏷️ |
+|:--:|:--:|:--:|:--:|
+| **Escanear Recibos** | **Respaldo** | **Gráficas** | **7 Categorías** |
+| ML Kit Document Scanner<br>+ OCR + auto-llenado | Export CSV • JSON<br>Auto Backup Drive | Donut chart por categoría<br>Periodos diario/semanal/mensual | Comida • Transporte • Ocio • Hogar<br>Salud • Ropa • Otros |
 
 </div>
+
+---
+
+## 🎯 Highlights
+
+```kotlin
+// Multi-moneda con tasas automáticas
+val gasto = Expense(
+    amount = 100.0,
+    currency = "USD",
+    amountInPEN = 375.0,   // conversión automática
+    exchangeRateUsed = 3.75 // tasa al momento de guardar
+)
+
+// Escaneo de recibo con IA
+val receipt = receiptOcrService.parseReceiptImage(uri)
+// → Total: S/ 45.90 | Fecha: 2026-07-14 | Moneda: PEN
+// → Nota: "Restaurante Donde Juan - 2 platos del día"
+```
 
 ---
 
@@ -81,88 +82,135 @@ Español • English • Português • Italiano • Deutsch • 日本語 • �
 
 <div align="center">
 
-| Componente | Tecnología |
-|:----------:|:----------:|
-| 🎨 UI | Jetpack Compose + Material 3 |
-| 🗄️ Base de datos | Room (SQLite) |
-| ⚙️ Preferencias | DataStore |
-| 💉 DI | Hilt |
-| 📱 Widget | Glance |
-| 🧭 Navegación | Navigation Compose |
-| 📈 Gráficas | Canvas custom (donut chart) |
-| ⏰ Background | WorkManager |
-| 💾 Respaldo | Auto Backup + JSON |
-| 🌍 Multi-idioma | Android Resources |
+| Categoría | Tecnología | Versión |
+|:---------:|:----------:|:-------:|
+| 🎨 **UI** | Jetpack Compose + Material 3 | BOM 2024.12 |
+| 🧠 **Lenguaje** | Kotlin | 2.1.0 |
+| 🗄️ **Base de datos** | Room + KSP | 2.7.0 |
+| ⚙️ **Preferencias** | DataStore Preferences | 1.1.1 |
+| 💉 **DI** | Hilt + KSP | 2.54 |
+| 📱 **Widget** | Glance | 1.1.1 |
+| 🧭 **Navegación** | Navigation Compose | 2.8.4 |
+| 📈 **Gráficas** | Canvas custom (Donut Chart) | — |
+| 🌐 **Network** | Retrofit + OkHttp | 2.11.0 / 4.12.0 |
+| 🤖 **ML Kit** | Document Scanner + Text Recognition | 16.0.0 / 16.0.1 |
+| ⏰ **Background** | WorkManager | 2.10.0 |
+| 🏗️ **Build** | Gradle + AGP | 8.7.3 / 8.7.3 |
+| 💾 **Respaldo** | Auto Backup + JSON + CSV | — |
 
 </div>
 
 ---
 
-## 🚀 Cómo Compilar
+## 📸 Screenshots
 
-### Requisitos
-- Android Studio Hedgehog (2023.1.1) o más nuevo
+<div align="center">
+
+```
+┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
+│  🏠 Inicio  │  │  📋 Lista  │  │  📊 Stats  │  │  ⚙️ Ajustes │
+│──────────│  │──────────│  │──────────│  │──────────│
+│ S/ 45.90 │  │ 🍔 Comida  │  │ 📈 Donut │  │ 🌙 Tema   │
+│ Total hoy│  │ 🚗 Transp │  │ por cat. │  │ 💰 Moneda │
+│  ───────  │  │   ...    │  │  ───────  │  │ 📸 Scan   │
+│  3 gastos │  │  filters │  │ período  │  │           │
+└──────────┘  └──────────┘  └──────────┘  └──────────┘
+```
+
+</div>
+
+---
+
+## 🚀 Empezar
+
+<details open>
+<summary><b>📦 Requisitos</b></summary>
+
+- Android Studio Hedgehog (2023.1.1)+
 - JDK 17 (incluido con Android Studio)
-- Dispositivo Android 8.0+ (API 26) o emulador
+- Dispositivo/Emulador Android 8.0+ (API 26)
+- Google Play Services (para ML Kit)
 
-### Instalación
+</details>
+
+<details>
+<summary><b>🔧 Instalación</b></summary>
 
 ```bash
-# 1. Clonar el repositorio
+# 1. Clonar
 git clone https://github.com/MaximillionSnyder/AppGasto.git
 
 # 2. Abrir en Android Studio
 # File → Open → seleccionar carpeta AppGasto
 
-# 3. Ejecutar
+# 3. Build & Run
 ./gradlew installDebug
 ```
 
----
-
-## 📂 Estructura del Proyecto
-
-```
-app/src/main/java/com/example/appgasto/
-│
-├── 📁 data/
-│   ├── local/        → Room: Expense, Category, DAOs, AppDatabase
-│   ├── repository/   → ExpenseRepository, PreferencesRepository
-│   └── backup/       → BackupManager, export/import JSON
-│
-├── 📁 domain/model/  → ThemeMode, AppLanguage, UserPreferences
-│
-├── 📁 ui/
-│   ├── home/         → Inicio: resumen del día
-│   ├── add/          → Agregar/Editar gasto
-│   ├── list/         → Historial con filtros
-│   ├── stats/        → Estadísticas y gráficas
-│   ├── settings/     → Ajustes, tema, idioma, presupuesto
-│   ├── navigation/   → Rutas del NavHost
-│   ├── theme/        → Material 3 colores, tipografía
-│   └── components/   → ExpenseItem, CategorySelector
-│
-├── 📁 widget/        → Glance widget
-├── 📁 notifications/ → WorkManager para alertas
-└── 📁 di/            → Módulos Hilt
-```
+</details>
 
 ---
 
-## 🌐 Idiomas Soportados
+## 📂 Arquitectura
 
-| Código | Idioma | |
-|:------:|:------:|:-:|
-| `es` | 🇪🇸 Español | Default |
-| `en` | 🇬🇧 English | |
-| `pt` | 🇧🇷 Português | |
-| `it` | 🇮🇹 Italiano | |
-| `de` | 🇩🇪 Deutsch | |
-| `ja` | 🇯🇵 日本語 | |
-| `ko` | 🇰🇷 한국어 | |
-| `qu` | Runasimi | Quechua |
+```
+📦 app/src/main/java/com/example/appgasto/
+ ┣ 📁 data/
+ ┃ ┣ 📂 local/          → Room entities, DAOs, AppDatabase + migraciones
+ ┃ ┣ 📂 repository/     → ExpenseRepository, PreferencesRepository
+ ┃ ┣ 📂 backup/         → BackupManager (JSON export/import)
+ ┃ ┣ 📂 currency/       → ExchangeRateApi, CurrencyConverter
+ ┃ ┗ 📂 ocr/            → MLKitReceiptOcrService, ReceiptParser
+ ┣ 📁 domain/model/     → ThemeMode, AppLanguage, UserPreferences
+ ┣ 📁 ui/
+ ┃ ┣ 📂 home/           → Resumen del día + desglose por moneda
+ ┃ ┣ 📂 add/            → Agregar/Editar + escaneo de recibos
+ ┃ ┣ 📂 list/           → Historial con filtros por categoría
+ ┃ ┣ 📂 stats/          → Estadísticas + donut chart
+ ┃ ┣ 📂 settings/       → Tema, idioma, presupuesto, CSV, tasas
+ ┃ ┣ 📂 navigation/     → NavHost + rutas parametrizadas
+ ┃ ┣ 📂 theme/          → Material 3 + Matrix theme
+ ┃ ┗ 📂 components/     → ExpenseItem, CategorySelector
+ ┣ 📁 widget/            → Glance app widget
+ ┣ 📁 notifications/     → WorkManager (alertas presupuesto)
+ ┗ 📁 di/                → Módulos Hilt (Database, Ocr, Currency)
+```
 
-> 💡 **¿Agregar un idioma?** Copia `values/strings.xml` a `values-XX/strings.xml` y traduce los textos.
+---
+
+## 🌐 Idiomas
+
+<div align="center">
+
+| Código | Idioma | | Código | Idioma |
+|:------:|:------:|:-:|:------:|:------:|
+| `es` | 🇪🇸 **Español** | Default | `de` | 🇩🇪 Deutsch |
+| `en` | 🇬🇧 **English** | | `ja` | 🇯🇵 日本語 |
+| `pt` | 🇧🇷 **Português** | | `ko` | 🇰🇷 한국어 |
+| `it` | 🇮🇹 **Italiano** | | `qu` | Runasimi (Quechua) |
+
+</div>
+
+---
+
+## 📊 Estado del Proyecto
+
+```yaml
+versión_actual: 0.2
+última_actualización: 2026-07-14
+features:
+  - ✅ Multi-moneda con tasas en tiempo real
+  - ✅ Escaneo de recibos con ML Kit + OCR
+  - ✅ 3 temas visuales (Claro / Oscuro / Matrix)
+  - ✅ Exportación CSV
+  - ✅ Widget de resumen
+  - ✅ Presupuesto mensual con alertas
+  - ✅ 8 idiomas
+próximos:
+  - 🔜 Modo oscuro automático (horario)
+  - 🔜 Categorías personalizables
+  - 🔜 Backup en la nube (Drive API)
+```
 
 ---
 
@@ -188,8 +236,16 @@ copies or substantial portions of the Software.
 
 <div align="center">
 
-**Hecho con ❤️ para Android**
+**Hecho con ❤️ para Android**  
+*Una app de MaximillionSnyder*
 
-[![GitHub](https://img.shields.io/badge/GitHub-MaximillionSnyder-181717?logo=github)](https://github.com/MaximillionSnyder)
+<br>
+
+[![GitHub](https://img.shields.io/badge/GitHub-MaximillionSnyder-181717?style=for-the-badge&logo=github)](https://github.com/MaximillionSnyder)
+[![Kotlin](https://img.shields.io/badge/made_with-Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)](https://kotlinlang.org)
+
+<br>
+
+[⬆ Volver arriba](#-appgasto)
 
 </div>
