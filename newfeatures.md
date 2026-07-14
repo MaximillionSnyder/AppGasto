@@ -12,7 +12,10 @@
 - **Objetivo:** Permitir escanear un recibo físico con la cámara y auto-llenar los campos del formulario de gasto, evitando el ingreso manual.
 - **Stack técnico:**
   - Google ML Kit Document Scanner API (`com.google.android.gms:play-services-mlkit-document-scanner:16.0.0`) — UI de escaneo con detección de bordes, corrección de perspectiva, auto-capture
-  - Google ML Kit Text Recognition v2 (`com.google.mlkit:text-recognition:16.0.0`) — OCR on-device para extraer texto del recibo
+    - **Paquete real:** `com.google.mlkit.vision.documentscanner.*` (NO `com.google.android.gms.mlkit.*`)
+    - **Clase Options:** `GmsDocumentScannerOptions` (NO `GmsDocumentScanningOptions`)
+  - Google ML Kit Text Recognition v2 (`com.google.mlkit:text-recognition:16.0.1`) — OCR on-device para extraer texto del recibo
+    - **`TextRecognizerOptions`** está en `com.google.mlkit.vision.text.latin` (NO `com.google.mlkit.vision.text`)
   - ReceiptParser propio — regex para extraer total, fecha, comercio y moneda
 - **Qué extraer:**
   - `[x]` **Total** del recibo (patrones: `TOTAL S/. 123.45`, `SUMA`, `IMPORTE`, `VUELTO`)

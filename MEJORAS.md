@@ -146,6 +146,23 @@
 
 ---
 
+## Versión 8 — 2026-07-14
+
+### 8.1 Fix: Paquetes incorrectos en imports de ML Kit
+- **Archivos:** `AddEditScreen.kt`, `MLKitReceiptOcrService.kt`, `gradle/libs.versions.toml`
+- **Problema:** Los imports de ML Kit usaban paquetes y nombres de clase que no existen en los AAR reales descargados desde Google Maven, causando múltiples errores "Unresolved reference" al compilar.
+- **Solución** (verificado extrayendo los AAR directamente de `dl.google.com`):
+  - **Package document scanner:** `com.google.mlkit.vision.documentscanner.*` — el código usaba `com.google.android.gms.mlkit.vision.documentscanner.*` (no existe)
+  - **Clase Options:** `GmsDocumentScannerOptions` (con "Scanner") — el código usaba `GmsDocumentScanningOptions` (con "Scanning")
+  - **Constante FORMAT_JPEG:** está en `GmsDocumentScannerOptions.RESULT_FORMAT_JPEG` — el código la buscaba en `GmsDocumentScanningResult.FORMAT_JPEG`
+  - **TextRecognizerOptions:** está en `com.google.mlkit.vision.text.latin` — el código importaba desde `com.google.mlkit.vision.text` (sin `.latin`)
+- **Adicional:** 
+  - Eliminado import `com.google.android.gms.tasks.addOnSuccessListener` (top-level extension no disponible en `play-services-tasks:18.2.0`); se usa la función miembro de `Task` vía SAM conversion
+  - Agregado import faltante `androidx.activity.compose.rememberLauncherForActivityResult`
+  - Bump `mlkitTextRecognition` de `16.0.0` a `16.0.1`
+
+---
+
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
@@ -157,3 +174,4 @@
 | 5 | 2026-07-08 | Sección de notas desplegable + Exportación CSV de gastos |
 | 6 | 2026-07-09 | Fix imports, tarjetas Home conectadas a Stats, desglose moneda colapsable |
 | 7 | 2026-07-09 | Escaneo de recibos con ML Kit Document Scanner + Text Recognition + parser |
+| 8 | 2026-07-14 | Fix paquetes/nombres imports ML Kit (verificado vs AAR reales), bump text-recognition 16.0.1, import faltante rememberLauncherForActivityResult |
