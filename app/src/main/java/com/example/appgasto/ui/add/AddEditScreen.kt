@@ -73,7 +73,6 @@ import com.example.appgasto.ui.theme.GradientStart
 import com.google.android.gms.mlkit.vision.documentscanner.GmsDocumentScanning
 import com.google.android.gms.mlkit.vision.documentscanner.GmsDocumentScanningOptions
 import com.google.android.gms.mlkit.vision.documentscanner.GmsDocumentScanningResult
-import com.google.android.gms.tasks.addOnFailureListener
 import com.google.android.gms.tasks.addOnSuccessListener
 import java.time.Instant
 import java.time.LocalDate
