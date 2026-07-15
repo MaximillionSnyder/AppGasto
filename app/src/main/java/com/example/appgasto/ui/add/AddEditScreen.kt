@@ -76,7 +76,7 @@ import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import androidx.activity.compose.rememberLauncherForActivityResult
 import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
+import java.time.ZoneOffset
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -348,7 +348,7 @@ fun AddEditScreen(
                 if (showDatePicker) {
                     val datePickerState = rememberDatePickerState(
                         initialSelectedDateMillis = state.date
-                            .atStartOfDay(ZoneId.systemDefault())
+                            .atStartOfDay(ZoneOffset.UTC)
                             .toInstant()
                             .toEpochMilli()
                     )
@@ -358,7 +358,7 @@ fun AddEditScreen(
                             TextButton(onClick = {
                                 datePickerState.selectedDateMillis?.let { millis ->
                                     val date = Instant.ofEpochMilli(millis)
-                                        .atZone(ZoneId.systemDefault())
+                                        .atZone(ZoneOffset.UTC)
                                         .toLocalDate()
                                     viewModel.updateDate(date)
                                 }

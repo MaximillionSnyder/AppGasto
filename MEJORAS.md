@@ -167,6 +167,7 @@
 
 | Versión | Fecha | Cambios |
 |:-------:|:-----:|:--------|
+| 9 | 2026-07-15 | Fix desfase temporal en DatePicker: ZoneId.systemDefault() → ZoneOffset.UTC para evitar off-by-one en timezones negativos |
 | 1 | 2026-07-04 | Fix declarations, LetterSpacing, FilterChips overflow, README redesign |
 | 2 | 2026-07-04 | Tope de 4 decimales con soporte punto/coma |
 | 3 | 2026-07-04 | Nuevo tema Matrix (verde neon glow) |
