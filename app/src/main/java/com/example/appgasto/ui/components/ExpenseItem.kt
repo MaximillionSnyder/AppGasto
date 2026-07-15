@@ -62,6 +62,7 @@ fun ExpenseItem(
     isMatrix: Boolean = false,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
+    showDelete: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     val catColor = category?.let {
@@ -137,13 +138,15 @@ fun ExpenseItem(
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
-                    IconButton(onClick = onDelete, modifier = Modifier.size(28.dp)) {
-                        Icon(
-                            Icons.Default.Delete,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                            tint = MaterialTheme.colorScheme.error
-                        )
+                    if (showDelete) {
+                        IconButton(onClick = onDelete, modifier = Modifier.size(28.dp)) {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
                     }
                 }
             }

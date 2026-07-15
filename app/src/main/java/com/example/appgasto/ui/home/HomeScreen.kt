@@ -287,7 +287,8 @@ fun HomeScreen(
                             isDark = isDark,
                             isMatrix = isMatrix,
                             onEdit = { onNavigateToEdit(expense.id) },
-                            onDelete = { viewModel.deleteExpense(expense) }
+                            onDelete = { viewModel.deleteExpense(expense) },
+                            showDelete = false
                         )
                     }
                 }

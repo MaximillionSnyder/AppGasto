@@ -56,26 +56,6 @@
 | ML Kit Document Scanner<br>+ OCR + auto-llenado | Export CSV • JSON<br>Auto Backup Drive | Donut chart por categoría<br>Periodos diario/semanal/mensual | Comida • Transporte • Ocio • Hogar<br>Salud • Ropa • Otros |
 
 </div>
-
----
-
-## 🎯 Highlights
-
-```kotlin
-// Multi-moneda con tasas automáticas
-val gasto = Expense(
-    amount = 100.0,
-    currency = "USD",
-    amountInPEN = 375.0,   // conversión automática
-    exchangeRateUsed = 3.75 // tasa al momento de guardar
-)
-
-// Escaneo de recibo con IA
-val receipt = receiptOcrService.parseReceiptImage(uri)
-// → Total: S/ 45.90 | Fecha: 2026-07-14 | Moneda: PEN
-// → Nota: "Restaurante Donde Juan - 2 platos del día"
-```
-
 ---
 
 ## 🛠️ Stack Técnico
@@ -148,34 +128,6 @@ git clone https://github.com/MaximillionSnyder/AppGasto.git
 ```
 
 </details>
-
----
-
-## 📂 Arquitectura
-
-```
-📦 app/src/main/java/com/example/appgasto/
- ┣ 📁 data/
- ┃ ┣ 📂 local/          → Room entities, DAOs, AppDatabase + migraciones
- ┃ ┣ 📂 repository/     → ExpenseRepository, PreferencesRepository
- ┃ ┣ 📂 backup/         → BackupManager (JSON export/import)
- ┃ ┣ 📂 currency/       → ExchangeRateApi, CurrencyConverter
- ┃ ┗ 📂 ocr/            → MLKitReceiptOcrService, ReceiptParser
- ┣ 📁 domain/model/     → ThemeMode, AppLanguage, UserPreferences
- ┣ 📁 ui/
- ┃ ┣ 📂 home/           → Resumen del día + desglose por moneda
- ┃ ┣ 📂 add/            → Agregar/Editar + escaneo de recibos
- ┃ ┣ 📂 list/           → Historial con filtros por categoría
- ┃ ┣ 📂 stats/          → Estadísticas + donut chart
- ┃ ┣ 📂 settings/       → Tema, idioma, presupuesto, CSV, tasas
- ┃ ┣ 📂 navigation/     → NavHost + rutas parametrizadas
- ┃ ┣ 📂 theme/          → Material 3 + Matrix theme
- ┃ ┗ 📂 components/     → ExpenseItem, CategorySelector
- ┣ 📁 widget/            → Glance app widget
- ┣ 📁 notifications/     → WorkManager (alertas presupuesto)
- ┗ 📁 di/                → Módulos Hilt (Database, Ocr, Currency)
-```
-
 ---
 
 ## 🌐 Idiomas
@@ -190,28 +142,6 @@ git clone https://github.com/MaximillionSnyder/AppGasto.git
 | `it` | 🇮🇹 **Italiano** | | `qu` | Runasimi (Quechua) |
 
 </div>
-
----
-
-## 📊 Estado del Proyecto
-
-```yaml
-versión_actual: 0.2
-última_actualización: 2026-07-14
-features:
-  - ✅ Multi-moneda con tasas en tiempo real
-  - ✅ Escaneo de recibos con ML Kit + OCR
-  - ✅ 3 temas visuales (Claro / Oscuro / Matrix)
-  - ✅ Exportación CSV
-  - ✅ Widget de resumen
-  - ✅ Presupuesto mensual con alertas
-  - ✅ 8 idiomas
-próximos:
-  - 🔜 Modo oscuro automático (horario)
-  - 🔜 Categorías personalizables
-  - 🔜 Backup en la nube (Drive API)
-```
-
 ---
 
 ## 📄 Licencia
