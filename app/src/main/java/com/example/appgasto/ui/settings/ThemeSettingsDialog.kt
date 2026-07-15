@@ -53,6 +53,7 @@ fun ThemeSettingsDialog(
                 ThemeOption(
                     icon = Icons.Default.LightMode,
                     iconColor = Color(0xFFFFAB00),
+                    previewColor = Color(0xFF6C63FF),
                     label = stringResource(R.string.theme_light),
                     isSelected = currentTheme == ThemeMode.LIGHT,
                     onClick = { onSelect(ThemeMode.LIGHT) }
@@ -60,6 +61,7 @@ fun ThemeSettingsDialog(
                 ThemeOption(
                     icon = Icons.Default.DarkMode,
                     iconColor = Color(0xFF6C63FF),
+                    previewColor = Color(0xFFB4AFFF),
                     label = stringResource(R.string.theme_dark),
                     isSelected = currentTheme == ThemeMode.DARK,
                     onClick = { onSelect(ThemeMode.DARK) }
@@ -67,6 +69,7 @@ fun ThemeSettingsDialog(
                 ThemeOption(
                     icon = Icons.Default.SettingsBrightness,
                     iconColor = Color(0xFF00BFA6),
+                    previewColor = Color(0xFF00BFA6),
                     label = stringResource(R.string.theme_system),
                     isSelected = currentTheme == ThemeMode.SYSTEM,
                     onClick = { onSelect(ThemeMode.SYSTEM) }
@@ -74,6 +77,7 @@ fun ThemeSettingsDialog(
                 ThemeOption(
                     icon = Icons.Default.Terminal,
                     iconColor = Color(0xFF00FF41),
+                    previewColor = Color(0xFF00FF41),
                     label = stringResource(R.string.theme_matrix),
                     isSelected = currentTheme == ThemeMode.MATRIX,
                     onClick = { onSelect(ThemeMode.MATRIX) }
@@ -93,6 +97,7 @@ fun ThemeSettingsDialog(
 private fun ThemeOption(
     icon: ImageVector,
     iconColor: Color,
+    previewColor: Color,
     label: String,
     isSelected: Boolean,
     onClick: () -> Unit
@@ -129,13 +134,21 @@ private fun ThemeOption(
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.weight(1f)
         )
-        if (isSelected) {
-            Icon(
-                Icons.Default.Check,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(20.dp)
-            )
+        Box(
+            modifier = Modifier
+                .size(24.dp)
+                .clip(CircleShape)
+                .background(previewColor.copy(alpha = 0.8f)),
+            contentAlignment = Alignment.Center
+        ) {
+            if (isSelected) {
+                Icon(
+                    Icons.Default.Check,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
         }
     }
 }

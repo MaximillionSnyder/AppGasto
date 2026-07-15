@@ -183,6 +183,8 @@
 ## Versión 11 — 2026-07-15
 
 ### 11.1 Barra de progreso del presupuesto mensual
+
+### 11.1 Barra de progreso del presupuesto mensual
 - **Archivos:** `SettingsViewModel.kt`, `SettingsScreen.kt`, `strings.xml` (+en)
 - **Objetivo:** Mostrar visualmente qué porcentaje del presupuesto mensual se ha consumido.
 - **Solución:**
@@ -201,13 +203,20 @@
   - Método `clearAllData()` en ViewModel que llama a `expenseRepository.deleteAllExpenses()` y resetea el presupuesto
   - Snackbar "Datos restablecidos" al completar
 
+### 11.3 Preview visual de temas y banderas en círculo
+- **Archivos:** `ThemeSettingsDialog.kt`, `LanguageSettingsDialog.kt`
+- **Objetivo:** Mejorar la apariencia de los diálogos de selección con previsualizaciones visuales.
+- **Solución:**
+  - **ThemeSettingsDialog:** Cada opción ahora muestra un círculo de color de 24dp al final con el color primario del tema (morado para Light, lila para Dark, teal para System, verde neón para Matrix). Al estar seleccionado, el checkmark se muestra dentro del círculo en blanco.
+  - **LanguageSettingsDialog:** La bandera de cada idioma ahora va dentro de un círculo de 40dp con fondo `surfaceVariant` (o primary con alpha si está seleccionado), consistente con el estilo de ThemeOption.
+
 ---
 
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
 |:-------:|:-----:|:--------|
-| 11 | 2026-07-15 | Barra de progreso presupuesto + botón restablecer datos |
+| 11 | 2026-07-15 | Barra progreso presupuesto, restablecer datos, preview visual temas/banderas |
 | 10 | 2026-07-15 | Rediseño Ajustes: secciones agrupadas, flechas >, versión dinámica, moneda como row, About mejorado, animación presupuesto |
 | 9 | 2026-07-15 | Fix desfase temporal en DatePicker |
 | 1 | 2026-07-04 | Fix declarations, LetterSpacing, FilterChips overflow, README redesign |
