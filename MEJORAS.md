@@ -163,11 +163,29 @@
 
 ---
 
+## Versión 10 — 2026-07-15
+
+### 10.1 Rediseño completo de la pantalla de Ajustes
+- **Archivos:** `SettingsScreen.kt`, `strings.xml` (+en)
+- **Objetivo:** Mejorar la apariencia visual, usabilidad y organización de la pantalla de Ajustes.
+- **Cambios:**
+  - **Encabezados de sección agrupados:** Se agregaron títulos GENERAL, PERSONALIZACIÓN, DATOS e INFORMACIÓN sobre las tarjetas, con texto en mayúsculas y color primario, para organizar visualmente los ajustes.
+  - **Flecha `>` en SettingsRow:** Cada fila clickable ahora muestra un ícono `KeyboardArrowRight` al final, indicando que es interactiva (estilo Ajustes de Android/iOS). Las filas informativas lo ocultan.
+  - **Versión dinámica:** Reemplazado el texto hardcodeado "Versión 0.2" por `BuildConfig.VERSION_NAME` (formato `v{X}`).
+  - **Sección de Moneda rediseñada:** Ahora incluye una fila informativa "Moneda base → PEN — Soles peruanos" y el botón "Actualizar tasas" con ícono `Refresh`.
+  - **Sección Acerca de mejorada:** Agregado ícono de la app con fondo gradiente (`GradientStart → GradientEnd`) en un `RoundedCornerShape(14.dp)`, nombre de la app en `SemiBold`, versión dinámica en color primario, y texto "Hecho con ❤️ en Kotlin".
+  - **Animación en presupuesto:** El bloque de "Cambiar monto" / "Definir presupuesto" ahora se expande/contrae con `AnimatedVisibility` usando `expandVertically()`/`shrinkVertically()` al activar/desactivar el Switch.
+  - **subtitle opcional:** El parámetro `subtitle` de `SettingsRow` ahora tiene default `""` y solo se muestra si tiene contenido.
+  - **Spacer horizontal consistente:** Reemplazado `Spacer(Modifier.padding(horizontal = 8.dp))` por `Spacer(Modifier.width(12.dp))` en SettingsRow y SettingsSection.
+
+---
+
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
 |:-------:|:-----:|:--------|
-| 9 | 2026-07-15 | Fix desfase temporal en DatePicker: ZoneId.systemDefault() → ZoneOffset.UTC para evitar off-by-one en timezones negativos |
+| 10 | 2026-07-15 | Rediseño Ajustes: secciones agrupadas, flechas >, versión dinámica, moneda como row, About mejorado, animación presupuesto |
+| 9 | 2026-07-15 | Fix desfase temporal en DatePicker |
 | 1 | 2026-07-04 | Fix declarations, LetterSpacing, FilterChips overflow, README redesign |
 | 2 | 2026-07-04 | Tope de 4 decimales con soporte punto/coma |
 | 3 | 2026-07-04 | Nuevo tema Matrix (verde neon glow) |
@@ -175,4 +193,4 @@
 | 5 | 2026-07-08 | Sección de notas desplegable + Exportación CSV de gastos |
 | 6 | 2026-07-09 | Fix imports, tarjetas Home conectadas a Stats, desglose moneda colapsable |
 | 7 | 2026-07-09 | Escaneo de recibos con ML Kit Document Scanner + Text Recognition + parser |
-| 8 | 2026-07-14 | Fix paquetes/nombres imports ML Kit (verificado vs AAR reales), bump text-recognition 16.0.1, import faltante rememberLauncherForActivityResult |
+| 8 | 2026-07-14 | Fix paquetes/nombres imports ML Kit, bump text-recognition 16.0.1, import faltante |

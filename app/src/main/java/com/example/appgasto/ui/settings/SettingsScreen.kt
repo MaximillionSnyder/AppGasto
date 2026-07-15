@@ -3,6 +3,9 @@ package com.example.appgasto.ui.settings
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,18 +18,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.CloudDownload
+import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.MonetizationOn
-import androidx.compose.material.icons.filled.CloudUpload
-import androidx.compose.material.icons.filled.CloudDownload
-import androidx.compose.material.icons.filled.CurrencyExchange
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.TableChart
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -55,6 +62,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -62,7 +70,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.appgasto.BuildConfig
 import com.example.appgasto.R
+import com.example.appgasto.ui.theme.GradientEnd
+import com.example.appgasto.ui.theme.GradientStart
 import com.example.appgasto.ui.theme.GradientTertiary
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -164,6 +175,9 @@ fun SettingsScreen(
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
+            // ── GENERAL ──
+            SettingsSectionHeader(stringResource(R.string.section_general))
+
             SettingsSection(
                 title = stringResource(R.string.monthly_budget),
                 icon = Icons.Default.MonetizationOn,
@@ -198,31 +212,103 @@ fun SettingsScreen(
                     )
                 }
 
-                if (state.budgetEnabled) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { showBudgetDialog = true }
-                            .padding(vertical = 8.dp)
-                    ) {
-                        Icon(
-                            Icons.Default.MonetizationOn,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.padding(horizontal = 8.dp))
-                        Text(
-                            text = if (state.monthlyBudget > 0) stringResource(R.string.change_amount) else stringResource(R.string.set_budget),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Medium
+                AnimatedVisibility(
+                    visible = state.budgetEnabled,
+                    enter = expandVertically(),
+                    exit = shrinkVertically()
+                ) {
+                    Column {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        SettingsRow(
+                            icon = Icons.Default.MonetizationOn,
+                            iconColor = MaterialTheme.colorScheme.primary,
+                            title = if (state.monthlyBudget > 0) stringResource(R.string.change_amount) else stringResource(R.string.set_budget),
+                            onClick = { showBudgetDialog = true },
+                            showArrow = true
                         )
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
+
+            SettingsSection(
+                title = stringResource(R.string.currency),
+                icon = Icons.Default.CurrencyExchange,
+                iconColor = MaterialTheme.colorScheme.primary
+            ) {
+                SettingsRow(
+                    icon = Icons.Default.CurrencyExchange,
+                    iconColor = MaterialTheme.colorScheme.primary,
+                    title = stringResource(R.string.base_currency),
+                    subtitle = "PEN — Soles peruanos",
+                    onClick = {},
+                    showArrow = false
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = {
+                            viewModel.refreshRates { success ->
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(
+                                        context.getString(
+                                            if (success) R.string.rates_updated else R.string.rates_error
+                                        )
+                                    )
+                                }
+                            }
+                        },
+                        enabled = !state.isRefreshingRates,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        if (state.isRefreshingRates) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        } else {
+                            Icon(
+                                Icons.Default.Refresh,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(stringResource(R.string.refresh_rates))
+                        }
+                    }
+                }
+
+                if (state.ratesUpdatedAt > 0) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(
+                            R.string.last_update,
+                            settingsDateFormat.format(Date(state.ratesUpdatedAt))
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
+
+            // ── PERSONALIZACIÓN ──
+            Spacer(modifier = Modifier.height(12.dp))
+            SettingsSectionHeader(stringResource(R.string.section_appearance))
 
             SettingsSection(
                 title = stringResource(R.string.appearance),
@@ -266,61 +352,9 @@ fun SettingsScreen(
                 )
             }
 
+            // ── DATOS ──
             Spacer(modifier = Modifier.height(12.dp))
-
-            SettingsSection(
-                title = stringResource(R.string.currency),
-                icon = Icons.Default.CurrencyExchange,
-                iconColor = MaterialTheme.colorScheme.primary
-            ) {
-                Column {
-                    Text(
-                        text = stringResource(R.string.base_currency_description),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(
-                        onClick = {
-                            viewModel.refreshRates { success ->
-                                scope.launch {
-                                    snackbarHostState.showSnackbar(
-                                        context.getString(
-                                            if (success) R.string.rates_updated else R.string.rates_error
-                                        )
-                                    )
-                                }
-                            }
-                        },
-                        enabled = !state.isRefreshingRates,
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = MaterialTheme.shapes.medium
-                    ) {
-                        if (state.isRefreshingRates) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(20.dp),
-                                strokeWidth = 2.dp,
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
-                        } else {
-                            Text(stringResource(R.string.refresh_rates))
-                        }
-                    }
-                    if (state.ratesUpdatedAt > 0) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = stringResource(
-                                R.string.last_update,
-                                settingsDateFormat.format(Date(state.ratesUpdatedAt))
-                            ),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
+            SettingsSectionHeader(stringResource(R.string.section_data))
 
             SettingsSection(
                 title = stringResource(R.string.backup),
@@ -370,7 +404,9 @@ fun SettingsScreen(
                 )
             }
 
+            // ── INFORMACIÓN ──
             Spacer(modifier = Modifier.height(12.dp))
+            SettingsSectionHeader(stringResource(R.string.section_info))
 
             SettingsSection(
                 title = stringResource(R.string.about),
@@ -378,28 +414,39 @@ fun SettingsScreen(
                 iconColor = MaterialTheme.colorScheme.onSurfaceVariant
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(36.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f)),
+                            .size(50.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(
+                                Brush.horizontalGradient(listOf(GradientStart, GradientEnd))
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            Icons.Default.Info,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(20.dp)
+                        Text(
+                            text = "A",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.White
                         )
                     }
-                    Spacer(modifier = Modifier.padding(horizontal = 8.dp))
+                    Spacer(modifier = Modifier.width(14.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(stringResource(R.string.app_name), style = MaterialTheme.typography.bodyLarge)
                         Text(
-                            text = "Versión 0.2",
+                            text = stringResource(R.string.app_name),
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            text = "v${BuildConfig.VERSION_NAME}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = stringResource(R.string.made_with),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -407,7 +454,7 @@ fun SettingsScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
         if (showThemeDialog) {
@@ -443,6 +490,17 @@ fun SettingsScreen(
 }
 
 @Composable
+private fun SettingsSectionHeader(title: String) {
+    Text(
+        text = title.uppercase(),
+        style = MaterialTheme.typography.labelSmall,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.padding(start = 4.dp, bottom = 4.dp, top = 4.dp)
+    )
+}
+
+@Composable
 private fun SettingsSection(
     title: String,
     icon: ImageVector,
@@ -472,7 +530,7 @@ private fun SettingsSection(
                         modifier = Modifier.size(18.dp)
                     )
                 }
-                Spacer(modifier = Modifier.padding(horizontal = 6.dp))
+                Spacer(modifier = Modifier.width(10.dp))
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
@@ -490,8 +548,9 @@ private fun SettingsRow(
     icon: ImageVector,
     iconColor: Color,
     title: String,
-    subtitle: String,
-    onClick: () -> Unit
+    subtitle: String = "",
+    onClick: () -> Unit,
+    showArrow: Boolean = true
 ) {
     Row(
         modifier = Modifier
@@ -514,13 +573,26 @@ private fun SettingsRow(
                 modifier = Modifier.size(20.dp)
             )
         }
-        Spacer(modifier = Modifier.padding(horizontal = 8.dp))
+        Spacer(modifier = Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.bodyLarge)
             Text(
-                text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                text = title,
+                style = MaterialTheme.typography.bodyLarge
+            )
+            if (subtitle.isNotEmpty()) {
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+        if (showArrow) {
+            Icon(
+                Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                modifier = Modifier.size(20.dp)
             )
         }
     }

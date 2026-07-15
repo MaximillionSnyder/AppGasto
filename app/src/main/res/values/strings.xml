@@ -107,6 +107,12 @@
     <string name="import_data">Restaurar datos</string>
     <string name="import_description">Importar desde un archivo</string>
     <string name="about">Acerca de</string>
+    <string name="section_general">General</string>
+    <string name="section_appearance">Personalización</string>
+    <string name="section_data">Datos</string>
+    <string name="section_info">Información</string>
+    <string name="base_currency">Moneda base</string>
+    <string name="made_with">Hecho con ❤️ en Kotlin</string>
 
     <!-- Theme -->
     <string name="theme_light">Claro</string>
