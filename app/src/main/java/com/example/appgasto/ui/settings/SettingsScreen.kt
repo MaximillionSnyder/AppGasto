@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.MonetizationOn
@@ -43,6 +44,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -98,6 +102,7 @@ fun SettingsScreen(
     var showThemeDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showBudgetDialog by remember { mutableStateOf(false) }
+    var showResetDialog by remember { mutableStateOf(false) }
 
     val importLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -213,16 +218,44 @@ fun SettingsScreen(
                 }
 
                 AnimatedVisibility(
-                    visible = state.budgetEnabled,
+                    visible = state.budgetEnabled && state.monthlyBudget > 0,
                     enter = expandVertically(),
                     exit = shrinkVertically()
                 ) {
                     Column {
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        val ratio = (state.monthlyExpenseTotal / state.monthlyBudget).toFloat().coerceIn(0f, 1.5f)
+                        val progressColor = when {
+                            ratio >= 1f -> MaterialTheme.colorScheme.error
+                            ratio >= 0.8f -> Color(0xFFFF9800)
+                            else -> MaterialTheme.colorScheme.primary
+                        }
+
+                        LinearProgressIndicator(
+                            progress = { ratio.coerceAtMost(1f) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(8.dp)
+                                .clip(MaterialTheme.shapes.small),
+                            color = progressColor,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                        )
+
                         Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = if (ratio >= 1f) stringResource(R.string.budget_exceeded)
+                                   else stringResource(R.string.budget_progress, state.monthlyExpenseTotal, state.monthlyBudget),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = progressColor,
+                            fontWeight = FontWeight.Medium
+                        )
+
                         SettingsRow(
                             icon = Icons.Default.MonetizationOn,
                             iconColor = MaterialTheme.colorScheme.primary,
-                            title = if (state.monthlyBudget > 0) stringResource(R.string.change_amount) else stringResource(R.string.set_budget),
+                            title = stringResource(R.string.change_amount),
                             onClick = { showBudgetDialog = true },
                             showArrow = true
                         )
@@ -402,6 +435,19 @@ fun SettingsScreen(
                         csvExportLauncher.launch("appgasto_$dateStr.csv")
                     }
                 )
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                )
+
+                SettingsRow(
+                    icon = Icons.Default.DeleteForever,
+                    iconColor = MaterialTheme.colorScheme.error,
+                    title = stringResource(R.string.reset_data),
+                    subtitle = stringResource(R.string.reset_data_description),
+                    onClick = { showResetDialog = true }
+                )
             }
 
             // ── INFORMACIÓN ──
@@ -484,6 +530,47 @@ fun SettingsScreen(
                 currentBudget = state.monthlyBudget,
                 onSave = { viewModel.setMonthlyBudget(it) },
                 onDismiss = { showBudgetDialog = false }
+            )
+        }
+
+        if (showResetDialog) {
+            AlertDialog(
+                onDismissRequest = { showResetDialog = false },
+                title = {
+                    Text(
+                        text = stringResource(R.string.reset_data),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                text = {
+                    Text(
+                        text = stringResource(R.string.reset_data_confirm),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        viewModel.clearAllData()
+                        showResetDialog = false
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                context.getString(R.string.reset_done)
+                            )
+                        }
+                    }) {
+                        Text(
+                            stringResource(R.string.confirm),
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showResetDialog = false }) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                },
+                shape = MaterialTheme.shapes.large
             )
         }
     }

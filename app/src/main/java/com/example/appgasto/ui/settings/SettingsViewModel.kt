@@ -26,6 +26,7 @@ data class SettingsUiState(
     val language: AppLanguage = AppLanguage.SYSTEM,
     val monthlyBudget: Double = 0.0,
     val budgetEnabled: Boolean = false,
+    val monthlyExpenseTotal: Double = 0.0,
     val ratesUpdatedAt: Long = 0L,
     val isRefreshingRates: Boolean = false
 )
@@ -44,11 +45,13 @@ class SettingsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             preferencesRepository.preferencesFlow.collect { prefs ->
+                val monthTotal = expenseRepository.getCurrentMonthTotal()
                 _uiState.value = SettingsUiState(
                     themeMode = prefs.themeMode,
                     language = prefs.language,
                     monthlyBudget = prefs.monthlyBudget,
                     budgetEnabled = prefs.budgetEnabled,
+                    monthlyExpenseTotal = monthTotal,
                     ratesUpdatedAt = prefs.ratesUpdatedAt
                 )
             }
@@ -93,6 +96,14 @@ class SettingsViewModel @Inject constructor(
     fun setBudgetEnabled(enabled: Boolean) {
         viewModelScope.launch {
             preferencesRepository.setBudgetEnabled(enabled)
+        }
+    }
+
+    fun clearAllData() {
+        viewModelScope.launch {
+            expenseRepository.deleteAllExpenses()
+            preferencesRepository.setMonthlyBudget(0.0)
+            preferencesRepository.setBudgetEnabled(false)
         }
     }
 

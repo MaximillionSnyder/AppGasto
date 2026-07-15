@@ -180,10 +180,34 @@
 
 ---
 
+## Versión 11 — 2026-07-15
+
+### 11.1 Barra de progreso del presupuesto mensual
+- **Archivos:** `SettingsViewModel.kt`, `SettingsScreen.kt`, `strings.xml` (+en)
+- **Objetivo:** Mostrar visualmente qué porcentaje del presupuesto mensual se ha consumido.
+- **Solución:**
+  - Nuevo campo `monthlyExpenseTotal` en `SettingsUiState` — se calcula en `init` del ViewModel usando `expenseRepository.getCurrentMonthTotal()`
+  - `LinearProgressIndicator` con altura de 8dp y bordes redondeados debajo del Switch de presupuesto
+  - Color dinámico: verde/primary (< 80%), naranja (80–99%), rojo/error (≥ 100%)
+  - Texto informativo: "S/. {gastado} de S/. {presupuesto}" o "¡Presupuesto excedido!"
+  - Animado con `AnimatedVisibility` junto al resto del contenido
+
+### 11.2 Botón "Restablecer datos"
+- **Archivos:** `SettingsViewModel.kt`, `SettingsScreen.kt`, `strings.xml` (+en)
+- **Objetivo:** Permitir borrar todos los gastos y reiniciar el presupuesto desde Ajustes.
+- **Solución:**
+  - Nueva fila `SettingsRow` con ícono `DeleteForever` y color error al final de la sección DATOS
+  - `AlertDialog` de confirmación con texto descriptivo y botón "Confirmar" en rojo
+  - Método `clearAllData()` en ViewModel que llama a `expenseRepository.deleteAllExpenses()` y resetea el presupuesto
+  - Snackbar "Datos restablecidos" al completar
+
+---
+
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
 |:-------:|:-----:|:--------|
+| 11 | 2026-07-15 | Barra de progreso presupuesto + botón restablecer datos |
 | 10 | 2026-07-15 | Rediseño Ajustes: secciones agrupadas, flechas >, versión dinámica, moneda como row, About mejorado, animación presupuesto |
 | 9 | 2026-07-15 | Fix desfase temporal en DatePicker |
 | 1 | 2026-07-04 | Fix declarations, LetterSpacing, FilterChips overflow, README redesign |

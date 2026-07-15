@@ -105,6 +105,12 @@
     <string name="section_info">Information</string>
     <string name="base_currency">Base currency</string>
     <string name="made_with">Made with ❤️ in Kotlin</string>
+    <string name="budget_progress">S/. %1$.2f of S/. %2$.2f</string>
+    <string name="budget_exceeded">Budget exceeded!</string>
+    <string name="reset_data">Reset data</string>
+    <string name="reset_data_description">Delete all expenses and budget</string>
+    <string name="reset_data_confirm">Are you sure? All expenses will be deleted and the budget will be reset. This action cannot be undone.</string>
+    <string name="reset_done">Data reset</string>
 
     <!-- Theme -->
     <string name="theme_light">Light</string>

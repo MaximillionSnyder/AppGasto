@@ -113,6 +113,12 @@
     <string name="section_info">Información</string>
     <string name="base_currency">Moneda base</string>
     <string name="made_with">Hecho con ❤️ en Kotlin</string>
+    <string name="budget_progress">S/. %1$.2f de S/. %2$.2f</string>
+    <string name="budget_exceeded">¡Presupuesto excedido!</string>
+    <string name="reset_data">Restablecer datos</string>
+    <string name="reset_data_description">Borrar todos los gastos y presupuesto</string>
+    <string name="reset_data_confirm">¿Estás seguro? Se borrarán todos los gastos y se reiniciará el presupuesto. Esta acción no se puede deshacer.</string>
+    <string name="reset_done">Datos restablecidos</string>
 
     <!-- Theme -->
     <string name="theme_light">Claro</string>
