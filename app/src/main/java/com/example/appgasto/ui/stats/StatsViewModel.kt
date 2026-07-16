@@ -1,7 +1,6 @@
 package com.example.appgasto.ui.stats
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.appgasto.data.local.Category
 import com.example.appgasto.data.local.Expense
@@ -35,8 +34,7 @@ data class StatsUiState(
 
 @HiltViewModel
 class StatsViewModel @Inject constructor(
-    private val expenseRepository: ExpenseRepository,
-    savedStateHandle: SavedStateHandle
+    private val expenseRepository: ExpenseRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(StatsUiState())
@@ -45,8 +43,7 @@ class StatsViewModel @Inject constructor(
     private var observeJob: Job? = null
 
     init {
-        val initialPeriod = StatsPeriod.valueOf(savedStateHandle.get<String>("period") ?: "MONTHLY")
-        loadStats(initialPeriod)
+        loadStats(StatsPeriod.MONTHLY)
     }
 
     fun loadStats(period: StatsPeriod) {

@@ -7,23 +7,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.appgasto.ui.add.AddEditScreen
-import com.example.appgasto.ui.home.HomeScreen
-import com.example.appgasto.ui.list.ListScreen
 import com.example.appgasto.ui.settings.SettingsScreen
-import com.example.appgasto.ui.stats.StatsPeriod
-import com.example.appgasto.ui.stats.StatsScreen
 
 object Routes {
-    const val HOME = "home"
+    const val MAIN = "main"
     const val ADD = "add?expenseId={expenseId}"
-    const val LIST = "list"
-    const val STATS = "stats?period={period}"
     const val SETTINGS = "settings"
 
     fun addExpense(expenseId: Long? = null) =
         if (expenseId != null) "add?expenseId=$expenseId" else "add"
-
-    fun stats(period: StatsPeriod = StatsPeriod.MONTHLY) = "stats?period=${period.name}"
 }
 
 @Composable
@@ -34,16 +26,14 @@ fun AppNavigation(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Routes.HOME
+        startDestination = Routes.MAIN
     ) {
-        composable(Routes.HOME) {
-            HomeScreen(
+        composable(Routes.MAIN) {
+            MainPagerScreen(
                 isDark = isDark,
                 isMatrix = isMatrix,
                 onNavigateToAdd = { navController.navigate(Routes.addExpense()) },
                 onNavigateToEdit = { expenseId -> navController.navigate(Routes.addExpense(expenseId)) },
-                onNavigateToList = { navController.navigate(Routes.LIST) },
-                onNavigateToStats = { period -> navController.navigate(Routes.stats(period)) },
                 onNavigateToSettings = { navController.navigate(Routes.SETTINGS) }
             )
         }
@@ -60,29 +50,6 @@ fun AppNavigation(
             val expenseId = backStackEntry.arguments?.getLong("expenseId") ?: -1L
             AddEditScreen(
                 expenseId = if (expenseId == -1L) null else expenseId,
-                isDark = isDark,
-                isMatrix = isMatrix,
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
-
-        composable(Routes.LIST) {
-            ListScreen(
-                isDark = isDark,
-                isMatrix = isMatrix,
-                onNavigateToEdit = { expenseId -> navController.navigate(Routes.addExpense(expenseId)) },
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
-
-        composable(
-            route = Routes.STATS,
-            arguments = listOf(navArgument("period") {
-                type = NavType.StringType
-                defaultValue = "MONTHLY"
-            })
-        ) {
-            StatsScreen(
                 isDark = isDark,
                 isMatrix = isMatrix,
                 onNavigateBack = { navController.popBackStack() }
