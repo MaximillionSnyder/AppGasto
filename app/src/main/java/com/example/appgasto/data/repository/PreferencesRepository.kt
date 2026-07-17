@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.appgasto.domain.model.AppLanguage
+import com.example.appgasto.domain.model.Currency
 import com.example.appgasto.domain.model.ThemeMode
 import com.example.appgasto.domain.model.UserPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -33,6 +34,7 @@ class PreferencesRepository @Inject constructor(
         val BUDGET_ALERT_80_MONTH = stringPreferencesKey("budget_alert_80_month")
         val BUDGET_ALERT_100_MONTH = stringPreferencesKey("budget_alert_100_month")
         val RATES_UPDATED_AT = longPreferencesKey("rates_updated_at")
+        val BASE_CURRENCY = stringPreferencesKey("base_currency")
     }
 
     val preferencesFlow: Flow<UserPreferences> = context.dataStore.data.map { prefs ->
@@ -41,7 +43,8 @@ class PreferencesRepository @Inject constructor(
             language = prefs[Keys.LANGUAGE]?.let { safeValueOf<AppLanguage>(it) } ?: AppLanguage.SYSTEM,
             monthlyBudget = prefs[Keys.MONTHLY_BUDGET] ?: 0.0,
             budgetEnabled = prefs[Keys.BUDGET_ENABLED] ?: false,
-            ratesUpdatedAt = prefs[Keys.RATES_UPDATED_AT] ?: 0L
+            ratesUpdatedAt = prefs[Keys.RATES_UPDATED_AT] ?: 0L,
+            baseCurrency = prefs[Keys.BASE_CURRENCY]?.let { Currency.fromCode(it) } ?: Currency.PEN
         )
     }
 
@@ -82,6 +85,12 @@ class PreferencesRepository @Inject constructor(
     suspend fun setRatesUpdatedAt(timestamp: Long) {
         context.dataStore.edit { prefs ->
             prefs[Keys.RATES_UPDATED_AT] = timestamp
+        }
+    }
+
+    suspend fun setBaseCurrency(currency: Currency) {
+        context.dataStore.edit { prefs ->
+            prefs[Keys.BASE_CURRENCY] = currency.code
         }
     }
 

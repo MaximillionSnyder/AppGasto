@@ -5,5 +5,6 @@ data class UserPreferences(
     val language: AppLanguage = AppLanguage.SYSTEM,
     val monthlyBudget: Double = 0.0,
     val budgetEnabled: Boolean = false,
-    val ratesUpdatedAt: Long = 0L
+    val ratesUpdatedAt: Long = 0L,
+    val baseCurrency: Currency = Currency.PEN
 )

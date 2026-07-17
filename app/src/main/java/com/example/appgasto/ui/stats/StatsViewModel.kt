@@ -2,9 +2,12 @@ package com.example.appgasto.ui.stats
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.appgasto.data.currency.ExchangeRateRepository
 import com.example.appgasto.data.local.Category
 import com.example.appgasto.data.local.Expense
 import com.example.appgasto.data.repository.ExpenseRepository
+import com.example.appgasto.data.repository.PreferencesRepository
+import com.example.appgasto.domain.model.Currency
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,12 +32,15 @@ data class StatsUiState(
     val categoryTotals: List<CategoryTotal> = emptyList(),
     val dailyTotals: List<Pair<String, Double>> = emptyList(),
     val totalExpenses: Double = 0.0,
-    val isLoading: Boolean = true
+    val isLoading: Boolean = true,
+    val baseCurrency: Currency = Currency.PEN
 )
 
 @HiltViewModel
 class StatsViewModel @Inject constructor(
-    private val expenseRepository: ExpenseRepository
+    private val expenseRepository: ExpenseRepository,
+    private val preferencesRepository: PreferencesRepository,
+    private val exchangeRateRepository: ExchangeRateRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(StatsUiState())
@@ -53,9 +59,14 @@ class StatsViewModel @Inject constructor(
             try {
                 combine(
                     expenseRepository.getAllExpenses(),
-                    expenseRepository.getAllCategories()
-                ) { expenses, categories -> expenses to categories }
-                    .collect { (expenses, categories) ->
+                    expenseRepository.getAllCategories(),
+                    preferencesRepository.preferencesFlow
+                ) { expenses, categories, prefs -> Triple(expenses, categories, prefs) }
+                    .collect { (expenses, categories, prefs) ->
+                        val baseCurrency = prefs.baseCurrency
+                        val rateToBase = if (baseCurrency == Currency.PEN) 1.0
+                            else exchangeRateRepository.getRateToPen(baseCurrency.code) ?: 1.0
+
                         val startDate = when (period) {
                             StatsPeriod.DAILY -> LocalDate.now()
                             StatsPeriod.WEEKLY -> LocalDate.now()
@@ -67,11 +78,10 @@ class StatsViewModel @Inject constructor(
                             !it.createdAt.toLocalDate().isBefore(startDate)
                         }
 
-                        val categoryMap = categories.associateBy { it.id }
                         val categoryTotals = categories.map { cat ->
                             val total = filtered
                                 .filter { it.categoryId == cat.id }
-                                .sumOf { it.amountInPEN }
+                                .sumOf { it.amountInPEN } * rateToBase
                             CategoryTotal(cat, total)
                         }.sortedByDescending { it.total }
 
@@ -82,7 +92,8 @@ class StatsViewModel @Inject constructor(
                             categoryTotals = categoryTotals,
                             dailyTotals = emptyList(),
                             totalExpenses = totalExpenses,
-                            isLoading = false
+                            isLoading = false,
+                            baseCurrency = baseCurrency
                         )
                     }
             } catch (e: Exception) {

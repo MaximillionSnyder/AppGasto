@@ -112,7 +112,7 @@ fun HomeScreen(
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = String.format("%.2f", state.monthTotal),
+                                    text = "${state.baseCurrency.symbol}${String.format("%.2f", state.monthTotal)}",
                                     style = MaterialTheme.typography.displayMedium,
                                     fontWeight = FontWeight.ExtraBold,
                                     color = androidx.compose.ui.graphics.Color.White
@@ -173,22 +173,24 @@ fun HomeScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        MiniSummaryCard(
-                            title = stringResource(R.string.total_today),
-                            amount = state.todayTotal,
-                            icon = Icons.Default.Today,
-                            color = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.weight(1f),
-                            onClick = { onNavigateToStats(StatsPeriod.DAILY) }
-                        )
-                        MiniSummaryCard(
-                            title = stringResource(R.string.total_week),
-                            amount = state.weekTotal,
-                            icon = Icons.Default.DateRange,
-                            color = GradientTertiary,
-                            modifier = Modifier.weight(1f),
-                            onClick = { onNavigateToStats(StatsPeriod.WEEKLY) }
-                        )
+                    MiniSummaryCard(
+                        title = stringResource(R.string.total_today),
+                        amount = state.todayTotal,
+                        icon = Icons.Default.Today,
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.weight(1f),
+                        onClick = { onNavigateToStats(StatsPeriod.DAILY) },
+                        symbol = state.baseCurrency.symbol
+                    )
+                    MiniSummaryCard(
+                        title = stringResource(R.string.total_week),
+                        amount = state.weekTotal,
+                        icon = Icons.Default.DateRange,
+                        color = GradientTertiary,
+                        modifier = Modifier.weight(1f),
+                        onClick = { onNavigateToStats(StatsPeriod.WEEKLY) },
+                        symbol = state.baseCurrency.symbol
+                    )
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -252,7 +254,8 @@ private fun MiniSummaryCard(
     icon: ImageVector,
     color: androidx.compose.ui.graphics.Color,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    symbol: String = ""
 ) {
     Card(
         modifier = modifier.clickable(onClick = onClick),
@@ -290,7 +293,7 @@ private fun MiniSummaryCard(
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = String.format("%.2f", amount),
+                text = "$symbol${String.format("%.2f", amount)}",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,

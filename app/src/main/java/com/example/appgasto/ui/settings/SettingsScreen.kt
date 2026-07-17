@@ -106,6 +106,7 @@ fun SettingsScreen(
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showBudgetDialog by remember { mutableStateOf(false) }
     var showResetDialog by remember { mutableStateOf(false) }
+    var showBaseCurrencyDialog by remember { mutableStateOf(false) }
 
     val importLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -205,7 +206,7 @@ fun SettingsScreen(
                         )
                         if (state.budgetEnabled && state.monthlyBudget > 0) {
                             Text(
-                                text = "S/. ${String.format("%.2f", state.monthlyBudget)}",
+                                text = "${state.baseCurrency.symbol}${String.format("%.2f", state.monthlyBudget)}",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.SemiBold
@@ -255,9 +256,10 @@ fun SettingsScreen(
 
                             Spacer(modifier = Modifier.height(8.dp))
 
+                            val symbol = state.baseCurrency.symbol
                             Text(
                                 text = if (ratio >= 1f) stringResource(R.string.budget_exceeded)
-                                       else stringResource(R.string.budget_progress, state.monthlyExpenseTotal, state.monthlyBudget),
+                                       else "$symbol${String.format("%.2f", state.monthlyExpenseTotal)} de $symbol${String.format("%.2f", state.monthlyBudget)}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = progressColor,
                                 fontWeight = FontWeight.Medium
@@ -287,9 +289,9 @@ fun SettingsScreen(
                     icon = Icons.Default.CurrencyExchange,
                     iconColor = MaterialTheme.colorScheme.primary,
                     title = stringResource(R.string.base_currency),
-                    subtitle = "PEN — Soles peruanos",
-                    onClick = {},
-                    showArrow = false
+                    subtitle = "${state.baseCurrency.symbol}  ${state.baseCurrency.code}",
+                    onClick = { showBaseCurrencyDialog = true },
+                    showArrow = true
                 )
 
                 HorizontalDivider(
@@ -535,6 +537,14 @@ fun SettingsScreen(
                     showLanguageDialog = false
                 },
                 onDismiss = { showLanguageDialog = false }
+            )
+        }
+
+        if (showBaseCurrencyDialog) {
+            CurrencySettingsDialog(
+                currentCurrency = state.baseCurrency,
+                onSelect = { viewModel.setBaseCurrency(it) },
+                onDismiss = { showBaseCurrencyDialog = false }
             )
         }
 

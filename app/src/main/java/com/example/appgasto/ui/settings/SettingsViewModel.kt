@@ -10,6 +10,7 @@ import com.example.appgasto.data.currency.ExchangeRateRepository
 import com.example.appgasto.data.repository.ExpenseRepository
 import com.example.appgasto.data.repository.PreferencesRepository
 import com.example.appgasto.domain.model.AppLanguage
+import com.example.appgasto.domain.model.Currency
 import com.example.appgasto.domain.model.ThemeMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,7 +29,8 @@ data class SettingsUiState(
     val budgetEnabled: Boolean = false,
     val monthlyExpenseTotal: Double = 0.0,
     val ratesUpdatedAt: Long = 0L,
-    val isRefreshingRates: Boolean = false
+    val isRefreshingRates: Boolean = false,
+    val baseCurrency: Currency = Currency.PEN
 )
 
 @HiltViewModel
@@ -52,7 +54,8 @@ class SettingsViewModel @Inject constructor(
                     monthlyBudget = prefs.monthlyBudget,
                     budgetEnabled = prefs.budgetEnabled,
                     monthlyExpenseTotal = monthTotal,
-                    ratesUpdatedAt = prefs.ratesUpdatedAt
+                    ratesUpdatedAt = prefs.ratesUpdatedAt,
+                    baseCurrency = prefs.baseCurrency
                 )
             }
         }
@@ -96,6 +99,12 @@ class SettingsViewModel @Inject constructor(
     fun setBudgetEnabled(enabled: Boolean) {
         viewModelScope.launch {
             preferencesRepository.setBudgetEnabled(enabled)
+        }
+    }
+
+    fun setBaseCurrency(currency: Currency) {
+        viewModelScope.launch {
+            preferencesRepository.setBaseCurrency(currency)
         }
     }
 
