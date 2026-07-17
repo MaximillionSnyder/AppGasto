@@ -7,12 +7,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.appgasto.ui.add.AddEditScreen
-import com.example.appgasto.ui.settings.SettingsScreen
 
 object Routes {
     const val MAIN = "main"
     const val ADD = "add?expenseId={expenseId}"
-    const val SETTINGS = "settings"
 
     fun addExpense(expenseId: Long? = null) =
         if (expenseId != null) "add?expenseId=$expenseId" else "add"
@@ -33,8 +31,7 @@ fun AppNavigation(
                 isDark = isDark,
                 isMatrix = isMatrix,
                 onNavigateToAdd = { navController.navigate(Routes.addExpense()) },
-                onNavigateToEdit = { expenseId -> navController.navigate(Routes.addExpense(expenseId)) },
-                onNavigateToSettings = { navController.navigate(Routes.SETTINGS) }
+                onNavigateToEdit = { expenseId -> navController.navigate(Routes.addExpense(expenseId)) }
             )
         }
 
@@ -52,13 +49,6 @@ fun AppNavigation(
                 expenseId = if (expenseId == -1L) null else expenseId,
                 isDark = isDark,
                 isMatrix = isMatrix,
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
-
-        composable(Routes.SETTINGS) {
-            SettingsScreen(
-                isDark = isDark,
                 onNavigateBack = { navController.popBackStack() }
             )
         }

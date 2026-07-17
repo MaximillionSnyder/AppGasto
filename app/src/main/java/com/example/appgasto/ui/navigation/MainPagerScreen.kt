@@ -1,6 +1,5 @@
 package com.example.appgasto.ui.navigation
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -11,20 +10,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,11 +28,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.appgasto.R
 import com.example.appgasto.ui.home.HomeScreen
 import com.example.appgasto.ui.list.ListScreen
+import com.example.appgasto.ui.settings.SettingsScreen
 import com.example.appgasto.ui.stats.StatsPeriod
 import com.example.appgasto.ui.stats.StatsScreen
 import kotlinx.coroutines.launch
@@ -48,52 +43,37 @@ fun MainPagerScreen(
     isDark: Boolean,
     isMatrix: Boolean,
     onNavigateToAdd: () -> Unit,
-    onNavigateToEdit: (Long) -> Unit,
-    onNavigateToSettings: () -> Unit
+    onNavigateToEdit: (Long) -> Unit
 ) {
-    val pagerState = rememberPagerState(pageCount = { 3 })
+    val pagerState = rememberPagerState(pageCount = { 4 })
     val scope = rememberCoroutineScope()
 
-    var showFilters by remember { mutableStateOf(false) }
     var pendingStatsPeriod by remember { mutableStateOf<StatsPeriod?>(null) }
 
-    val pageTitles = listOf(R.string.app_name, R.string.list_title, R.string.stats_title)
-    val pageIcons = listOf(Icons.Default.Home, Icons.Default.FormatListBulleted, Icons.Default.BarChart)
+    val pageTitles = listOf(R.string.home_title, R.string.list_title, R.string.stats_title, R.string.settings_title)
+    val pageIcons = listOf(Icons.Default.Home, Icons.Default.FormatListBulleted, Icons.Default.BarChart, Icons.Default.Settings)
 
     Scaffold(
         topBar = {
-            Column {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = stringResource(pageTitles[pagerState.currentPage]),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-                    },
-                    actions = {
-                        if (pagerState.currentPage == 1) {
-                            IconButton(onClick = { showFilters = !showFilters }) {
-                                Icon(Icons.Default.FilterList, contentDescription = null)
-                            }
+            TabRow(selectedTabIndex = pagerState.currentPage) {
+                pageTitles.forEachIndexed { index, title ->
+                    Tab(
+                        selected = pagerState.currentPage == index,
+                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                        icon = {
+                            Icon(
+                                pageIcons[index],
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        },
+                        text = {
+                            Text(
+                                text = stringResource(title),
+                                style = MaterialTheme.typography.labelSmall
+                            )
                         }
-                        IconButton(onClick = onNavigateToSettings) {
-                            Icon(Icons.Default.Settings, contentDescription = null)
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background
                     )
-                )
-                TabRow(selectedTabIndex = pagerState.currentPage) {
-                    pageTitles.forEachIndexed { index, title ->
-                        Tab(
-                            selected = pagerState.currentPage == index,
-                            onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
-                            icon = { Icon(pageIcons[index], contentDescription = null) },
-                            text = { Text(stringResource(title)) }
-                        )
-                    }
                 }
             }
         },
@@ -133,14 +113,17 @@ fun MainPagerScreen(
                 1 -> ListScreen(
                     isDark = isDark,
                     isMatrix = isMatrix,
-                    onNavigateToEdit = onNavigateToEdit,
-                    showFilters = showFilters
+                    onNavigateToEdit = onNavigateToEdit
                 )
                 2 -> StatsScreen(
                     isDark = isDark,
                     isMatrix = isMatrix,
                     pendingPeriod = pendingStatsPeriod,
                     onPeriodConsumed = { pendingStatsPeriod = null }
+                )
+                3 -> SettingsScreen(
+                    isDark = isDark,
+                    embeddedInPager = true
                 )
             }
         }

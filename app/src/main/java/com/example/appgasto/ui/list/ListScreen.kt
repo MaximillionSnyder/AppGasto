@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,11 +15,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -43,17 +46,33 @@ fun ListScreen(
     isDark: Boolean,
     isMatrix: Boolean = false,
     onNavigateToEdit: (Long) -> Unit,
-    showFilters: Boolean,
     viewModel: ListViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.uiState.collectAsState()
     var selectedFilterCategory by remember { mutableStateOf<Long?>(null) }
+    var showFilters by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
             .fillMaxSize()
     ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(onClick = { showFilters = !showFilters }) {
+                    Icon(
+                        Icons.Default.FilterList,
+                        contentDescription = null,
+                        tint = if (showFilters) MaterialTheme.colorScheme.primary
+                               else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
             if (showFilters) {
                 Column(
                     modifier = Modifier
