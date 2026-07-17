@@ -134,9 +134,164 @@
 
 ---
 
+## Versión 3 — 2026-07-16
+
+### 3.1 Accesibilidad (TalkBack, baja visión, fuentes ajustables)
+
+- **Estado:** `[ ]` Pendiente
+- **Objetivo:** Hacer la app usable para personas con discapacidad visual, motriz o cognitiva mediante content descriptions, semántica Compose, tamaño de fuente ajustable y modo alto contraste.
+
+#### 3.1.1 Content descriptions en todos los iconos
+- `[ ]` Reemplazar `contentDescription = null` por strings localizados en TODOS los `Icon`/`IconButton` del proyecto (~20+ ocurrencias)
+- `[ ]` Strings nuevos en `strings.xml` (8 idiomas): `cd_back`, `cd_add_expense`, `cd_edit`, `cd_delete`, `cd_filter`, `cd_settings`, `cd_expand`, `cd_collapse`, `cd_category`, `cd_scan_receipt`, `cd_date`, `cd_theme`, `cd_language`, `cd_refresh_rates`, `cd_empty_state`
+- Archivos afectados: `ExpenseItem.kt`, `HomeScreen.kt`, `AddEditScreen.kt`, `ListScreen.kt`, `SettingsScreen.kt`, `MainPagerScreen.kt`, `CategorySelector.kt`, `ThemeSettingsDialog.kt`, `LanguageSettingsDialog.kt`
+
+#### 3.1.2 Semántica para screen readers
+- `[ ]` Agregar `Modifier.semantics { contentDescription = "..." }` en tarjetas de resumen del Home (día/semana/mes)
+- `[ ]` `semantics { mergeDescendants = true }` en `ExpenseItem`: anuncio como "Comida, 15 soles, hoy 14:30"
+- `[ ]` `semantics { heading() }` en títulos de sección (GENERAL, PERSONALIZACIÓN, DATOS)
+- `[ ]` `semantics { liveRegion = LiveRegionMode.Polite }` en indicadores de carga y snackbar
+
+#### 3.1.3 Tamaño de fuente ajustable
+- `[ ]` Nuevo enum `FontScale`: SMALL(0.85), NORMAL(1.0), LARGE(1.15), EXTRA_LARGE(1.3)
+- `[ ]` Nueva clave en `PreferencesRepository`: `font_scale` (String, default "NORMAL")
+- `[ ]` `SettingsScreen`: nueva fila "Tamaño de fuente" → `FontScaleDialog` con 4 opciones + preview
+- `[ ]` Aplicar `fontScale` en `AppGastoTheme` escalando `Typography` según preferencia
+- `[ ]` Strings localizados para las 4 opciones en 8 idiomas
+
+#### 3.1.4 Touch targets mínimos de 48dp
+- `[ ]` Revisar elementos clickeables y asegurar `Modifier.minimumInteractiveComponentSize()`
+- `[ ]` Ajustar espaciado de `ExpenseItem` para evitar overlap de botones editar/eliminar
+
+#### 3.1.5 Modo alto contraste (WCAG AAA)
+- `[ ]` Nuevo tema `HIGH_CONTRAST` en `ThemeMode` (basado en Light pero con colores WCAG AAA)
+- `[ ]` Colores: fondo blanco puro, texto negro puro, bordes visibles, sin transparencias
+- `[ ]` Opción en `ThemeSettingsDialog` con ícono `Contrast`
+
+### 3.2 Backup automático + recordatorios
+
+- **Estado:** `[ ]` Pendiente
+- **Objetivo:** Resguardar los datos automáticamente sin depender de que el usuario haga exportación manual. Incluye backup programado y recordatorios.
+- **Stack técnico:** WorkManager (ya usado) + BackupManager (ya existente)
+
+#### 3.2.1 Auto-backup programado
+- `[ ]` `BackupWorker.kt` — `CoroutineWorker` que ejecuta `BackupManager.exportToJson()` cada 24h
+- `[ ]` Guarda en `Documents/AppGasto/backups/appgasto_auto_YYYYMMDD_HHmmss.json`
+- `[ ]` Limpieza automática: conservar últimos N backups (default 7)
+- `[ ]` Schedule en `AppGastoApplication.onCreate()`: `PeriodicWorkRequest` 24h, unique `"auto_backup"` con `KEEP`
+- `[ ]` Solo se ejecuta si el toggle está activado
+
+#### 3.2.2 Toggle en Ajustes
+- `[ ]` Nuevo `SettingsRow` con Switch: "Auto-backup diario"
+- `[ ]` Nuevas claves DataStore: `auto_backup_enabled` (Boolean, default false), `max_backup_files` (Int, default 7)
+- `[ ]` Fila informativa: "Se guarda en Documents/AppGasto/backups/"
+- `[ ]` Strings localizados
+
+#### 3.2.3 Recordatorio de backup manual
+- `[ ]` Nueva clave DataStore: `last_manual_export_timestamp` (Long)
+- `[ ]` `BackupReminderWorker.kt` — si pasaron 7+ días sin exportación manual, envía notificación
+- `[ ]` Schedule 24h, se desactiva si auto-backup está activado
+- `[ ]` Notificación con acción: "Hacer backup ahora"
+
+### 3.3 Guardar imágenes de recibos escaneados
+
+- **Estado:** `[ ]` Pendiente
+- **Objetivo:** Al escanear un recibo, guardar la imagen JPEG en almacenamiento interno y asociarla al gasto para consulta futura.
+- **Depende de:** 2.1 (multi-moneda) y 7.1 (receipt scanning) — ya implementadas
+
+#### 3.3.1 Modelo de datos
+- `[ ]` Nuevo campo en `Expense`: `receiptImagePath: String?` (nullable)
+- `[ ]` Migración Room v2→v3:
+  ```sql
+  ALTER TABLE expenses ADD COLUMN receiptImagePath TEXT;
+  ```
+- `[ ]` `AppDatabase.version` → 3, agregar `MIGRATION_2_3`
+
+#### 3.3.2 Almacenamiento de imágenes
+- `[ ]` `ReceiptImageManager.kt` con:
+  - `saveReceiptImage(expenseId, sourceUri)` — copia JPEG a `files/receipts/{id}.jpg`, comprime a max 1920px
+  - `getReceiptImage(expenseId)` — carga Bitmap desde disco
+  - `deleteReceiptImage(expenseId)` — borra archivo
+  - `deleteAllReceiptImages()` — borra carpeta completa
+  - `getReceiptImageUri(expenseId)` — FileProvider URI para compartir
+- `[ ]` Proveer vía Hilt `@Singleton`
+
+#### 3.3.3 Integración en flujo de escaneo
+- `[ ]` `AddEditViewModel.handleScanResult()`: guardar imagen tras OCR exitoso
+- `[ ]` El path se guarda con el Expense al hacer `save()`. Si es edición, se mantiene el path existente
+- `[ ]` Si OCR falla, la imagen igual se guarda (usuario puede rellenar manualmente)
+
+#### 3.3.4 Visualización en UI
+- `[ ]` `ExpenseItem.kt`: thumbnail de 48dp si hay recibo, a la izquierda del ícono de categoría
+- `[ ]` `ReceiptViewerDialog.kt`: diálogo fullscreen con:
+  - Imagen a máxima resolución + zoom con `Modifier.transformable`
+  - Botón compartir (`FileProvider` + `Intent.ACTION_SEND`)
+  - Botón eliminar recibo (borra archivo + limpia campo en DB)
+- `[ ]` Thumbnail click → abre `ReceiptViewerDialog`
+- `[ ]` `AddEditScreen.kt`: mostrar thumbnail existente + opción de re-escanear al editar
+
+#### 3.3.5 Eliminación en cascada
+- `[ ]` `ExpenseRepository.deleteExpense()`: borrar imagen antes del registro
+- `[ ]` `ExpenseRepository.deleteAllExpenses()`: borrar todas las imágenes
+- `[ ]` `SettingsViewModel.clearAllData()`: hereda el comportamiento
+
+#### 3.3.6 Backup con imágenes
+- `[ ]` `BackupData.version` → 3
+- `[ ]` `BackupItem` con `receiptImageBase64: String?`
+- `[ ]` Exportar v3: codificar imagen en Base64 si existe
+- `[ ]` Importar v3: decodificar Base64 y restaurar imagen
+- `[ ]` Importar v1/v2: `receiptImagePath = null`
+- `[ ]` Nueva opción en Ajustes: "Incluir imágenes en backup" (default: true)
+
+#### 3.3.7 Limpieza de huérfanos
+- `[ ]` `ReceiptCleanupWorker.kt`: WorkManager semanal que borra imágenes sin gasto asociado
+
+#### 3.3.8 FileProvider
+- `[ ]` `res/xml/file_paths.xml` — paths para `files/receipts/`
+- `[ ]` `<provider>` en `AndroidManifest.xml` con `authorities="${applicationId}.fileprovider"`
+
+### Archivos a crear (estimado ~8 nuevos)
+- `di/ReceiptModule.kt` — módulo Hilt para ReceiptImageManager
+- `data/receipt/ReceiptImageManager.kt` — guardar/cargar/borrar imágenes de recibos
+- `ui/components/ReceiptViewerDialog.kt` — visor fullscreen con zoom
+- `ui/settings/FontScaleDialog.kt` — selector de tamaño de fuente
+- `workers/BackupWorker.kt` — auto-backup programado
+- `workers/BackupReminderWorker.kt` — recordatorio de backup manual
+- `workers/ReceiptCleanupWorker.kt` — limpieza de imágenes huérfanas
+- `res/xml/file_paths.xml` — FileProvider paths
+
+### Archivos a modificar (estimado ~25)
+- `data/local/Expense.kt` — +receiptImagePath
+- `data/local/AppDatabase.kt` — version 3, MIGRATION_2_3
+- `data/repository/ExpenseRepository.kt` — deleteExpense borra imagen
+- `data/repository/PreferencesRepository.kt` — +font_scale, +auto_backup, +last_export
+- `data/backup/BackupManager.kt` — BackupData v3 con Base64 de imágenes
+- `domain/model/UserPreferences.kt` — +fontScale, +autoBackupEnabled
+- `domain/model/ThemeMode.kt` — +HIGH_CONTRAST
+- `ui/add/AddEditScreen.kt` — guardar imagen tras scan + thumbnail
+- `ui/add/AddEditViewModel.kt` — handleScanResult guarda imagen
+- `ui/components/ExpenseItem.kt` — thumbnail de recibo + contentDescription
+- `ui/components/CategorySelector.kt` — contentDescription
+- `ui/home/HomeScreen.kt` — contentDescription + semantics
+- `ui/list/ListScreen.kt` — contentDescription + semantics
+- `ui/settings/SettingsScreen.kt` — auto-backup toggle, font scale, incluir imágenes
+- `ui/settings/SettingsViewModel.kt` — nuevas propiedades
+- `ui/settings/ThemeSettingsDialog.kt` — opción HIGH_CONTRAST + contentDescription
+- `ui/settings/LanguageSettingsDialog.kt` — contentDescription
+- `ui/theme/Color.kt` — paleta HIGH_CONTRAST
+- `ui/theme/Theme.kt` — AppGastoTheme aplica fontScale + HIGH_CONTRAST
+- `ui/theme/CategoryColors.kt` — colores HIGH_CONTRAST
+- `ui/navigation/MainPagerScreen.kt` — contentDescription
+- `AppGastoApplication.kt` — schedule BackupWorker + BackupReminderWorker + CleanupWorker
+- `app/src/main/AndroidManifest.xml` — FileProvider
+- Todos los `strings.xml` (8 idiomas) — ~30+ nuevas claves
+
+---
+
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
 |:-------:|:-----:|:--------|
 | 1 | 2026-07-05 | Receipt Scanning con ML Kit Document Scanner + Text Recognition + Parser |
 | 2 | 2026-07-05 | Multi-moneda con tasas de cambio + Receipt Scanning multi-moneda |
+| 3 | 2026-07-16 | Accesibilidad (TalkBack, fontScale, alto contraste) + Auto-backup + Guardar recibos |

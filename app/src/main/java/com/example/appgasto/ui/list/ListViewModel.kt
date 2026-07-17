@@ -16,12 +16,14 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.YearMonth
 import javax.inject.Inject
 
 data class ListUiState(
     val expenses: List<Expense> = emptyList(),
     val categories: Map<Long, Category> = emptyMap(),
     val selectedCategoryId: Long? = null,
+    val availableMonths: List<YearMonth> = emptyList(),
     val startDate: LocalDate? = null,
     val endDate: LocalDate? = null,
     val isLoading: Boolean = true
@@ -50,9 +52,11 @@ class ListViewModel @Inject constructor(
                 ) { expenses, categories -> expenses to categories }
                     .collect { (expenses, categories) ->
                         val state = _uiState.value
+                        val months = expenses.map { YearMonth.from(it.createdAt) }.distinct().sortedDescending()
                         _uiState.value = state.copy(
                             expenses = applyFilters(expenses, state),
                             categories = categories.associateBy { it.id },
+                            availableMonths = months,
                             isLoading = false
                         )
                     }

@@ -31,6 +31,8 @@ import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.MonetizationOn
@@ -212,7 +214,12 @@ fun SettingsScreen(
                     }
                     Switch(
                         checked = state.budgetEnabled,
-                        onCheckedChange = { viewModel.setBudgetEnabled(it) },
+                        onCheckedChange = { enabled ->
+                            viewModel.setBudgetEnabled(enabled)
+                            if (enabled && state.monthlyBudget <= 0) {
+                                showBudgetDialog = true
+                            }
+                        },
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
                             checkedTrackColor = MaterialTheme.colorScheme.primary
@@ -221,44 +228,47 @@ fun SettingsScreen(
                 }
 
                 AnimatedVisibility(
-                    visible = state.budgetEnabled && state.monthlyBudget > 0,
+                    visible = state.budgetEnabled,
                     enter = expandVertically(),
                     exit = shrinkVertically()
                 ) {
                     Column {
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        val ratio = (state.monthlyExpenseTotal / state.monthlyBudget).toFloat().coerceIn(0f, 1.5f)
-                        val progressColor = when {
-                            ratio >= 1f -> MaterialTheme.colorScheme.error
-                            ratio >= 0.8f -> Color(0xFFFF9800)
-                            else -> MaterialTheme.colorScheme.primary
+                        if (state.monthlyBudget > 0) {
+                            val ratio = (state.monthlyExpenseTotal / state.monthlyBudget).toFloat().coerceIn(0f, 1.5f)
+                            val progressColor = when {
+                                ratio >= 1f -> MaterialTheme.colorScheme.error
+                                ratio >= 0.8f -> Color(0xFFFF9800)
+                                else -> MaterialTheme.colorScheme.primary
+                            }
+
+                            LinearProgressIndicator(
+                                progress = { ratio.coerceAtMost(1f) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(8.dp)
+                                    .clip(MaterialTheme.shapes.small),
+                                color = progressColor,
+                                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Text(
+                                text = if (ratio >= 1f) stringResource(R.string.budget_exceeded)
+                                       else stringResource(R.string.budget_progress, state.monthlyExpenseTotal, state.monthlyBudget),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = progressColor,
+                                fontWeight = FontWeight.Medium
+                            )
                         }
-
-                        LinearProgressIndicator(
-                            progress = { ratio.coerceAtMost(1f) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(8.dp)
-                                .clip(MaterialTheme.shapes.small),
-                            color = progressColor,
-                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Text(
-                            text = if (ratio >= 1f) stringResource(R.string.budget_exceeded)
-                                   else stringResource(R.string.budget_progress, state.monthlyExpenseTotal, state.monthlyBudget),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = progressColor,
-                            fontWeight = FontWeight.Medium
-                        )
 
                         SettingsRow(
                             icon = Icons.Default.MonetizationOn,
                             iconColor = MaterialTheme.colorScheme.primary,
-                            title = stringResource(R.string.change_amount),
+                            title = if (state.monthlyBudget > 0) stringResource(R.string.change_amount)
+                                    else stringResource(R.string.set_budget),
                             onClick = { showBudgetDialog = true },
                             showArrow = true
                         )
@@ -595,8 +605,11 @@ private fun SettingsSection(
     title: String,
     icon: ImageVector,
     iconColor: Color,
+    initiallyExpanded: Boolean = false,
     content: @Composable () -> Unit
 ) {
+    var expanded by remember { mutableStateOf(initiallyExpanded) }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
@@ -605,7 +618,12 @@ private fun SettingsSection(
         )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expanded = !expanded },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Box(
                     modifier = Modifier
                         .size(32.dp)
@@ -624,11 +642,22 @@ private fun SettingsSection(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    modifier = Modifier.size(22.dp)
                 )
             }
-            Spacer(modifier = Modifier.height(12.dp))
-            content()
+            AnimatedVisibility(visible = expanded) {
+                Column {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    content()
+                }
+            }
         }
     }
 }

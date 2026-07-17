@@ -34,11 +34,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.appgasto.R
 import com.example.appgasto.data.local.localizedName
 import com.example.appgasto.ui.components.ExpenseItem
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -51,7 +55,10 @@ fun ListScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     var selectedFilterCategory by remember { mutableStateOf<Long?>(null) }
+    var selectedMonth by remember { mutableStateOf<YearMonth?>(null) }
     var showFilters by remember { mutableStateOf(false) }
+    val monthFormatter = remember { DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault()) }
+    val currentMonth = remember { YearMonth.now() }
 
     Column(
         modifier = modifier
@@ -118,10 +125,61 @@ fun ListScreen(
                         }
                     }
 
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = "Por mes",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        FilterChip(
+                            selected = selectedMonth == null,
+                            onClick = {
+                                selectedMonth = null
+                                viewModel.applyFilters(selectedFilterCategory, null, null)
+                            },
+                            label = { Text(stringResource(R.string.filter_all)) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        )
+                        state.availableMonths.forEach { month ->
+                            FilterChip(
+                                selected = selectedMonth == month,
+                                onClick = {
+                                    selectedMonth = month
+                                    viewModel.applyFilters(
+                                        selectedFilterCategory,
+                                        month.atDay(1),
+                                        month.atEndOfMonth()
+                                    )
+                                },
+                                label = {
+                                    Text(
+                                        if (month == currentMonth) "Este mes"
+                                        else month.format(monthFormatter)
+                                    )
+                                },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                                )
+                            )
+                        }
+                    }
+
                     Spacer(modifier = Modifier.height(4.dp))
 
                     TextButton(onClick = {
                         selectedFilterCategory = null
+                        selectedMonth = null
                         viewModel.applyFilters(null, null, null)
                     }) {
                         Text(stringResource(R.string.clear))
@@ -157,6 +215,11 @@ fun ListScreen(
                     }
                 }
             } else {
+                val groupedExpenses = remember(state.expenses) {
+                    state.expenses.groupBy { YearMonth.from(it.createdAt) }
+                        .toSortedMap(Comparator.reverseOrder())
+                }
+
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -164,15 +227,27 @@ fun ListScreen(
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     item(contentType = "spacer_top") { Spacer(modifier = Modifier.height(4.dp)) }
-                    items(state.expenses, key = { it.id }, contentType = { "expense" }) { expense ->
-                        ExpenseItem(
-                            expense = expense,
-                            category = state.categories[expense.categoryId],
-                            isDark = isDark,
-                            isMatrix = isMatrix,
-                            onEdit = { onNavigateToEdit(expense.id) },
-                            onDelete = { viewModel.deleteExpense(expense) }
-                        )
+                    groupedExpenses.forEach { (month, expenses) ->
+                        item(contentType = "month_header") {
+                            Text(
+                                text = if (month == currentMonth) "Este mes"
+                                       else month.format(monthFormatter),
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp)
+                            )
+                        }
+                        items(expenses, key = { it.id }, contentType = { "expense" }) { expense ->
+                            ExpenseItem(
+                                expense = expense,
+                                category = state.categories[expense.categoryId],
+                                isDark = isDark,
+                                isMatrix = isMatrix,
+                                onEdit = { onNavigateToEdit(expense.id) },
+                                onDelete = { viewModel.deleteExpense(expense) }
+                            )
+                        }
                     }
                     item(contentType = "spacer_bottom") { Spacer(modifier = Modifier.height(16.dp)) }
                 }
