@@ -7,5 +7,6 @@ data class UserPreferences(
     val budgetEnabled: Boolean = false,
     val ratesUpdatedAt: Long = 0L,
     val baseCurrency: Currency = Currency.PEN,
-    val fontScale: FontScale = FontScale.NORMAL
+    val fontScale: FontScale = FontScale.NORMAL,
+    val onboardingCompleted: Boolean = false
 )

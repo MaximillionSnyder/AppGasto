@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">AppGasto</string>
+    <string name="welcome_title">Bem-vindo ao AppGasto</string>
+    <string name="welcome_description">Selecione sua moeda base para começar a registrar seus gastos. Você pode alterá-la depois em Configurações.</string>
+    <string name="welcome_confirm">Começar</string>
     <string name="home_title">Início</string>
     <string name="list_title">Histórico</string>
     <string name="add_title">Adicionar Gasto</string>

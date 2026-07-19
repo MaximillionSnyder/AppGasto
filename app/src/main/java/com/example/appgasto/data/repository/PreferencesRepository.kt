@@ -37,6 +37,7 @@ class PreferencesRepository @Inject constructor(
         val RATES_UPDATED_AT = longPreferencesKey("rates_updated_at")
         val BASE_CURRENCY = stringPreferencesKey("base_currency")
         val FONT_SCALE = stringPreferencesKey("font_scale")
+        val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
     }
 
     val preferencesFlow: Flow<UserPreferences> = context.dataStore.data.map { prefs ->
@@ -47,7 +48,8 @@ class PreferencesRepository @Inject constructor(
             budgetEnabled = prefs[Keys.BUDGET_ENABLED] ?: false,
             ratesUpdatedAt = prefs[Keys.RATES_UPDATED_AT] ?: 0L,
             baseCurrency = prefs[Keys.BASE_CURRENCY]?.let { Currency.fromCode(it) } ?: Currency.PEN,
-            fontScale = prefs[Keys.FONT_SCALE]?.let { safeValueOf<FontScale>(it) } ?: FontScale.NORMAL
+            fontScale = prefs[Keys.FONT_SCALE]?.let { safeValueOf<FontScale>(it) } ?: FontScale.NORMAL,
+            onboardingCompleted = prefs[Keys.ONBOARDING_COMPLETED] ?: false
         )
     }
 
@@ -100,6 +102,19 @@ class PreferencesRepository @Inject constructor(
     suspend fun setFontScale(scale: FontScale) {
         context.dataStore.edit { prefs ->
             prefs[Keys.FONT_SCALE] = scale.name
+        }
+    }
+
+    suspend fun setOnboardingCompleted(completed: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[Keys.ONBOARDING_COMPLETED] = completed
+        }
+    }
+
+    suspend fun completeOnboarding(currency: Currency) {
+        context.dataStore.edit { prefs ->
+            prefs[Keys.BASE_CURRENCY] = currency.code
+            prefs[Keys.ONBOARDING_COMPLETED] = true
         }
     }
 

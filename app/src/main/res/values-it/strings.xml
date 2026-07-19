@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">AppGasto</string>
+    <string name="welcome_title">Benvenuto in AppGasto</string>
+    <string name="welcome_description">Seleziona la tua valuta di base per iniziare a registrare le spese. Puoi cambiarla in seguito nelle Impostazioni.</string>
+    <string name="welcome_confirm">Inizia</string>
     <string name="home_title">Home</string>
     <string name="list_title">Cronologia</string>
     <string name="add_title">Aggiungi Spesa</string>

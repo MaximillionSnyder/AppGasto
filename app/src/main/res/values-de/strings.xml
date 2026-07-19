@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">AppGasto</string>
+    <string name="welcome_title">Willkommen bei AppGasto</string>
+    <string name="welcome_description">Wähle deine Basiswährung, um deine Ausgaben zu erfassen. Du kannst sie später in den Einstellungen ändern.</string>
+    <string name="welcome_confirm">Loslegen</string>
     <string name="home_title">Start</string>
     <string name="list_title">Verlauf</string>
     <string name="add_title">Ausgabe hinzufügen</string>

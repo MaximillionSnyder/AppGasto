@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">AppGasto</string>
+    <string name="welcome_title">AppGastoへようこそ</string>
+    <string name="welcome_description">支出の記録を始めるために基準通貨を選択してください。後から設定で変更できます。</string>
+    <string name="welcome_confirm">はじめる</string>
     <string name="home_title">ホーム</string>
     <string name="list_title">履歴</string>
     <string name="add_title">支出を追加</string>

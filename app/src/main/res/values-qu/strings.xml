@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">AppGasto</string>
+    <string name="welcome_title">Allin hamusqayki AppGastoman</string>
+    <string name="welcome_description">Qullqi monedanta akllay gastuykita qillqanaykipaq. Qhipaman Allichaypi tikrayta atinki.</string>
+    <string name="welcome_confirm">Qallariy</string>
     <string name="home_title">Wasipi</string>
     <string name="list_title">Sutiw</string>
     <string name="add_title">Gastuta Yapay</string>

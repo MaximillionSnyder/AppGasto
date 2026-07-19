@@ -2,6 +2,11 @@
 <resources>
     <string name="app_name">AppGasto</string>
 
+    <!-- Onboarding -->
+    <string name="welcome_title">Bienvenido a AppGasto</string>
+    <string name="welcome_description">Selecciona tu moneda base para comenzar a registrar tus gastos. Puedes cambiarla después en Ajustes.</string>
+    <string name="welcome_confirm">Comenzar</string>
+
     <!-- Screens -->
     <string name="home_title">Inicio</string>
     <string name="list_title">Lista</string>
