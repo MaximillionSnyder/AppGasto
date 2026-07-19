@@ -156,7 +156,7 @@
 - `[ ]` Nuevo enum `FontScale`: SMALL(0.85), NORMAL(1.0), LARGE(1.15), EXTRA_LARGE(1.3)
 - `[ ]` Nueva clave en `PreferencesRepository`: `font_scale` (String, default "NORMAL")
 - `[ ]` `SettingsScreen`: nueva fila "Tamaño de fuente" → `FontScaleDialog` con 4 opciones + preview
-- `[ ]` Aplicar `fontScale` en `AppGastoTheme` escalando `Typography` según preferencia
+- `[ ]` Aplicar `fontScale` en `AppGastoTheme`: escalar `Typography` **y además** envolver el contenido en `CompositionLocalProvider(LocalDensity provides density.copy(fontScale = scale))` para coherencia con todos los valores `sp` (paddings/tamaños derivados)
 - `[ ]` Strings localizados para las 4 opciones en 8 idiomas
 
 #### 3.1.4 Touch targets mínimos de 48dp
@@ -175,9 +175,14 @@
 - **Stack técnico:** WorkManager (ya usado) + BackupManager (ya existente)
 
 #### 3.2.1 Auto-backup programado
-- `[ ]` `BackupWorker.kt` — `CoroutineWorker` que ejecuta `BackupManager.exportToJson()` cada 24h
+- `[ ]` `BackupWorker.kt` — `CoroutineWorker` que ejecuta `BackupManager.exportToJsonString()` cada 24h
 - `[ ]` Guarda en `Documents/AppGasto/backups/appgasto_auto_YYYYMMDD_HHmmss.json`
-- `[ ]` Limpieza automática: conservar últimos N backups (default 7)
+- `[ ]` **CRÍTICO — Scoped Storage (`minSdk = 26`):** la escritura a `Documents/` depende de la API:
+  - **API 26–28:** `File` API directa, requiere `WRITE_EXTERNAL_STORAGE` con `android:maxSdkVersion="28"` en el Manifest + check de permiso en runtime. Si el permiso es denegado, degradar a recordatorio de backup manual (3.2.3).
+  - **API 29+:** `MediaStore.Files` con `RELATIVE_PATH = Documents/AppGasto/backups/` — sin permisos. Insertar entry, escribir vía `contentResolver.openOutputStream(uri)`, `IS_PENDING = 0` al terminar.
+  - Lógica encapsulada en `AutoBackupStorage.kt` (nuevo): `fun writeBackup(json: String, fileName: String): Boolean`
+- `[ ]` Refactor de `BackupManager`: extraer `exportToJsonString(): String` (lógica pura de serialización) del flujo SAF actual (`exportToJson(uri)`), para que el worker escriba sin UI. La exportación manual sigue usando SAF (`CreateDocument`).
+- `[ ]` Limpieza automática: conservar últimos N backups (default 7) — query a MediaStore (API 29+) o listado de carpeta (API ≤28), borrar los más antiguos
 - `[ ]` Schedule en `AppGastoApplication.onCreate()`: `PeriodicWorkRequest` 24h, unique `"auto_backup"` con `KEEP`
 - `[ ]` Solo se ejecuta si el toggle está activado
 
@@ -190,6 +195,7 @@
 #### 3.2.3 Recordatorio de backup manual
 - `[ ]` Nueva clave DataStore: `last_manual_export_timestamp` (Long)
 - `[ ]` `BackupReminderWorker.kt` — si pasaron 7+ días sin exportación manual, envía notificación
+- `[ ]` Nuevo canal de notificación `backup_reminders` (separado del canal de presupuesto existente) para que el usuario pueda silenciarlos por separado
 - `[ ]` Schedule 24h, se desactiva si auto-backup está activado
 - `[ ]` Notificación con acción: "Hacer backup ahora"
 
@@ -209,20 +215,23 @@
 
 #### 3.3.2 Almacenamiento de imágenes
 - `[ ]` `ReceiptImageManager.kt` con:
-  - `saveReceiptImage(expenseId, sourceUri)` — copia JPEG a `files/receipts/{id}.jpg`, comprime a max 1920px
-  - `getReceiptImage(expenseId)` — carga Bitmap desde disco
-  - `deleteReceiptImage(expenseId)` — borra archivo
+  - `saveReceiptImage(sourceUri): String?` — copia JPEG a `files/receipts/{uuid}.jpg` y retorna el path. **CRÍTICO: el nombre es UUID, NO expenseId** — al escanear, el gasto aún no existe en DB (el ID se genera en el `insert()`), por lo que no se puede usar `expenseId` como nombre de archivo
+  - Compresión al guardar: redimensionar a max 1920px (lado mayor), JPEG calidad 80, tope objetivo ~500KB por imagen
+  - `getReceiptImage(path)` — carga Bitmap desde disco
+  - `deleteReceiptImage(path)` — borra archivo
   - `deleteAllReceiptImages()` — borra carpeta completa
-  - `getReceiptImageUri(expenseId)` — FileProvider URI para compartir
+  - `getReceiptImageUri(path)` — FileProvider URI para compartir
 - `[ ]` Proveer vía Hilt `@Singleton`
 
 #### 3.3.3 Integración en flujo de escaneo
-- `[ ]` `AddEditViewModel.handleScanResult()`: guardar imagen tras OCR exitoso
-- `[ ]` El path se guarda con el Expense al hacer `save()`. Si es edición, se mantiene el path existente
+- `[ ]` `AddEditViewModel.handleScanResult()`: guardar imagen con `saveReceiptImage(sourceUri)` (nombre UUID) tras el scan y guardar el path en el state del formulario
+- `[ ]` El path se persiste con el Expense al hacer `save()` (insert o update). Si es edición y no se re-escaneó, se mantiene el path existente
 - `[ ]` Si OCR falla, la imagen igual se guarda (usuario puede rellenar manualmente)
+- `[ ]` **Dependencia con 3.3.7:** si el usuario escanea pero NO guarda el gasto (cancela/cierra), la imagen queda huérfana — la borra el `ReceiptCleanupWorker` semanal. No borrar en `onCleared()` para no eliminar imágenes de gastos ya guardados
 
 #### 3.3.4 Visualización en UI
-- `[ ]` `ExpenseItem.kt`: thumbnail de 48dp si hay recibo, a la izquierda del ícono de categoría
+- `[ ]` **Nueva dependencia Coil** (`io.coil-kt:coil-compose`) en `libs.versions.toml` + `app/build.gradle.kts` — cargar imágenes async con caché; cargar Bitmap directo en un `LazyColumn` causaría jank
+- `[ ]` `ExpenseItem.kt`: thumbnail de 48dp si hay recibo, a la izquierda del ícono de categoría, con `rememberAsyncImagePainter` + placeholder
 - `[ ]` `ReceiptViewerDialog.kt`: diálogo fullscreen con:
   - Imagen a máxima resolución + zoom con `Modifier.transformable`
   - Botón compartir (`FileProvider` + `Intent.ACTION_SEND`)
@@ -231,16 +240,18 @@
 - `[ ]` `AddEditScreen.kt`: mostrar thumbnail existente + opción de re-escanear al editar
 
 #### 3.3.5 Eliminación en cascada
-- `[ ]` `ExpenseRepository.deleteExpense()`: borrar imagen antes del registro
+- `[ ]` `ExpenseRepository.deleteExpense()`: leer `receiptImagePath` del gasto y borrar el archivo antes del registro
 - `[ ]` `ExpenseRepository.deleteAllExpenses()`: borrar todas las imágenes
 - `[ ]` `SettingsViewModel.clearAllData()`: hereda el comportamiento
 
-#### 3.3.6 Backup con imágenes
-- `[ ]` `BackupData.version` → 3
-- `[ ]` `BackupItem` con `receiptImageBase64: String?`
-- `[ ]` Exportar v3: codificar imagen en Base64 si existe
-- `[ ]` Importar v3: decodificar Base64 y restaurar imagen
-- `[ ]` Importar v1/v2: `receiptImagePath = null`
+#### 3.3.6 Backup con imágenes (formato ZIP)
+- `[ ]` **CRÍTICO — NO usar Base64 en JSON:** infla el tamaño ~33% y parsear un JSON con varias imágenes en memoria (Gson) puede causar OOM en gama baja
+- `[ ]` `BackupData.version` → 3 con nuevo formato: archivo **`.zip`** que contiene:
+  - `backup.json` — mismo JSON que v2 (sin campos de imagen embebida; `receiptImagePath` se incluye como nombre de archivo relativo)
+  - `receipts/{uuid}.jpg` — una entrada por imagen asociada a un gasto
+- `[ ]` Exportar v3: streaming con `ZipOutputStream` (escribir JSON primero, luego cada imagen). Si "Incluir imágenes" está desactivado, exportar solo el JSON (formato v2-compatible)
+- `[ ]` Importar: detectar formato por extensión/magic bytes — `.zip` (PK header) → flujo v3; JSON puro → flujo v1/v2 actual (sin cambios, `receiptImagePath = null`)
+- `[ ]` Importar v3: streaming con `ZipInputStream` — parsear `backup.json`, extraer cada imagen a `files/receipts/` y mapear el path al gasto insertado
 - `[ ]` Nueva opción en Ajustes: "Incluir imágenes en backup" (default: true)
 
 #### 3.3.7 Limpieza de huérfanos
@@ -250,9 +261,18 @@
 - `[ ]` `res/xml/file_paths.xml` — paths para `files/receipts/`
 - `[ ]` `<provider>` en `AndroidManifest.xml` con `authorities="${applicationId}.fileprovider"`
 
-### Archivos a crear (estimado ~8 nuevos)
+### 3.4 Tests (nuevo — se tocan migraciones de DB y backup, alto riesgo de pérdida de datos)
+
+- **Estado:** `[ ]` Pendiente
+- `[ ]` `MigrationTest.kt` (androidTest, `MigrationTestHelper`) — verificar `MIGRATION_2_3`: crear DB v2 con datos, migrar a v3, validar esquema (`receiptImagePath` nullable) y que los datos se conservan
+- `[ ]` `BackupV3Test.kt` — exportar gastos con imágenes a ZIP, importar en DB limpia, verificar round-trip (gastos + imágenes restauradas). Casos: backup sin imágenes, import v1/v2 (JSON) sigue funcionando
+- `[ ]` `ReceiptImageManagerTest.kt` — save/get/delete de imagen, compresión (resultado ≤ 1920px), borrado de carpeta completa
+- `[ ]` `AutoBackupStorageTest.kt` (o Robolectric) — escritura y limpieza de N backups mockeando ContentResolver
+
+### Archivos a crear (estimado ~10 nuevos)
 - `di/ReceiptModule.kt` — módulo Hilt para ReceiptImageManager
 - `data/receipt/ReceiptImageManager.kt` — guardar/cargar/borrar imágenes de recibos
+- `data/backup/AutoBackupStorage.kt` — escritura a Documents vía MediaStore (API 29+) / File API (API 26–28)
 - `ui/components/ReceiptViewerDialog.kt` — visor fullscreen con zoom
 - `ui/settings/FontScaleDialog.kt` — selector de tamaño de fuente
 - `workers/BackupWorker.kt` — auto-backup programado
@@ -265,12 +285,12 @@
 - `data/local/AppDatabase.kt` — version 3, MIGRATION_2_3
 - `data/repository/ExpenseRepository.kt` — deleteExpense borra imagen
 - `data/repository/PreferencesRepository.kt` — +font_scale, +auto_backup, +last_export
-- `data/backup/BackupManager.kt` — BackupData v3 con Base64 de imágenes
+- `data/backup/BackupManager.kt` — extraer exportToJsonString(), BackupData v3 con ZIP (sin Base64)
 - `domain/model/UserPreferences.kt` — +fontScale, +autoBackupEnabled
 - `domain/model/ThemeMode.kt` — +HIGH_CONTRAST
 - `ui/add/AddEditScreen.kt` — guardar imagen tras scan + thumbnail
-- `ui/add/AddEditViewModel.kt` — handleScanResult guarda imagen
-- `ui/components/ExpenseItem.kt` — thumbnail de recibo + contentDescription
+- `ui/add/AddEditViewModel.kt` — handleScanResult guarda imagen (path UUID)
+- `ui/components/ExpenseItem.kt` — thumbnail de recibo (Coil) + contentDescription
 - `ui/components/CategorySelector.kt` — contentDescription
 - `ui/home/HomeScreen.kt` — contentDescription + semantics
 - `ui/list/ListScreen.kt` — contentDescription + semantics
@@ -279,11 +299,13 @@
 - `ui/settings/ThemeSettingsDialog.kt` — opción HIGH_CONTRAST + contentDescription
 - `ui/settings/LanguageSettingsDialog.kt` — contentDescription
 - `ui/theme/Color.kt` — paleta HIGH_CONTRAST
-- `ui/theme/Theme.kt` — AppGastoTheme aplica fontScale + HIGH_CONTRAST
+- `ui/theme/Theme.kt` — AppGastoTheme aplica fontScale (Typography + LocalDensity) + HIGH_CONTRAST
 - `ui/theme/CategoryColors.kt` — colores HIGH_CONTRAST
 - `ui/navigation/MainPagerScreen.kt` — contentDescription
-- `AppGastoApplication.kt` — schedule BackupWorker + BackupReminderWorker + CleanupWorker
-- `app/src/main/AndroidManifest.xml` — FileProvider
+- `AppGastoApplication.kt` — schedule BackupWorker + BackupReminderWorker + CleanupWorker + canal backup_reminders
+- `app/src/main/AndroidManifest.xml` — FileProvider + WRITE_EXTERNAL_STORAGE (maxSdkVersion=28)
+- `gradle/libs.versions.toml` — +coil-compose
+- `app/build.gradle.kts` — +coil-compose
 - Todos los `strings.xml` (8 idiomas) — ~30+ nuevas claves
 
 ---
@@ -295,3 +317,4 @@
 | 1 | 2026-07-05 | Receipt Scanning con ML Kit Document Scanner + Text Recognition + Parser |
 | 2 | 2026-07-05 | Multi-moneda con tasas de cambio + Receipt Scanning multi-moneda |
 | 3 | 2026-07-16 | Accesibilidad (TalkBack, fontScale, alto contraste) + Auto-backup + Guardar recibos |
+| 3-rev | 2026-07-19 | Revisión del plan V3: fix Scoped Storage en auto-backup (MediaStore/permiso legacy), imágenes con UUID (sin expenseId), backup v3 como ZIP (no Base64), Coil para thumbnails, canal backup_reminders, fontScale con LocalDensity, sección 3.4 Tests |
