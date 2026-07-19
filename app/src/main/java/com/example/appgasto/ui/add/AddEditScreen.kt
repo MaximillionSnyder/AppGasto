@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -169,9 +170,9 @@ fun AddEditScreen(
                             brush = Brush.horizontalGradient(
                                 colors = listOf(GradientStart, GradientEnd)
                             ),
-                            shape = RoundedCornerShape(20.dp)
+                            shape = RoundedCornerShape(16.dp)
                         )
-                        .padding(24.dp)
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Row(
@@ -181,7 +182,7 @@ fun AddEditScreen(
                         ) {
                             Text(
                                 text = stringResource(R.string.amount),
-                                style = MaterialTheme.typography.labelLarge,
+                                style = MaterialTheme.typography.labelMedium,
                                 color = Color.White.copy(alpha = 0.8f)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -189,6 +190,7 @@ fun AddEditScreen(
                                 OutlinedButton(
                                     onClick = { currencyMenuExpanded = true },
                                     border = null,
+                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
                                     colors = ButtonDefaults.outlinedButtonColors(
                                         containerColor = Color.White.copy(alpha = 0.15f)
                                     )
@@ -196,7 +198,7 @@ fun AddEditScreen(
                                     Text(
                                         text = state.currency,
                                         color = Color.White,
-                                        style = MaterialTheme.typography.labelLarge
+                                        style = MaterialTheme.typography.labelMedium
                                     )
                                 }
                                 DropdownMenu(
@@ -215,7 +217,7 @@ fun AddEditScreen(
                                 }
                             }
                         }
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
                         OutlinedTextField(
                             value = state.amount,
                             onValueChange = viewModel::updateAmount,
@@ -230,7 +232,7 @@ fun AddEditScreen(
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
-                            textStyle = MaterialTheme.typography.displayMedium.copy(
+                            textStyle = MaterialTheme.typography.headlineMedium.copy(
                                 color = Color.White,
                                 textAlign = TextAlign.Center
                             ),
