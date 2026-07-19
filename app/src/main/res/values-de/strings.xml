@@ -120,4 +120,25 @@
     <string name="to">Bis</string>
     <string name="apply">Anwenden</string>
     <string name="clear">Löschen</string>
+    <string name="filter_by_month">Nach Monat</string>
+    <string name="this_month">Dieser Monat</string>
+
+    <!-- Accessibility: content descriptions -->
+    <string name="cd_back">Zurück</string>
+    <string name="cd_add_expense">Ausgabe hinzufügen</string>
+    <string name="cd_edit">Ausgabe bearbeiten</string>
+    <string name="cd_delete">Ausgabe löschen</string>
+    <string name="cd_filter">Filter</string>
+    <string name="cd_expand">Erweitern</string>
+    <string name="cd_collapse">Reduzieren</string>
+
+    <!-- Accessibility: font size -->
+    <string name="font_size">Schriftgröße</string>
+    <string name="font_scale_small">Klein</string>
+    <string name="font_scale_normal">Normal</string>
+    <string name="font_scale_large">Groß</string>
+    <string name="font_scale_extra_large">Sehr groß</string>
+
+    <!-- Accessibility: theme -->
+    <string name="theme_high_contrast">Hoher Kontrast</string>
 </resources>

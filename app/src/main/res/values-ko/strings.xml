@@ -120,4 +120,25 @@
     <string name="to">까지</string>
     <string name="apply">적용</string>
     <string name="clear">초기화</string>
+    <string name="filter_by_month">월별</string>
+    <string name="this_month">이번 달</string>
+
+    <!-- Accessibility: content descriptions -->
+    <string name="cd_back">뒤로</string>
+    <string name="cd_add_expense">지출 추가</string>
+    <string name="cd_edit">지출 수정</string>
+    <string name="cd_delete">지출 삭제</string>
+    <string name="cd_filter">필터</string>
+    <string name="cd_expand">펼치기</string>
+    <string name="cd_collapse">접기</string>
+
+    <!-- Accessibility: font size -->
+    <string name="font_size">글자 크기</string>
+    <string name="font_scale_small">작게</string>
+    <string name="font_scale_normal">보통</string>
+    <string name="font_scale_large">크게</string>
+    <string name="font_scale_extra_large">아주 크게</string>
+
+    <!-- Accessibility: theme -->
+    <string name="theme_high_contrast">고대비</string>
 </resources>

@@ -45,6 +45,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -72,7 +75,9 @@ fun HomeScreen(
 
     if (state.isLoading) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .semantics { liveRegion = LiveRegionMode.Polite },
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator()
@@ -90,7 +95,9 @@ fun HomeScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { onNavigateToStats(StatsPeriod.MONTHLY) },
+                            .clickable(
+                                onClickLabel = stringResource(R.string.stats_title)
+                            ) { onNavigateToStats(StatsPeriod.MONTHLY) },
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
@@ -141,7 +148,9 @@ fun HomeScreen(
                             )
                             Icon(
                                 imageVector = if (currencyExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                                contentDescription = null,
+                                contentDescription = stringResource(
+                                    if (currencyExpanded) R.string.cd_collapse else R.string.cd_expand
+                                ),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -258,7 +267,7 @@ private fun MiniSummaryCard(
     currency: Currency = Currency.PEN
 ) {
     Card(
-        modifier = modifier.clickable(onClick = onClick),
+        modifier = modifier.clickable(onClickLabel = title, onClick = onClick),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)

@@ -86,7 +86,7 @@ fun MainPagerScreen(
                 ) {
                     Icon(
                         Icons.Default.Add,
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.cd_add_expense),
                         tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(32.dp)
                     )

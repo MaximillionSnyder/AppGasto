@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.example.appgasto.data.repository.PreferencesRepository
+import com.example.appgasto.domain.model.FontScale
 import com.example.appgasto.domain.model.ThemeMode
 import com.example.appgasto.ui.navigation.AppNavigation
 import com.example.appgasto.ui.theme.AppGastoTheme
@@ -39,13 +40,15 @@ class MainActivity : AppCompatActivity() {
                 ThemeMode.LIGHT -> false
                 ThemeMode.DARK -> true
                 ThemeMode.MATRIX -> true
+                ThemeMode.HIGH_CONTRAST -> false
                 else -> isSystemInDarkTheme()
             }
 
             val isMatrix = preferences?.themeMode == ThemeMode.MATRIX
 
             AppGastoTheme(
-                themeMode = preferences?.themeMode ?: ThemeMode.SYSTEM
+                themeMode = preferences?.themeMode ?: ThemeMode.SYSTEM,
+                fontScale = preferences?.fontScale ?: FontScale.NORMAL
             ) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),

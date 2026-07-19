@@ -34,6 +34,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -73,7 +77,7 @@ fun ListScreen(
                 IconButton(onClick = { showFilters = !showFilters }) {
                     Icon(
                         Icons.Default.FilterList,
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.cd_filter),
                         tint = if (showFilters) MaterialTheme.colorScheme.primary
                                else MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -128,7 +132,7 @@ fun ListScreen(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Text(
-                        text = "Por mes",
+                        stringResource(R.string.filter_by_month),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -163,7 +167,7 @@ fun ListScreen(
                                 },
                                 label = {
                                     Text(
-                                        if (month == currentMonth) "Este mes"
+                                        if (month == currentMonth) stringResource(R.string.this_month)
                                         else month.format(monthFormatter)
                                     )
                                 },
@@ -189,7 +193,9 @@ fun ListScreen(
 
             if (state.isLoading) {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .semantics { liveRegion = LiveRegionMode.Polite },
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
@@ -230,12 +236,14 @@ fun ListScreen(
                     groupedExpenses.forEach { (month, expenses) ->
                         item(contentType = "month_header") {
                             Text(
-                                text = if (month == currentMonth) "Este mes"
+                                text = if (month == currentMonth) stringResource(R.string.this_month)
                                        else month.format(monthFormatter),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(vertical = 8.dp, horizontal = 4.dp)
+                                modifier = Modifier
+                                    .padding(vertical = 8.dp, horizontal = 4.dp)
+                                    .semantics { heading() }
                             )
                         }
                         items(expenses, key = { it.id }, contentType = { "expense" }) { expense ->

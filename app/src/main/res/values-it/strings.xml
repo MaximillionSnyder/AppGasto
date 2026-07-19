@@ -120,4 +120,25 @@
     <string name="to">A</string>
     <string name="apply">Applica</string>
     <string name="clear">Pulisci</string>
+    <string name="filter_by_month">Per mese</string>
+    <string name="this_month">Questo mese</string>
+
+    <!-- Accessibility: content descriptions -->
+    <string name="cd_back">Indietro</string>
+    <string name="cd_add_expense">Aggiungi spesa</string>
+    <string name="cd_edit">Modifica spesa</string>
+    <string name="cd_delete">Elimina spesa</string>
+    <string name="cd_filter">Filtri</string>
+    <string name="cd_expand">Espandi</string>
+    <string name="cd_collapse">Comprimi</string>
+
+    <!-- Accessibility: font size -->
+    <string name="font_size">Dimensione carattere</string>
+    <string name="font_scale_small">Piccola</string>
+    <string name="font_scale_normal">Normale</string>
+    <string name="font_scale_large">Grande</string>
+    <string name="font_scale_extra_large">Molto grande</string>
+
+    <!-- Accessibility: theme -->
+    <string name="theme_high_contrast">Contrasto elevato</string>
 </resources>

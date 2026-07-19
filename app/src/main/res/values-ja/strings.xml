@@ -120,4 +120,25 @@
     <string name="to">まで</string>
     <string name="apply">適用</string>
     <string name="clear">クリア</string>
+    <string name="filter_by_month">月ごと</string>
+    <string name="this_month">今月</string>
+
+    <!-- Accessibility: content descriptions -->
+    <string name="cd_back">戻る</string>
+    <string name="cd_add_expense">支出を追加</string>
+    <string name="cd_edit">支出を編集</string>
+    <string name="cd_delete">支出を削除</string>
+    <string name="cd_filter">フィルター</string>
+    <string name="cd_expand">展開</string>
+    <string name="cd_collapse">折りたたむ</string>
+
+    <!-- Accessibility: font size -->
+    <string name="font_size">文字サイズ</string>
+    <string name="font_scale_small">小</string>
+    <string name="font_scale_normal">標準</string>
+    <string name="font_scale_large">大</string>
+    <string name="font_scale_extra_large">特大</string>
+
+    <!-- Accessibility: theme -->
+    <string name="theme_high_contrast">ハイコントラスト</string>
 </resources>

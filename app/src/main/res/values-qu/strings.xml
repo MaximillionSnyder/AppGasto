@@ -120,4 +120,25 @@
     <string name="to">Kama</string>
     <string name="apply">Churay</string>
     <string name="clear">Pichay</string>
+    <string name="filter_by_month">Killa kuskan</string>
+    <string name="this_month">Kay killa</string>
+
+    <!-- Accessibility: content descriptions -->
+    <string name="cd_back">Kutiy</string>
+    <string name="cd_add_expense">Gastota yapay</string>
+    <string name="cd_edit">Gastota allichay</string>
+    <string name="cd_delete">Gastota qichuy</string>
+    <string name="cd_filter">Ch\'uyachina</string>
+    <string name="cd_expand">Hatunyachiy</string>
+    <string name="cd_collapse">Uchuyachiy</string>
+
+    <!-- Accessibility: font size -->
+    <string name="font_size">San\'pa hatun kay</string>
+    <string name="font_scale_small">Uchuy</string>
+    <string name="font_scale_normal">Normal</string>
+    <string name="font_scale_large">Hatun</string>
+    <string name="font_scale_extra_large">Aswan hatun</string>
+
+    <!-- Accessibility: theme -->
+    <string name="theme_high_contrast">Aswan contrasta</string>
 </resources>

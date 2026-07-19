@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.MonetizationOn
@@ -73,6 +74,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -107,6 +112,7 @@ fun SettingsScreen(
     var showBudgetDialog by remember { mutableStateOf(false) }
     var showResetDialog by remember { mutableStateOf(false) }
     var showBaseCurrencyDialog by remember { mutableStateOf(false) }
+    var showFontScaleDialog by remember { mutableStateOf(false) }
 
     val importLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -166,7 +172,10 @@ fun SettingsScreen(
                     },
                     navigationIcon = {
                         IconButton(onClick = onNavigateBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.cd_back)
+                            )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
@@ -175,7 +184,12 @@ fun SettingsScreen(
                 )
             }
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = {
+            SnackbarHost(
+                snackbarHostState,
+                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite }
+            )
+        }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -371,8 +385,27 @@ fun SettingsScreen(
                         com.example.appgasto.domain.model.ThemeMode.DARK -> stringResource(R.string.theme_dark)
                         com.example.appgasto.domain.model.ThemeMode.SYSTEM -> stringResource(R.string.theme_system)
                         com.example.appgasto.domain.model.ThemeMode.MATRIX -> stringResource(R.string.theme_matrix)
+                        com.example.appgasto.domain.model.ThemeMode.HIGH_CONTRAST -> stringResource(R.string.theme_high_contrast)
                     },
                     onClick = { showThemeDialog = true }
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                )
+
+                SettingsRow(
+                    icon = Icons.Default.FormatSize,
+                    iconColor = MaterialTheme.colorScheme.primary,
+                    title = stringResource(R.string.font_size),
+                    subtitle = when (state.fontScale) {
+                        com.example.appgasto.domain.model.FontScale.SMALL -> stringResource(R.string.font_scale_small)
+                        com.example.appgasto.domain.model.FontScale.NORMAL -> stringResource(R.string.font_scale_normal)
+                        com.example.appgasto.domain.model.FontScale.LARGE -> stringResource(R.string.font_scale_large)
+                        com.example.appgasto.domain.model.FontScale.EXTRA_LARGE -> stringResource(R.string.font_scale_extra_large)
+                    },
+                    onClick = { showFontScaleDialog = true }
                 )
 
                 HorizontalDivider(
@@ -539,6 +572,17 @@ fun SettingsScreen(
             )
         }
 
+        if (showFontScaleDialog) {
+            FontScaleDialog(
+                currentScale = state.fontScale,
+                onSelect = {
+                    viewModel.setFontScale(it)
+                    showFontScaleDialog = false
+                },
+                onDismiss = { showFontScaleDialog = false }
+            )
+        }
+
         if (showBaseCurrencyDialog) {
             CurrencySettingsDialog(
                 currentCurrency = state.baseCurrency,
@@ -605,7 +649,9 @@ private fun SettingsSectionHeader(title: String) {
         style = MaterialTheme.typography.labelSmall,
         fontWeight = FontWeight.Bold,
         color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(start = 4.dp, bottom = 4.dp, top = 4.dp)
+        modifier = Modifier
+            .padding(start = 4.dp, bottom = 4.dp, top = 4.dp)
+            .semantics { heading() }
     )
 }
 
@@ -656,7 +702,9 @@ private fun SettingsSection(
                 )
                 Icon(
                     imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                    contentDescription = null,
+                    contentDescription = stringResource(
+                        if (expanded) R.string.cd_collapse else R.string.cd_expand
+                    ),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                     modifier = Modifier.size(22.dp)
                 )

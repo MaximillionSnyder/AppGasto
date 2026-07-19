@@ -174,4 +174,25 @@
     <string name="to">Hasta</string>
     <string name="apply">Aplicar</string>
     <string name="clear">Limpiar</string>
+    <string name="filter_by_month">Por mes</string>
+    <string name="this_month">Este mes</string>
+
+    <!-- Accessibility: content descriptions -->
+    <string name="cd_back">Volver</string>
+    <string name="cd_add_expense">Agregar gasto</string>
+    <string name="cd_edit">Editar gasto</string>
+    <string name="cd_delete">Eliminar gasto</string>
+    <string name="cd_filter">Filtros</string>
+    <string name="cd_expand">Expandir</string>
+    <string name="cd_collapse">Contraer</string>
+
+    <!-- Accessibility: font size -->
+    <string name="font_size">Tamaño de fuente</string>
+    <string name="font_scale_small">Pequeña</string>
+    <string name="font_scale_normal">Normal</string>
+    <string name="font_scale_large">Grande</string>
+    <string name="font_scale_extra_large">Extra grande</string>
+
+    <!-- Accessibility: theme -->
+    <string name="theme_high_contrast">Alto contraste</string>
 </resources>

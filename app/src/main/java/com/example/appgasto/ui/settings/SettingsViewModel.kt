@@ -11,6 +11,7 @@ import com.example.appgasto.data.repository.ExpenseRepository
 import com.example.appgasto.data.repository.PreferencesRepository
 import com.example.appgasto.domain.model.AppLanguage
 import com.example.appgasto.domain.model.Currency
+import com.example.appgasto.domain.model.FontScale
 import com.example.appgasto.domain.model.ThemeMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +31,8 @@ data class SettingsUiState(
     val monthlyExpenseTotal: Double = 0.0,
     val ratesUpdatedAt: Long = 0L,
     val isRefreshingRates: Boolean = false,
-    val baseCurrency: Currency = Currency.PEN
+    val baseCurrency: Currency = Currency.PEN,
+    val fontScale: FontScale = FontScale.NORMAL
 )
 
 @HiltViewModel
@@ -57,7 +59,8 @@ class SettingsViewModel @Inject constructor(
                     budgetEnabled = prefs.budgetEnabled,
                     monthlyExpenseTotal = monthTotal,
                     ratesUpdatedAt = prefs.ratesUpdatedAt,
-                    baseCurrency = prefs.baseCurrency
+                    baseCurrency = prefs.baseCurrency,
+                    fontScale = prefs.fontScale
                 )
             }
         }
@@ -101,6 +104,12 @@ class SettingsViewModel @Inject constructor(
     fun setBudgetEnabled(enabled: Boolean) {
         viewModelScope.launch {
             preferencesRepository.setBudgetEnabled(enabled)
+        }
+    }
+
+    fun setFontScale(scale: FontScale) {
+        viewModelScope.launch {
+            preferencesRepository.setFontScale(scale)
         }
     }
 

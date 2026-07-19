@@ -48,6 +48,7 @@ import com.example.appgasto.data.local.localizedName
 import com.example.appgasto.ui.theme.CategoryColors
 import com.example.appgasto.ui.theme.GradientEnd
 import com.example.appgasto.ui.theme.GradientStart
+import com.example.appgasto.ui.theme.LocalIsHighContrast
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -165,10 +166,11 @@ fun StatsScreen(
                                 .padding(20.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            val donutSlices = remember(state.categoryTotals, isDark, isMatrix) {
+                            val isHighContrast = LocalIsHighContrast.current
+                            val donutSlices = remember(state.categoryTotals, isDark, isMatrix, isHighContrast) {
                                 state.categoryTotals.map { catTotal ->
                                     DonutSlice(
-                                        color = CategoryColors.getById(catTotal.category.id, isDark, isMatrix),
+                                        color = CategoryColors.getById(catTotal.category.id, isDark, isMatrix, isHighContrast),
                                         percentage = (catTotal.total / state.totalExpenses * 100).toFloat()
                                     )
                                 }
@@ -181,7 +183,7 @@ fun StatsScreen(
                             Spacer(modifier = Modifier.height(20.dp))
 
                             state.categoryTotals.forEach { catTotal ->
-                                val catColor = CategoryColors.getById(catTotal.category.id, isDark, isMatrix)
+                                val catColor = CategoryColors.getById(catTotal.category.id, isDark, isMatrix, isHighContrast)
                                 val percentage = if (state.totalExpenses > 0)
                                     (catTotal.total / state.totalExpenses * 100).toFloat() else 0f
 

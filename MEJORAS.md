@@ -212,10 +212,26 @@
 
 ---
 
+## Versión 12 — 2026-07-19
+
+### 12.1 Accesibilidad completa (plan V3, sección 3.1)
+- **Archivos:** `FontScale.kt` (nuevo), `FontScaleDialog.kt` (nuevo), `ThemeMode.kt`, `UserPreferences.kt`, `PreferencesRepository.kt`, `Theme.kt`, `Color.kt`, `CategoryColors.kt`, `MainActivity.kt`, `SettingsScreen.kt`, `SettingsViewModel.kt`, `ThemeSettingsDialog.kt`, `MainPagerScreen.kt`, `HomeScreen.kt`, `ListScreen.kt`, `AddEditScreen.kt`, `ExpenseItem.kt`, `CategorySelector.kt`, `StatsScreen.kt`, todos los `strings.xml` (8 idiomas)
+- **Objetivo:** Hacer la app usable con TalkBack, baja visión y necesidades de fuente grande/alto contraste.
+- **Cambios:**
+  - **Content descriptions:** botones icon-only ahora anuncian su acción (volver, agregar gasto, editar/eliminar gasto, filtros, expandir/contraer). Los iconos decorativos junto a texto mantienen `null` (práctica WCAG — evita anuncios duplicados).
+  - **Semántica:** `heading()` en encabezados de sección y de mes; `liveRegion = Polite` en indicadores de carga y snackbar; `clickable(onClickLabel = …)` en tarjetas del Home que navegan a Estadísticas.
+  - **Tamaño de fuente:** nuevo enum `FontScale` (0.85/1.0/1.15/1.3) + clave DataStore `font_scale` + diálogo con preview "Aa". Se aplica SOLO vía `LocalDensity` (escalar también `Typography` duplicaría el factor, pues los `sp` ya los escala la densidad).
+  - **Touch targets:** botones de 28dp en `ExpenseItem` con `minimumInteractiveComponentSize()` (48dp táctil, mismo tamaño visual).
+  - **Tema HIGH_CONTRAST:** 5ª opción de tema (WCAG AAA: blanco puro/negro puro, acentos oscuros). Paleta de categorías propia y `LocalIsHighContrast` CompositionLocal para no enhebrar otro booleano por la navegación.
+- **Extra (i18n):** strings hardcodeados "Por mes"/"Este mes" de `ListScreen` reemplazados por `filter_by_month`/`this_month` en los 8 idiomas.
+
+---
+
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
 |:-------:|:-----:|:--------|
+| 12 | 2026-07-19 | Accesibilidad: content descriptions, semántica, fontScale, touch targets 48dp, tema alto contraste + fix strings hardcodeados de Lista |
 | 11 | 2026-07-15 | Barra progreso presupuesto, restablecer datos, preview visual temas/banderas |
 | 10 | 2026-07-15 | Rediseño Ajustes: secciones agrupadas, flechas >, versión dinámica, moneda como row, About mejorado, animación presupuesto |
 | 9 | 2026-07-15 | Fix desfase temporal en DatePicker |

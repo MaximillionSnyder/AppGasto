@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import com.example.appgasto.data.local.Category
 import com.example.appgasto.data.local.localizedName
 import com.example.appgasto.ui.theme.CategoryColors
+import com.example.appgasto.ui.theme.LocalIsHighContrast
 
 private fun categoryIcon(categoryId: Long): ImageVector = when (categoryId) {
     1L -> Icons.Default.Fastfood
@@ -69,7 +70,7 @@ fun CategorySelector(
     ) {
         categories.forEach { category ->
             val isSelected = category.id == selectedCategoryId
-            val catColor = CategoryColors.getById(category.id, isDark, isMatrix)
+            val catColor = CategoryColors.getById(category.id, isDark, isMatrix, LocalIsHighContrast.current)
 
             val containerColor by animateColorAsState(
                 targetValue = if (isSelected) catColor.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),

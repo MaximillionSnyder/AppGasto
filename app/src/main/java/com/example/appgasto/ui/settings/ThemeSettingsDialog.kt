@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Contrast
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.SettingsBrightness
@@ -81,6 +82,14 @@ fun ThemeSettingsDialog(
                     label = stringResource(R.string.theme_matrix),
                     isSelected = currentTheme == ThemeMode.MATRIX,
                     onClick = { onSelect(ThemeMode.MATRIX) }
+                )
+                ThemeOption(
+                    icon = Icons.Default.Contrast,
+                    iconColor = Color(0xFF1B1B1F),
+                    previewColor = Color(0xFF0033A0),
+                    label = stringResource(R.string.theme_high_contrast),
+                    isSelected = currentTheme == ThemeMode.HIGH_CONTRAST,
+                    onClick = { onSelect(ThemeMode.HIGH_CONTRAST) }
                 )
             }
         },

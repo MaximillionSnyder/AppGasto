@@ -132,7 +132,10 @@ fun AddEditScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.cd_back)
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -313,7 +316,9 @@ fun AddEditScreen(
                     )
                     Icon(
                         imageVector = if (noteExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                        contentDescription = null,
+                        contentDescription = stringResource(
+                            if (noteExpanded) R.string.cd_collapse else R.string.cd_expand
+                        ),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }

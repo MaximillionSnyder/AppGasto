@@ -120,4 +120,25 @@
     <string name="to">Até</string>
     <string name="apply">Aplicar</string>
     <string name="clear">Limpar</string>
+    <string name="filter_by_month">Por mês</string>
+    <string name="this_month">Este mês</string>
+
+    <!-- Accessibility: content descriptions -->
+    <string name="cd_back">Voltar</string>
+    <string name="cd_add_expense">Adicionar despesa</string>
+    <string name="cd_edit">Editar despesa</string>
+    <string name="cd_delete">Excluir despesa</string>
+    <string name="cd_filter">Filtros</string>
+    <string name="cd_expand">Expandir</string>
+    <string name="cd_collapse">Recolher</string>
+
+    <!-- Accessibility: font size -->
+    <string name="font_size">Tamanho da fonte</string>
+    <string name="font_scale_small">Pequena</string>
+    <string name="font_scale_normal">Normal</string>
+    <string name="font_scale_large">Grande</string>
+    <string name="font_scale_extra_large">Extra grande</string>
+
+    <!-- Accessibility: theme -->
+    <string name="theme_high_contrast">Alto contraste</string>
 </resources>

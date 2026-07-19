@@ -27,6 +27,15 @@ object CategoryColors {
     val clothingMatrix = Color(0xFFFFD740)
     val otherMatrix = Color(0xFF90A4AE)
 
+    // High Contrast variants — darker tones with strong contrast on white
+    val foodHighContrast = Color(0xFFB34700)
+    val transportHighContrast = Color(0xFF004FC4)
+    val leisureHighContrast = Color(0xFF6A00A8)
+    val homeHighContrast = Color(0xFF007A33)
+    val healthHighContrast = Color(0xFFC40030)
+    val clothingHighContrast = Color(0xFF8F6D00)
+    val otherHighContrast = Color(0xFF37474F)
+
     private val lightColors = mapOf(
         1L to food,
         2L to transport,
@@ -57,8 +66,24 @@ object CategoryColors {
         7L to otherMatrix
     )
 
-    fun getById(categoryId: Long, isDark: Boolean = false, isMatrix: Boolean = false): Color {
+    private val highContrastColors = mapOf(
+        1L to foodHighContrast,
+        2L to transportHighContrast,
+        3L to leisureHighContrast,
+        4L to homeHighContrast,
+        5L to healthHighContrast,
+        6L to clothingHighContrast,
+        7L to otherHighContrast
+    )
+
+    fun getById(
+        categoryId: Long,
+        isDark: Boolean = false,
+        isMatrix: Boolean = false,
+        isHighContrast: Boolean = false
+    ): Color {
         val colors = when {
+            isHighContrast -> highContrastColors
             isMatrix -> matrixColors
             isDark -> darkColors
             else -> lightColors

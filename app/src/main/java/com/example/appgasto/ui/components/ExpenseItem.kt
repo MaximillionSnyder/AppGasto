@@ -27,19 +27,23 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.appgasto.R
 import com.example.appgasto.data.local.Category
 import com.example.appgasto.data.local.Expense
 import com.example.appgasto.data.local.localizedName
 import com.example.appgasto.domain.model.Currency
 import com.example.appgasto.ui.theme.CategoryColors
+import com.example.appgasto.ui.theme.LocalIsHighContrast
 import java.time.format.DateTimeFormatter
 
 private val itemDateFormatter = DateTimeFormatter.ofPattern("dd MMM HH:mm")
@@ -66,7 +70,7 @@ fun ExpenseItem(
     modifier: Modifier = Modifier
 ) {
     val catColor = category?.let {
-        CategoryColors.getById(category.id, isDark, isMatrix)
+        CategoryColors.getById(category.id, isDark, isMatrix, LocalIsHighContrast.current)
     } ?: Color.Gray
 
     Surface(
@@ -129,19 +133,25 @@ fun ExpenseItem(
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(0.dp)) {
-                    IconButton(onClick = onEdit, modifier = Modifier.size(28.dp)) {
+                    IconButton(
+                        onClick = onEdit,
+                        modifier = Modifier.size(28.dp).minimumInteractiveComponentSize()
+                    ) {
                         Icon(
                             Icons.Default.Edit,
-                            contentDescription = null,
+                            contentDescription = stringResource(R.string.cd_edit),
                             modifier = Modifier.size(16.dp),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
                     if (showDelete) {
-                        IconButton(onClick = onDelete, modifier = Modifier.size(28.dp)) {
+                        IconButton(
+                            onClick = onDelete,
+                            modifier = Modifier.size(28.dp).minimumInteractiveComponentSize()
+                        ) {
                             Icon(
                                 Icons.Default.Delete,
-                                contentDescription = null,
+                                contentDescription = stringResource(R.string.cd_delete),
                                 modifier = Modifier.size(16.dp),
                                 tint = MaterialTheme.colorScheme.error
                             )

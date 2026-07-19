@@ -138,35 +138,36 @@
 
 ### 3.1 Accesibilidad (TalkBack, baja visión, fuentes ajustables)
 
-- **Estado:** `[ ]` Pendiente
+- **Estado:** `[x]` Implementado (2026-07-19)
 - **Objetivo:** Hacer la app usable para personas con discapacidad visual, motriz o cognitiva mediante content descriptions, semántica Compose, tamaño de fuente ajustable y modo alto contraste.
 
 #### 3.1.1 Content descriptions en todos los iconos
-- `[ ]` Reemplazar `contentDescription = null` por strings localizados en TODOS los `Icon`/`IconButton` del proyecto (~20+ ocurrencias)
-- `[ ]` Strings nuevos en `strings.xml` (8 idiomas): `cd_back`, `cd_add_expense`, `cd_edit`, `cd_delete`, `cd_filter`, `cd_settings`, `cd_expand`, `cd_collapse`, `cd_category`, `cd_scan_receipt`, `cd_date`, `cd_theme`, `cd_language`, `cd_refresh_rates`, `cd_empty_state`
-- Archivos afectados: `ExpenseItem.kt`, `HomeScreen.kt`, `AddEditScreen.kt`, `ListScreen.kt`, `SettingsScreen.kt`, `MainPagerScreen.kt`, `CategorySelector.kt`, `ThemeSettingsDialog.kt`, `LanguageSettingsDialog.kt`
+- `[x]` Iconos en botones icon-only reemplazados por strings localizados: back (Settings, AddEdit), FAB agregar, editar/eliminar gasto, filtro, expandir/contraer (Home, AddEdit, Settings)
+- `[x]` **Decisión (WCAG):** iconos decorativos junto a etiquetas de texto (filas de Ajustes, checkmarks de selección, iconos de categoría, empty states) mantienen `contentDescription = null` — describirlos duplicaría el anuncio de TalkBack
+- `[x]` Strings nuevos en `strings.xml` (8 idiomas): `cd_back`, `cd_add_expense`, `cd_edit`, `cd_delete`, `cd_filter`, `cd_expand`, `cd_collapse`
+- Archivos afectados: `ExpenseItem.kt`, `HomeScreen.kt`, `AddEditScreen.kt`, `ListScreen.kt`, `SettingsScreen.kt`, `MainPagerScreen.kt`
 
 #### 3.1.2 Semántica para screen readers
-- `[ ]` Agregar `Modifier.semantics { contentDescription = "..." }` en tarjetas de resumen del Home (día/semana/mes)
-- `[ ]` `semantics { mergeDescendants = true }` en `ExpenseItem`: anuncio como "Comida, 15 soles, hoy 14:30"
-- `[ ]` `semantics { heading() }` en títulos de sección (GENERAL, PERSONALIZACIÓN, DATOS)
-- `[ ]` `semantics { liveRegion = LiveRegionMode.Polite }` en indicadores de carga y snackbar
+- `[x]` `clickable(onClickLabel = ...)` en tarjetas de resumen del Home (mes/día/semana navegan a Estadísticas)
+- `[x]` `semantics { heading() }` en títulos de sección (GENERAL, PERSONALIZACIÓN, DATOS, INFORMACIÓN) y encabezados de mes en Lista
+- `[x]` `semantics { liveRegion = LiveRegionMode.Polite }` en indicadores de carga (Home, Lista) y SnackbarHost de Ajustes
+- `[x]` **Decisión:** NO se aplicó `mergeDescendants` en `ExpenseItem` para no fusionar las acciones de los botones editar/eliminar en el nodo padre
 
 #### 3.1.3 Tamaño de fuente ajustable
-- `[ ]` Nuevo enum `FontScale`: SMALL(0.85), NORMAL(1.0), LARGE(1.15), EXTRA_LARGE(1.3)
-- `[ ]` Nueva clave en `PreferencesRepository`: `font_scale` (String, default "NORMAL")
-- `[ ]` `SettingsScreen`: nueva fila "Tamaño de fuente" → `FontScaleDialog` con 4 opciones + preview
-- `[ ]` Aplicar `fontScale` en `AppGastoTheme`: escalar `Typography` **y además** envolver el contenido en `CompositionLocalProvider(LocalDensity provides density.copy(fontScale = scale))` para coherencia con todos los valores `sp` (paddings/tamaños derivados)
-- `[ ]` Strings localizados para las 4 opciones en 8 idiomas
+- `[x]` Nuevo enum `FontScale`: SMALL(0.85), NORMAL(1.0), LARGE(1.15), EXTRA_LARGE(1.3)
+- `[x]` Nueva clave en `PreferencesRepository`: `font_scale` (String, default "NORMAL")
+- `[x]` `SettingsScreen`: nueva fila "Tamaño de fuente" → `FontScaleDialog` con 4 opciones + preview ("Aa" escalado por opción)
+- `[x]` **Decisión:** se aplica SOLO vía `CompositionLocalProvider(LocalDensity provides density.copy(fontScale))` — escalar también `Typography` duplicaría el factor (Typography usa `sp`, que la densidad ya escala)
+- `[x]` Strings localizados para las 4 opciones en 8 idiomas
 
 #### 3.1.4 Touch targets mínimos de 48dp
-- `[ ]` Revisar elementos clickeables y asegurar `Modifier.minimumInteractiveComponentSize()`
-- `[ ]` Ajustar espaciado de `ExpenseItem` para evitar overlap de botones editar/eliminar
+- `[x]` Botones editar/eliminar de `ExpenseItem` (28dp visuales) envueltos con `Modifier.minimumInteractiveComponentSize()` — área táctil de 48dp sin cambiar el tamaño visual
 
 #### 3.1.5 Modo alto contraste (WCAG AAA)
-- `[ ]` Nuevo tema `HIGH_CONTRAST` en `ThemeMode` (basado en Light pero con colores WCAG AAA)
-- `[ ]` Colores: fondo blanco puro, texto negro puro, bordes visibles, sin transparencias
-- `[ ]` Opción en `ThemeSettingsDialog` con ícono `Contrast`
+- `[x]` Nuevo tema `HIGH_CONTRAST` en `ThemeMode` (basado en Light: fondo blanco puro, texto negro puro, acentos oscuros, outline visible)
+- `[x]` Paleta de categorías `highContrastColors` en `CategoryColors.kt` (tonos oscuros sobre blanco)
+- `[x]` `LocalIsHighContrast` CompositionLocal (en `Theme.kt`) para que los call sites de `CategoryColors.getById()` lean el modo sin enhebrar otro booleano por la navegación
+- `[x]` Opción en `ThemeSettingsDialog` con ícono `Contrast`
 
 ### 3.2 Backup automático + recordatorios
 
@@ -318,3 +319,4 @@
 | 2 | 2026-07-05 | Multi-moneda con tasas de cambio + Receipt Scanning multi-moneda |
 | 3 | 2026-07-16 | Accesibilidad (TalkBack, fontScale, alto contraste) + Auto-backup + Guardar recibos |
 | 3-rev | 2026-07-19 | Revisión del plan V3: fix Scoped Storage en auto-backup (MediaStore/permiso legacy), imágenes con UUID (sin expenseId), backup v3 como ZIP (no Base64), Coil para thumbnails, canal backup_reminders, fontScale con LocalDensity, sección 3.4 Tests |
+| 3.1 | 2026-07-19 | ✅ Accesibilidad implementada: content descriptions, semántica (heading/liveRegion/clickLabel), fontScale vía LocalDensity, touch targets 48dp, tema HIGH_CONTRAST con paleta de categorías propia + strings hardcodeados de Lista localizados (filter_by_month, this_month) |

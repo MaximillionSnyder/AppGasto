@@ -72,6 +72,29 @@ val MatrixGradientStart = Color(0xFF00C853)
 val MatrixGradientEnd = Color(0xFF00FF41)
 val MatrixGradientTertiary = Color(0xFF00FFFF)
 
+// High Contrast (WCAG AAA — pure white background, pure black text, strong accents)
+val HighContrastPrimary = Color(0xFF0033A0)
+val HighContrastOnPrimary = Color.White
+val HighContrastPrimaryContainer = Color(0xFFE0E7FF)
+val HighContrastOnPrimaryContainer = Color(0xFF001033)
+val HighContrastSecondary = Color(0xFF8B0051)
+val HighContrastOnSecondary = Color.White
+val HighContrastSecondaryContainer = Color(0xFFFFD9E8)
+val HighContrastOnSecondaryContainer = Color(0xFF3A0022)
+val HighContrastTertiary = Color(0xFF00574B)
+val HighContrastOnTertiary = Color.White
+val HighContrastTertiaryContainer = Color(0xFFD7FFF4)
+val HighContrastOnTertiaryContainer = Color(0xFF00201B)
+val HighContrastSurface = Color.White
+val HighContrastOnSurface = Color.Black
+val HighContrastBackground = Color.White
+val HighContrastOnBackground = Color.Black
+val HighContrastSurfaceVariant = Color(0xFFF5F5F5)
+val HighContrastOnSurfaceVariant = Color.Black
+val HighContrastError = Color(0xFFB00020)
+val HighContrastOnError = Color.White
+val HighContrastOutline = Color(0xFF1B1B1F)
+
 val GradientStart = Color(0xFF6C63FF)
 val GradientEnd = Color(0xFFFF6584)
 val GradientTertiary = Color(0xFF00BFA6)
