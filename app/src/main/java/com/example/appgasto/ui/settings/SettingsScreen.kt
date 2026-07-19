@@ -206,7 +206,7 @@ fun SettingsScreen(
                         )
                         if (state.budgetEnabled && state.monthlyBudget > 0) {
                             Text(
-                                text = "${state.baseCurrency.symbol}${String.format("%.2f", state.monthlyBudget)}",
+                                text = state.baseCurrency.format(state.monthlyBudget),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.SemiBold
@@ -256,10 +256,9 @@ fun SettingsScreen(
 
                             Spacer(modifier = Modifier.height(8.dp))
 
-                            val symbol = state.baseCurrency.symbol
                             Text(
                                 text = if (ratio >= 1f) stringResource(R.string.budget_exceeded)
-                                       else "$symbol${String.format("%.2f", state.monthlyExpenseTotal)} de $symbol${String.format("%.2f", state.monthlyBudget)}",
+                                       else "${state.baseCurrency.format(state.monthlyExpenseTotal)} de ${state.baseCurrency.format(state.monthlyBudget)}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = progressColor,
                                 fontWeight = FontWeight.Medium

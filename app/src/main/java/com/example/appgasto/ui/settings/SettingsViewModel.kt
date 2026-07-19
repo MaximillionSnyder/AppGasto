@@ -47,7 +47,9 @@ class SettingsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             preferencesRepository.preferencesFlow.collect { prefs ->
-                val monthTotal = expenseRepository.getCurrentMonthTotal()
+                val rateToBase = if (prefs.baseCurrency == Currency.PEN) 1.0
+                    else exchangeRateRepository.getRateToPen(prefs.baseCurrency.code) ?: 1.0
+                val monthTotal = expenseRepository.getCurrentMonthTotal() * rateToBase
                 _uiState.value = SettingsUiState(
                     themeMode = prefs.themeMode,
                     language = prefs.language,
@@ -104,7 +106,17 @@ class SettingsViewModel @Inject constructor(
 
     fun setBaseCurrency(currency: Currency) {
         viewModelScope.launch {
+            val oldBase = _uiState.value.baseCurrency
+            val budget = _uiState.value.monthlyBudget
             preferencesRepository.setBaseCurrency(currency)
+            // The budget is defined in the base currency: reconvert the stored
+            // amount so it keeps representing the same value in the new base.
+            if (budget > 0 && oldBase != currency) {
+                val converted = exchangeRateRepository.convert(budget, oldBase.code, currency.code)
+                if (converted != null) {
+                    preferencesRepository.setMonthlyBudget(converted)
+                }
+            }
         }
     }
 

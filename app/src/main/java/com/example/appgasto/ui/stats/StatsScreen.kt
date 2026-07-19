@@ -132,7 +132,7 @@ fun StatsScreen(
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "${state.baseCurrency.symbol}${String.format("%.2f", state.totalExpenses)}",
+                                text = state.baseCurrency.format(state.totalExpenses),
                                 style = MaterialTheme.typography.displayLarge,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = Color.White
@@ -210,7 +210,7 @@ fun StatsScreen(
                                         modifier = Modifier.padding(end = 8.dp)
                                     )
                                     Text(
-                                        text = "${state.baseCurrency.symbol}${String.format("%.2f", catTotal.total)}",
+                                        text = state.baseCurrency.format(catTotal.total),
                                         style = MaterialTheme.typography.bodyMedium,
                                         fontWeight = FontWeight.SemiBold,
                                         color = MaterialTheme.colorScheme.onSurface

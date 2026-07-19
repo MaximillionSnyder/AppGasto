@@ -5,9 +5,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.AlertDialog
@@ -41,16 +45,28 @@ fun CurrencySettingsDialog(
         },
         text = {
             Column {
-                Currency.entries.forEach { currency ->
-                    CurrencyOption(
-                        currency = currency,
-                        isSelected = currentCurrency == currency,
-                        onClick = {
-                            onSelect(currency)
-                            onDismiss()
-                        }
-                    )
+                Column(
+                    modifier = Modifier
+                        .heightIn(max = 360.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Currency.entries.forEach { currency ->
+                        CurrencyOption(
+                            currency = currency,
+                            isSelected = currentCurrency == currency,
+                            onClick = {
+                                onSelect(currency)
+                                onDismiss()
+                            }
+                        )
+                    }
                 }
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = stringResource(R.string.base_currency_description),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         },
         confirmButton = {
@@ -79,10 +95,10 @@ private fun CurrencyOption(
             text = "${currency.symbol}  ${currency.code}",
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.width(64.dp)
+            modifier = Modifier.width(84.dp)
         )
         Text(
-            text = currencyName(currency),
+            text = currency.displayName(),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.weight(1f)
@@ -96,13 +112,4 @@ private fun CurrencyOption(
             )
         }
     }
-}
-
-private fun currencyName(currency: Currency): String = when (currency) {
-    Currency.PEN -> "Sol peruano"
-    Currency.USD -> "US Dollar"
-    Currency.EUR -> "Euro"
-    Currency.JPY -> "Yen"
-    Currency.GBP -> "Pound Sterling"
-    Currency.BRL -> "Brazilian Real"
 }

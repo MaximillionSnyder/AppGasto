@@ -104,8 +104,8 @@
     <string name="section_data">Data</string>
     <string name="section_info">Information</string>
     <string name="base_currency">Base currency</string>
+    <string name="base_currency_description">Totals are shown in the chosen currency. Each expense keeps its original currency.</string>
     <string name="made_with">Made with ❤️ in Kotlin</string>
-    <string name="budget_progress">S/. %1$.2f of S/. %2$.2f</string>
     <string name="budget_exceeded">Budget exceeded!</string>
     <string name="reset_data">Reset data</string>
     <string name="reset_data_description">Delete all expenses and budget</string>

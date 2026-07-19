@@ -79,6 +79,22 @@ class ExchangeRateRepository @Inject constructor(
     }
 
     /**
+     * Converts [amount] from [fromCode] to [toCode] using the cached rates
+     * with PEN as pivot currency (from -> PEN -> to).
+     * Returns null if a required rate is not cached.
+     */
+    suspend fun convert(amount: Double, fromCode: String, toCode: String): Double? {
+        val from = fromCode.uppercase()
+        val to = toCode.uppercase()
+        if (from == to) return amount
+        val fromRate = if (from == Currency.PEN.code) 1.0
+            else getRateToPen(from) ?: return null
+        val toRate = if (to == Currency.PEN.code) 1.0
+            else getRateToPen(to) ?: return null
+        return (amount / fromRate) * toRate
+    }
+
+    /**
      * Best-effort refresh: if network fails but cache exists, consider it acceptable.
      * Useful during app startup / worker runs.
      */

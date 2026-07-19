@@ -7,8 +7,10 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.appgasto.R
+import com.example.appgasto.data.currency.ExchangeRateRepository
 import com.example.appgasto.data.repository.ExpenseRepository
 import com.example.appgasto.data.repository.PreferencesRepository
+import com.example.appgasto.domain.model.Currency
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
@@ -19,7 +21,8 @@ class BudgetWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted workerParams: WorkerParameters,
     private val expenseRepository: ExpenseRepository,
-    private val preferencesRepository: PreferencesRepository
+    private val preferencesRepository: PreferencesRepository,
+    private val exchangeRateRepository: ExchangeRateRepository
 ) : CoroutineWorker(appContext, workerParams) {
 
     companion object {
@@ -35,9 +38,14 @@ class BudgetWorker @AssistedInject constructor(
             }
 
             val monthStart = LocalDate.now().withDayOfMonth(1)
-            val currentTotal = expenseRepository.getTotalForPeriod(
+            val totalPEN = expenseRepository.getTotalForPeriod(
                 monthStart, LocalDate.now()
             )
+            // The budget is defined in the user's base currency.
+            val baseCurrency = preferences.baseCurrency
+            val rateToBase = if (baseCurrency == Currency.PEN) 1.0
+                else exchangeRateRepository.getRateToPen(baseCurrency.code) ?: 1.0
+            val currentTotal = totalPEN * rateToBase
             val percentage = (currentTotal / preferences.monthlyBudget) * 100
 
             when {

@@ -77,7 +77,7 @@
 
     <!-- Settings -->
     <string name="currency">Moneda</string>
-    <string name="base_currency_description">Todas las conversiones se guardan en soles peruanos (PEN).</string>
+    <string name="base_currency_description">Los totales se muestran en la moneda elegida. Cada gasto conserva su moneda original.</string>
     <string name="refresh_rates">Actualizar tasas</string>
     <string name="last_update">Última actualización: %1$s</string>
     <string name="rates_updated">Tasas actualizadas</string>
@@ -113,7 +113,6 @@
     <string name="section_info">Información</string>
     <string name="base_currency">Moneda base</string>
     <string name="made_with">Hecho con ❤️ en Kotlin</string>
-    <string name="budget_progress">S/. %1$.2f de S/. %2$.2f</string>
     <string name="budget_exceeded">¡Presupuesto excedido!</string>
     <string name="reset_data">Restablecer datos</string>
     <string name="reset_data_description">Borrar todos los gastos y presupuesto</string>

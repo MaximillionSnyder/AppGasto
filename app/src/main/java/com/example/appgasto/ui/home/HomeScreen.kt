@@ -112,7 +112,7 @@ fun HomeScreen(
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "${state.baseCurrency.symbol}${String.format("%.2f", state.monthTotal)}",
+                                    text = state.baseCurrency.format(state.monthTotal),
                                     style = MaterialTheme.typography.displayMedium,
                                     fontWeight = FontWeight.ExtraBold,
                                     color = androidx.compose.ui.graphics.Color.White
@@ -152,12 +152,12 @@ fun HomeScreen(
                                 verticalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
                                 state.monthCurrencyBreakdown.forEach { tuple ->
-                                    val symbol = Currency.fromCode(tuple.currency).symbol
+                                    val tupleCurrency = Currency.fromCode(tuple.currency)
                                     SuggestionChip(
                                         onClick = { },
                                         label = {
                                             Text(
-                                                text = "$symbol${String.format("%.2f", tuple.totalOriginal)} = S/.${String.format("%.2f", tuple.totalInPEN)}",
+                                                text = "${tupleCurrency.format(tuple.totalOriginal)} = ${state.baseCurrency.format(tuple.totalInPEN * state.rateToBase)}",
                                                 style = MaterialTheme.typography.labelMedium
                                             )
                                         }
@@ -180,7 +180,7 @@ fun HomeScreen(
                         color = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.weight(1f),
                         onClick = { onNavigateToStats(StatsPeriod.DAILY) },
-                        symbol = state.baseCurrency.symbol
+                        currency = state.baseCurrency
                     )
                     MiniSummaryCard(
                         title = stringResource(R.string.total_week),
@@ -189,7 +189,7 @@ fun HomeScreen(
                         color = GradientTertiary,
                         modifier = Modifier.weight(1f),
                         onClick = { onNavigateToStats(StatsPeriod.WEEKLY) },
-                        symbol = state.baseCurrency.symbol
+                        currency = state.baseCurrency
                     )
                     }
 
@@ -255,7 +255,7 @@ private fun MiniSummaryCard(
     color: androidx.compose.ui.graphics.Color,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
-    symbol: String = ""
+    currency: Currency = Currency.PEN
 ) {
     Card(
         modifier = modifier.clickable(onClick = onClick),
@@ -293,7 +293,7 @@ private fun MiniSummaryCard(
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "$symbol${String.format("%.2f", amount)}",
+                text = currency.format(amount),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,

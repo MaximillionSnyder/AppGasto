@@ -28,7 +28,8 @@ data class HomeUiState(
     val todayExpenses: List<Expense> = emptyList(),
     val categories: Map<Long, Category> = emptyMap(),
     val isLoading: Boolean = true,
-    val baseCurrency: Currency = Currency.PEN
+    val baseCurrency: Currency = Currency.PEN,
+    val rateToBase: Double = 1.0
 )
 
 @HiltViewModel
@@ -74,7 +75,8 @@ class HomeViewModel @Inject constructor(
                             todayExpenses = expenses,
                             categories = categories.associateBy { it.id },
                             isLoading = false,
-                            baseCurrency = baseCurrency
+                            baseCurrency = baseCurrency,
+                            rateToBase = rateToBase
                         )
                     }
             } catch (e: Exception) {

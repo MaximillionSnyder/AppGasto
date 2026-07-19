@@ -121,9 +121,8 @@ fun ExpenseItem(
             }
 
             Column(horizontalAlignment = Alignment.End) {
-                val currencySymbol = Currency.fromCode(expense.currency).symbol
                 Text(
-                    text = "$currencySymbol${String.format("%.2f", expense.amount)}",
+                    text = Currency.fromCode(expense.currency).format(expense.amount),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface

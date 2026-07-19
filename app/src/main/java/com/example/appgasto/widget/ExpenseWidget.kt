@@ -7,14 +7,23 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import com.example.appgasto.MainActivity
 import com.example.appgasto.R
 import com.example.appgasto.data.local.AppDatabase
+import com.example.appgasto.domain.model.Currency
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+
+// Same DataStore name as PreferencesRepository: both delegates share the file.
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 class ExpenseWidget : AppWidgetProvider() {
 
@@ -33,8 +42,8 @@ class ExpenseWidget : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetId: Int
     ) {
-        val total = runBlocking(Dispatchers.IO) { getTodayTotal(context) }
-        val totalText = String.format("%.2f", total)
+        val (total, baseCurrency) = runBlocking(Dispatchers.IO) { getTodayTotalInBase(context) }
+        val totalText = baseCurrency.format(total)
 
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -52,17 +61,26 @@ class ExpenseWidget : AppWidgetProvider() {
         appWidgetManager.updateAppWidget(appWidgetId, views)
     }
 
-    private suspend fun getTodayTotal(context: Context): Double {
+    private suspend fun getTodayTotalInBase(context: Context): Pair<Double, Currency> {
         return try {
             val database = AppDatabase.create(context.applicationContext)
             val start = LocalDateTime.of(LocalDate.now(), LocalTime.MIN)
-            database.expenseDao().getTotalSince(start) ?: 0.0
+            val totalPEN = database.expenseDao().getTotalSince(start) ?: 0.0
+
+            val baseCode = context.dataStore.data.first()[BASE_CURRENCY_KEY] ?: Currency.PEN.code
+            val baseCurrency = Currency.fromCode(baseCode)
+            val rateToBase = if (baseCurrency == Currency.PEN) 1.0
+                else database.exchangeRateDao().getByCode(baseCurrency.code)?.rateToPen ?: 1.0
+
+            Pair(totalPEN * rateToBase, baseCurrency)
         } catch (e: Exception) {
-            0.0
+            Pair(0.0, Currency.PEN)
         }
     }
 
     companion object {
+        private val BASE_CURRENCY_KEY = stringPreferencesKey("base_currency")
+
         fun updateAll(context: Context) {
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val componentName = ComponentName(context, ExpenseWidget::class.java)

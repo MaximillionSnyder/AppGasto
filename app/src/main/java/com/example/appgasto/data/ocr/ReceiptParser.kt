@@ -6,12 +6,27 @@ import java.util.Locale
 
 object ReceiptParser {
 
+    // Order matters: specific multi-char symbols first, generic "$" last.
     private val CURRENCY_PATTERNS = listOf(
         "S/." to "PEN",
+        "AR$" to "ARS",
         "R$" to "BRL",
+        "MX$" to "MXN",
+        "COL$" to "COP",
+        "CL$" to "CLP",
+        "RD$" to "DOP",
+        "CA$" to "CAD",
+        "A$" to "AUD",
+        "NZ$" to "NZD",
+        "UY$" to "UYU",
+        "₲" to "PYG",
+        "₡" to "CRC",
+        "Bs" to "BOB",
         "€" to "EUR",
         "£" to "GBP",
         "¥" to "JPY",
+        "₩" to "KRW",
+        "₹" to "INR",
         "$" to "USD"
     )
 
