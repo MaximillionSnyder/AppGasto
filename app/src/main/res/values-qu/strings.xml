@@ -34,6 +34,7 @@
     <string name="backup_success">Backup apachisqa</string>
     <string name="import_success">Apachiy tukusqa</string>
     <string name="import_error">Apachiypi pantay</string>
+    <string name="import_error_detail">Apachiypi pantay: %1$s</string>
     <string name="export_success">Backup apachisqa</string>
     <string name="export_error">Apachiy pantay</string>
     <string name="restore_success">Willakuykuna apamusqa</string>

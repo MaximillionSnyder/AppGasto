@@ -121,9 +121,17 @@ fun SettingsScreen(
             scope.launch {
                 context.contentResolver.openInputStream(uri)?.use { inputStream ->
                     val result = viewModel.importData(inputStream)
-                    snackbarHostState.showSnackbar(
-                        if (result.isSuccess) context.getString(R.string.import_success) else context.getString(R.string.import_error)
-                    )
+                    val message = if (result.isSuccess) {
+                        context.getString(R.string.import_success)
+                    } else {
+                        val error = result.exceptionOrNull()?.localizedMessage ?: ""
+                        if (error.isNotBlank()) {
+                            context.getString(R.string.import_error_detail, error)
+                        } else {
+                            context.getString(R.string.import_error)
+                        }
+                    }
+                    snackbarHostState.showSnackbar(message)
                 }
             }
         }
@@ -463,7 +471,7 @@ fun SettingsScreen(
                     iconColor = MaterialTheme.colorScheme.primary,
                     title = stringResource(R.string.import_data),
                     subtitle = stringResource(R.string.import_description),
-                    onClick = { importLauncher.launch("application/json") }
+                    onClick = { importLauncher.launch("*/*") }
                 )
 
                 HorizontalDivider(

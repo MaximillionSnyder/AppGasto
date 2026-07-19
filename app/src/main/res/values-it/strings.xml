@@ -34,6 +34,7 @@
     <string name="backup_success">Backup esportato con successo</string>
     <string name="import_success">Importazione completata</string>
     <string name="import_error">Errore durante l\'importazione</string>
+    <string name="import_error_detail">Errore durante l\'importazione: %1$s</string>
     <string name="export_success">Backup esportato</string>
     <string name="export_error">Errore durante l\'esportazione</string>
     <string name="restore_success">Dati ripristinati con successo</string>

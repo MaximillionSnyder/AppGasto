@@ -44,6 +44,7 @@
     <string name="backup_success">Backup exported successfully</string>
     <string name="import_success">Import completed</string>
     <string name="import_error">Error importing</string>
+    <string name="import_error_detail">Error importing: %1$s</string>
     <string name="export_success">Backup exported</string>
     <string name="export_error">Error exporting</string>
     <string name="restore_success">Data restored successfully</string>

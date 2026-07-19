@@ -227,10 +227,25 @@
 
 ---
 
+## Versión 13 — 2026-07-19
+
+### 13.1 Fix: Importación de backup no funcionaba
+- **Archivos:** `BackupManager.kt`, `SettingsScreen.kt`, `strings.xml` (8 idiomas)
+- **Problema:** Gson no tenía un adapter para `java.time.LocalDateTime`, por lo que la fecha/hora se serializaba como objeto JSON complejo y al importar el backup fallaba o producía fechas inválidas. Además, el selector de archivos usaba MIME `application/json`, que en algunos dispositivos no mostraba los archivos `.json`, y el mensaje de error no mostraba el detalle real.
+- **Solución:**
+  - Agregado `LocalDateTimeAdapter` en `BackupManager` que exporta como string ISO-8601 e importa tanto el nuevo formato string como el formato objeto antiguo (incluyendo mes como nombre o número).
+  - `BackupData` ahora usa defaults no nulos para `categories` y `expenses` y valida nulos al importar.
+  - Cambiado el MIME del import launcher a `"*/*"` para que el picker muestre cualquier archivo.
+  - El `Snackbar` ahora muestra el mensaje de error concreto usando `import_error_detail`.
+  - Agregado `import_error_detail` en todos los `strings.xml`.
+
+---
+
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
 |:-------:|:-----:|:--------|
+| 13 | 2026-07-19 | Fix importación de backup: adapter LocalDateTime, MIME picker `*/*`, mensajes de error detallados |
 | 12 | 2026-07-19 | Accesibilidad: content descriptions, semántica, fontScale, touch targets 48dp, tema alto contraste + fix strings hardcodeados de Lista |
 | 11 | 2026-07-15 | Barra progreso presupuesto, restablecer datos, preview visual temas/banderas |
 | 10 | 2026-07-15 | Rediseño Ajustes: secciones agrupadas, flechas >, versión dinámica, moneda como row, About mejorado, animación presupuesto |
