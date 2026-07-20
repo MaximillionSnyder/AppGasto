@@ -4,6 +4,7 @@ import com.example.appgasto.data.local.AppDatabase
 import com.example.appgasto.data.local.Category
 import com.example.appgasto.data.local.CurrencyTotalTuple
 import com.example.appgasto.data.local.Expense
+import com.example.appgasto.data.local.PeriodTotals
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import java.time.LocalDate
@@ -30,6 +31,25 @@ class ExpenseRepository @Inject constructor(
     suspend fun getExpenseById(id: Long) = expenseDao.getById(id)
 
     fun getAllExpenses(): Flow<List<Expense>> = expenseDao.getAll()
+
+    suspend fun getPeriodTotals(): PeriodTotals {
+        val now = LocalDate.now()
+        val todayStart = LocalDateTime.of(now, LocalTime.MIN)
+        val todayEnd = LocalDateTime.of(now, LocalTime.MAX)
+        val weekStart = LocalDateTime.of(now.with(java.time.DayOfWeek.MONDAY), LocalTime.MIN)
+        val monthStart = LocalDateTime.of(now.withDayOfMonth(1), LocalTime.MIN)
+        return expenseDao.getPeriodTotals(todayStart, todayEnd, weekStart, monthStart)
+    }
+
+    fun getFilteredExpenses(categoryId: Long?, startDate: LocalDate?, endDate: LocalDate?): Flow<List<Expense>> {
+        return expenseDao.getFiltered(
+            categoryId,
+            startDate?.atStartOfDay(),
+            endDate?.atTime(LocalTime.MAX)
+        )
+    }
+
+    fun getAllDates(): Flow<List<LocalDateTime>> = expenseDao.getAllDates()
 
     fun getTodayExpenses(): Flow<List<Expense>> {
         val start = LocalDateTime.of(LocalDate.now(), LocalTime.MIN)

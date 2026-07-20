@@ -13,11 +13,14 @@ import com.example.appgasto.domain.model.Currency
 import com.example.appgasto.widget.ExpenseWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 data class HomeUiState(
@@ -56,28 +59,29 @@ class HomeViewModel @Inject constructor(
                     expenseRepository.getAllCategories(),
                     preferencesRepository.preferencesFlow
                 ) { expenses, categories, prefs -> Triple(expenses, categories, prefs) }
+                    .flowOn(Dispatchers.IO)
                     .collect { (expenses, categories, prefs) ->
-                        val baseCurrency = prefs.baseCurrency
-                        val rateToBase = if (baseCurrency == Currency.PEN) 1.0
-                            else exchangeRateRepository.getRateToPen(baseCurrency.code) ?: 1.0
+                        withContext(Dispatchers.IO) {
+                            val baseCurrency = prefs.baseCurrency
+                            val rateToBase = if (baseCurrency == Currency.PEN) 1.0
+                                else exchangeRateRepository.getRateToPen(baseCurrency.code) ?: 1.0
 
-                        val todayPEN = expenseRepository.getTodayTotal()
-                        val weekPEN = expenseRepository.getCurrentWeekTotal()
-                        val monthPEN = expenseRepository.getCurrentMonthTotal()
-                        val monthStart = java.time.LocalDate.now().withDayOfMonth(1)
-                        val monthCurrencyBreakdown = expenseRepository.getTotalByCurrencySince(monthStart)
+                            val periodTotals = expenseRepository.getPeriodTotals()
+                            val monthStart = java.time.LocalDate.now().withDayOfMonth(1)
+                            val monthCurrencyBreakdown = expenseRepository.getTotalByCurrencySince(monthStart)
 
-                        _uiState.value = HomeUiState(
-                            todayTotal = todayPEN * rateToBase,
-                            weekTotal = weekPEN * rateToBase,
-                            monthTotal = monthPEN * rateToBase,
-                            monthCurrencyBreakdown = monthCurrencyBreakdown,
-                            todayExpenses = expenses,
-                            categories = categories.associateBy { it.id },
-                            isLoading = false,
-                            baseCurrency = baseCurrency,
-                            rateToBase = rateToBase
-                        )
+                            _uiState.value = HomeUiState(
+                                todayTotal = periodTotals.todayTotal * rateToBase,
+                                weekTotal = periodTotals.weekTotal * rateToBase,
+                                monthTotal = periodTotals.monthTotal * rateToBase,
+                                monthCurrencyBreakdown = monthCurrencyBreakdown,
+                                todayExpenses = expenses,
+                                categories = categories.associateBy { it.id },
+                                isLoading = false,
+                                baseCurrency = baseCurrency,
+                                rateToBase = rateToBase
+                            )
+                        }
                     }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false)

@@ -26,12 +26,16 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
+    }
+
+    baselineProfile {
+        // Usa la configuración de release build type para generar perfiles
     }
 
     compileOptions {

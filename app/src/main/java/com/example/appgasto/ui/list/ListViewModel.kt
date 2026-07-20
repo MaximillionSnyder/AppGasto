@@ -9,11 +9,15 @@ import com.example.appgasto.data.repository.ExpenseRepository
 import com.example.appgasto.widget.ExpenseWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth
@@ -22,18 +26,18 @@ import javax.inject.Inject
 data class ListUiState(
     val expenses: List<Expense> = emptyList(),
     val categories: Map<Long, Category> = emptyMap(),
-    val selectedCategoryId: Long? = null,
     val availableMonths: List<YearMonth> = emptyList(),
-    val startDate: LocalDate? = null,
-    val endDate: LocalDate? = null,
     val isLoading: Boolean = true
 )
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ListViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val expenseRepository: ExpenseRepository
 ) : ViewModel() {
+
+    private val _filterState = MutableStateFlow(Triple<Long?, LocalDate?, LocalDate?>(null, null, null))
 
     private val _uiState = MutableStateFlow(ListUiState())
     val uiState: StateFlow<ListUiState> = _uiState.asStateFlow()
@@ -47,14 +51,17 @@ class ListViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(isLoading = true)
             try {
                 combine(
-                    expenseRepository.getAllExpenses(),
-                    expenseRepository.getAllCategories()
-                ) { expenses, categories -> expenses to categories }
-                    .collect { (expenses, categories) ->
-                        val state = _uiState.value
-                        val months = expenses.map { YearMonth.from(it.createdAt) }.distinct().sortedDescending()
-                        _uiState.value = state.copy(
-                            expenses = applyFilters(expenses, state),
+                    _filterState.flatMapLatest { (categoryId, startDate, endDate) ->
+                        expenseRepository.getFilteredExpenses(categoryId, startDate, endDate)
+                    }.flowOn(Dispatchers.IO),
+                    expenseRepository.getAllCategories().flowOn(Dispatchers.IO),
+                    expenseRepository.getAllDates().flowOn(Dispatchers.IO).map { dates ->
+                        dates.map { YearMonth.from(it) }.distinct().sortedDescending()
+                    }
+                ) { expenses, categories, months -> Triple(expenses, categories, months) }
+                    .collect { (expenses, categories, months) ->
+                        _uiState.value = ListUiState(
+                            expenses = expenses,
                             categories = categories.associateBy { it.id },
                             availableMonths = months,
                             isLoading = false
@@ -67,33 +74,7 @@ class ListViewModel @Inject constructor(
     }
 
     fun applyFilters(categoryId: Long?, startDate: LocalDate?, endDate: LocalDate?) {
-        _uiState.value = _uiState.value.copy(
-            selectedCategoryId = categoryId,
-            startDate = startDate,
-            endDate = endDate
-        )
-        viewModelScope.launch {
-            val allExpenses = expenseRepository.getAllExpenses().first()
-            _uiState.value = _uiState.value.copy(
-                expenses = applyFilters(allExpenses, _uiState.value)
-            )
-        }
-    }
-
-    private fun applyFilters(
-        expenses: List<Expense>,
-        state: ListUiState
-    ): List<Expense> {
-        return expenses.filter { expense ->
-            val categoryMatch = state.selectedCategoryId?.let { expense.categoryId == it } ?: true
-            val startMatch = state.startDate?.let {
-                !expense.createdAt.toLocalDate().isBefore(it)
-            } ?: true
-            val endMatch = state.endDate?.let {
-                !expense.createdAt.toLocalDate().isAfter(it)
-            } ?: true
-            categoryMatch && startMatch && endMatch
-        }
+        _filterState.value = Triple(categoryId, startDate, endDate)
     }
 
     fun deleteExpense(expense: Expense) {

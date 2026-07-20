@@ -16,7 +16,7 @@ import java.time.LocalDateTime
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index("categoryId")]
+    indices = [Index("categoryId"), Index("createdAt")]
 )
 data class Expense(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,

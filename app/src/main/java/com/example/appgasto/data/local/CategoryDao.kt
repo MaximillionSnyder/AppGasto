@@ -12,6 +12,9 @@ interface CategoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(category: Category): Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(categories: List<Category>)
+
     @Query("SELECT * FROM categories ORDER BY id ASC")
     fun getAll(): Flow<List<Category>>
 

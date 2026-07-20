@@ -6,6 +6,7 @@ import com.example.appgasto.data.repository.PreferencesRepository
 import com.example.appgasto.domain.model.Currency
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,6 +17,8 @@ class ExchangeRateRepository @Inject constructor(
     private val converter: CurrencyConverter,
     private val preferencesRepository: PreferencesRepository
 ) {
+
+    private val ratesCache = ConcurrentHashMap<String, ExchangeRateEntity>()
 
     val ratesFlow: Flow<List<ExchangeRateEntity>> = exchangeRateDao.getAll()
 
@@ -44,6 +47,8 @@ class ExchangeRateRepository @Inject constructor(
             }
 
             exchangeRateDao.insertAll(entities)
+            ratesCache.clear()
+            entities.forEach { ratesCache[it.code] = it }
             preferencesRepository.setRatesUpdatedAt(System.currentTimeMillis())
             Result.success(Unit)
         } catch (e: Exception) {
@@ -52,11 +57,14 @@ class ExchangeRateRepository @Inject constructor(
     }
 
     /**
-     * Returns the cached rate for [currencyCode].
-     * Returns null if not cached.
+     * Returns the cached rate for [currencyCode] from in-memory cache or DB.
      */
     suspend fun getRateToPen(currencyCode: String): Double? {
-        return exchangeRateDao.getByCode(currencyCode.uppercase())?.rateToPen
+        val code = currencyCode.uppercase()
+        ratesCache[code]?.let { return it.rateToPen }
+        val entity = exchangeRateDao.getByCode(code)
+        if (entity != null) ratesCache[code] = entity
+        return entity?.rateToPen
     }
 
     /**
