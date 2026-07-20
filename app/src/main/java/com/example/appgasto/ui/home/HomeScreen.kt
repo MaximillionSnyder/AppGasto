@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -118,8 +119,11 @@ fun HomeScreen(
                                     color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.8f)
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
+                                val formattedMonthTotal = remember(state.monthTotal, state.baseCurrency) {
+                                    state.baseCurrency.format(state.monthTotal)
+                                }
                                 Text(
-                                    text = state.baseCurrency.format(state.monthTotal),
+                                    text = formattedMonthTotal,
                                     style = MaterialTheme.typography.displayMedium,
                                     fontWeight = FontWeight.ExtraBold,
                                     color = androidx.compose.ui.graphics.Color.White
@@ -161,12 +165,15 @@ fun HomeScreen(
                                 verticalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
                                 state.monthCurrencyBreakdown.forEach { tuple ->
-                                    val tupleCurrency = Currency.fromCode(tuple.currency)
+                                    val breakdownText = remember(tuple, state.baseCurrency, state.rateToBase) {
+                                        val tupleCurrency = Currency.fromCode(tuple.currency)
+                                        "${tupleCurrency.format(tuple.totalOriginal)} = ${state.baseCurrency.format(tuple.totalInPEN * state.rateToBase)}"
+                                    }
                                     SuggestionChip(
                                         onClick = { },
                                         label = {
                                             Text(
-                                                text = "${tupleCurrency.format(tuple.totalOriginal)} = ${state.baseCurrency.format(tuple.totalInPEN * state.rateToBase)}",
+                                                text = breakdownText,
                                                 style = MaterialTheme.typography.labelMedium
                                             )
                                         }

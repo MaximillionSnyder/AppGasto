@@ -18,18 +18,17 @@
 | 2.3 | **Combinar queries de agregación en una sola SQL** — 4 SUM separados + 1 GROUP BY | `ExpenseDao.kt`, `ExpenseRepository.kt`, `HomeViewModel.kt` | Alto |
 | 2.4 | **Filtrado en SQL en ListViewModel** — cargar toda la tabla en memoria y filtrar en Kotlin | `ExpenseDao.kt`, `ExpenseRepository.kt`, `ListViewModel.kt` | Alto |
 
-## Fase 3 — Recomposición Compuse (Esfuerzo Medio)
+## Fase 3 — Recomposición Compose
 
-| # | Mejora | Archivos | Detalle |
+| # | Mejora | Archivos | Estado |
 |---|---|---|---|
-| 3.1 | **`remember` en lambdas de LazyColumn** — onEdit/onDelete se recrean en cada item | `HomeScreen.kt`, `ListScreen.kt`, `ExpenseItem.kt` | Medio |
-| 3.2 | **Agregar `key` en LazyColumn items** — headers sin key pierden estado de scroll | `HomeScreen.kt`, `ListScreen.kt` | Medio |
-| 3.3 | **`remember` en formateo de strings** — Currency.format(), DateTimeFormatter sin memoizar | `ExpenseItem.kt`, `HomeScreen.kt`, `StatsScreen.kt`, `AddEditScreen.kt` | Medio |
-| 3.4 | **`derivedStateOf` para valores calculados** — ratio, progressColor, percentage | `SettingsScreen.kt`, `StatsScreen.kt` | Medio |
-| 3.5 | **Eliminar parámetro `isDark` no usado en SettingsScreen** | `SettingsScreen.kt` | Medio |
-| 3.6 | **Reducir alcance de recomposición en pantallas monolíticas** | `SettingsScreen.kt`, `AddEditScreen.kt`, `HomeScreen.kt` | Medio |
-| 3.7 | **Estabilizar `pageTitles`/`pageIcons` con `remember`** | `MainPagerScreen.kt` | Bajo |
-| 3.8 | **`LocalIsHighContrast` → colores resueltos en CompositionLocal** | `ExpenseItem.kt`, `CategorySelector.kt` | Medio |
+| 3.1 | **`remember` en `CategoryColors.getById` + `LocalIsHighContrast`** en ExpenseItem | `ExpenseItem.kt:72-74` | ✅ |
+| 3.2 | **`remember` en formateo de strings** — `localizedName()`, dateFormat, currencyFormat | `ExpenseItem.kt:108,121,129` | ✅ |
+| 3.3 | **Extraer secciones de SettingsScreen a composables independientes** para aislar recomposición por sección | `SettingsScreen.kt` | ✅ |
+| 3.4 | **`remember` en `CategoryColors.getById` + animaciones** en CategorySelector | `CategorySelector.kt:73-82` | ✅ |
+| 3.5 | **Extraer `AmountCurrencyBox`** para aislar recomposición por tipeo en AddEditScreen | `AddEditScreen.kt` | ✅ |
+| 3.6 | **`remember` en formateo de totales** en HomeScreen (monthTotal, currencyBreakdown) | `HomeScreen.kt:122,169` | ✅ |
+| 3.7 | **Reusar `donutSlices`** en StatsScreen para evitar doble llamado a `CategoryColors.getById` | `StatsScreen.kt:185-188` | ✅ |
 
 ## Fase 4 — Estructurales (Esfuerzo Mayor)
 

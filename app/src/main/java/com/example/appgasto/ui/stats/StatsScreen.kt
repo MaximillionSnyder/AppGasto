@@ -182,11 +182,7 @@ fun StatsScreen(
 
                             Spacer(modifier = Modifier.height(20.dp))
 
-                            state.categoryTotals.forEach { catTotal ->
-                                val catColor = CategoryColors.getById(catTotal.category.id, isDark, isMatrix, isHighContrast)
-                                val percentage = if (state.totalExpenses > 0)
-                                    (catTotal.total / state.totalExpenses * 100).toFloat() else 0f
-
+                            state.categoryTotals.zip(donutSlices) { catTotal, slice ->
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -197,7 +193,7 @@ fun StatsScreen(
                                         modifier = Modifier
                                             .size(12.dp)
                                             .clip(CircleShape)
-                                            .background(catColor)
+                                            .background(slice.color)
                                     )
                                     Spacer(modifier = Modifier.width(10.dp))
                                     Text(
@@ -206,13 +202,16 @@ fun StatsScreen(
                                         modifier = Modifier.weight(1f)
                                     )
                                     Text(
-                                        text = "${String.format("%.1f", percentage)}%",
+                                        text = "${String.format("%.1f", slice.percentage)}%",
                                         style = MaterialTheme.typography.labelMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.padding(end = 8.dp)
                                     )
+                                    val formattedTotal = remember(catTotal.total, state.baseCurrency) {
+                                        state.baseCurrency.format(catTotal.total)
+                                    }
                                     Text(
-                                        text = state.baseCurrency.format(catTotal.total),
+                                        text = formattedTotal,
                                         style = MaterialTheme.typography.bodyMedium,
                                         fontWeight = FontWeight.SemiBold,
                                         color = MaterialTheme.colorScheme.onSurface
@@ -228,12 +227,12 @@ fun StatsScreen(
                                 ) {
                                     Box(
                                         modifier = Modifier
-                                            .fillMaxWidth(percentage / 100f)
+                                            .fillMaxWidth(slice.percentage / 100f)
                                             .height(6.dp)
                                             .clip(MaterialTheme.shapes.extraSmall)
                                             .background(
                                                 Brush.horizontalGradient(
-                                                    colors = listOf(catColor, catColor.copy(alpha = 0.6f))
+                                                    colors = listOf(slice.color, slice.color.copy(alpha = 0.6f))
                                                 )
                                             )
                                     )

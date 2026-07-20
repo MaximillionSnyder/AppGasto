@@ -208,352 +208,66 @@ fun SettingsScreen(
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            // ── GENERAL ──
-            SettingsSectionHeader(stringResource(R.string.section_general))
+            GeneralSettingsSection(
+                budgetEnabled = state.budgetEnabled,
+                monthlyBudget = state.monthlyBudget,
+                monthlyExpenseTotal = state.monthlyExpenseTotal,
+                baseCurrency = state.baseCurrency,
+                onBudgetToggle = { enabled ->
+                    viewModel.setBudgetEnabled(enabled)
+                    if (enabled && state.monthlyBudget <= 0) {
+                        showBudgetDialog = true
+                    }
+                },
+                onBudgetClick = { showBudgetDialog = true }
+            )
 
-            SettingsSection(
-                title = stringResource(R.string.monthly_budget),
-                icon = Icons.Default.MonetizationOn,
-                iconColor = MaterialTheme.colorScheme.primary
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.monthly_budget),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                        if (state.budgetEnabled && state.monthlyBudget > 0) {
-                            Text(
-                                text = state.baseCurrency.format(state.monthlyBudget),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.SemiBold
+            Spacer(modifier = Modifier.height(12.dp))
+
+            CurrencySettingsSection(
+                baseCurrency = state.baseCurrency,
+                isRefreshingRates = state.isRefreshingRates,
+                ratesUpdatedAt = state.ratesUpdatedAt,
+                onBaseCurrencyClick = { showBaseCurrencyDialog = true },
+                onRefreshRates = {
+                    viewModel.refreshRates { success ->
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                context.getString(
+                                    if (success) R.string.rates_updated else R.string.rates_error
+                                )
                             )
                         }
                     }
-                    Switch(
-                        checked = state.budgetEnabled,
-                        onCheckedChange = { enabled ->
-                            viewModel.setBudgetEnabled(enabled)
-                            if (enabled && state.monthlyBudget <= 0) {
-                                showBudgetDialog = true
-                            }
-                        },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
-                            checkedTrackColor = MaterialTheme.colorScheme.primary
-                        )
-                    )
                 }
-
-                AnimatedVisibility(
-                    visible = state.budgetEnabled,
-                    enter = expandVertically(),
-                    exit = shrinkVertically()
-                ) {
-                    Column {
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        if (state.monthlyBudget > 0) {
-                            val ratio = (state.monthlyExpenseTotal / state.monthlyBudget).toFloat().coerceIn(0f, 1.5f)
-                            val progressColor = when {
-                                ratio >= 1f -> MaterialTheme.colorScheme.error
-                                ratio >= 0.8f -> Color(0xFFFF9800)
-                                else -> MaterialTheme.colorScheme.primary
-                            }
-
-                            LinearProgressIndicator(
-                                progress = { ratio.coerceAtMost(1f) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(8.dp)
-                                    .clip(MaterialTheme.shapes.small),
-                                color = progressColor,
-                                trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                            )
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            Text(
-                                text = if (ratio >= 1f) stringResource(R.string.budget_exceeded)
-                                       else "${state.baseCurrency.format(state.monthlyExpenseTotal)} de ${state.baseCurrency.format(state.monthlyBudget)}",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = progressColor,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-
-                        SettingsRow(
-                            icon = Icons.Default.MonetizationOn,
-                            iconColor = MaterialTheme.colorScheme.primary,
-                            title = if (state.monthlyBudget > 0) stringResource(R.string.change_amount)
-                                    else stringResource(R.string.set_budget),
-                            onClick = { showBudgetDialog = true },
-                            showArrow = true
-                        )
-                    }
-                }
-            }
+            )
 
             Spacer(modifier = Modifier.height(12.dp))
+            AppearanceSettingsSection(
+                themeMode = state.themeMode,
+                fontScale = state.fontScale,
+                language = state.language,
+                onThemeClick = { showThemeDialog = true },
+                onFontScaleClick = { showFontScaleDialog = true },
+                onLanguageClick = { showLanguageDialog = true }
+            )
 
-            SettingsSection(
-                title = stringResource(R.string.currency),
-                icon = Icons.Default.CurrencyExchange,
-                iconColor = MaterialTheme.colorScheme.primary
-            ) {
-                SettingsRow(
-                    icon = Icons.Default.CurrencyExchange,
-                    iconColor = MaterialTheme.colorScheme.primary,
-                    title = stringResource(R.string.base_currency),
-                    subtitle = "${state.baseCurrency.symbol}  ${state.baseCurrency.code}",
-                    onClick = { showBaseCurrencyDialog = true },
-                    showArrow = true
-                )
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 4.dp),
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Button(
-                        onClick = {
-                            viewModel.refreshRates { success ->
-                                scope.launch {
-                                    snackbarHostState.showSnackbar(
-                                        context.getString(
-                                            if (success) R.string.rates_updated else R.string.rates_error
-                                        )
-                                    )
-                                }
-                            }
-                        },
-                        enabled = !state.isRefreshingRates,
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = MaterialTheme.shapes.medium
-                    ) {
-                        if (state.isRefreshingRates) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(20.dp),
-                                strokeWidth = 2.dp,
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
-                        } else {
-                            Icon(
-                                Icons.Default.Refresh,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(stringResource(R.string.refresh_rates))
-                        }
-                    }
-                }
-
-                if (state.ratesUpdatedAt > 0) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = stringResource(
-                            R.string.last_update,
-                            settingsDateFormat.format(Date(state.ratesUpdatedAt))
-                        ),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
-            }
-
-            // ── PERSONALIZACIÓN ──
             Spacer(modifier = Modifier.height(12.dp))
-            SettingsSectionHeader(stringResource(R.string.section_appearance))
+            DataSettingsSection(
+                onExportClick = {
+                    val dateStr = java.time.LocalDateTime.now().format(backupDateFormatter)
+                    exportLauncher.launch("appgasto_backup_$dateStr.json")
+                },
+                onImportClick = { importLauncher.launch("*/*") },
+                onCsvExportClick = {
+                    val dateStr = java.time.LocalDateTime.now().format(backupDateFormatter)
+                    csvExportLauncher.launch("appgasto_$dateStr.csv")
+                },
+                onResetClick = { showResetDialog = true }
+            )
 
-            SettingsSection(
-                title = stringResource(R.string.appearance),
-                icon = Icons.Default.DarkMode,
-                iconColor = MaterialTheme.colorScheme.secondary
-            ) {
-                SettingsRow(
-                    icon = Icons.Default.DarkMode,
-                    iconColor = MaterialTheme.colorScheme.secondary,
-                    title = stringResource(R.string.theme),
-                    subtitle = when (state.themeMode) {
-                        com.example.appgasto.domain.model.ThemeMode.LIGHT -> stringResource(R.string.theme_light)
-                        com.example.appgasto.domain.model.ThemeMode.DARK -> stringResource(R.string.theme_dark)
-                        com.example.appgasto.domain.model.ThemeMode.SYSTEM -> stringResource(R.string.theme_system)
-                        com.example.appgasto.domain.model.ThemeMode.MATRIX -> stringResource(R.string.theme_matrix)
-                        com.example.appgasto.domain.model.ThemeMode.HIGH_CONTRAST -> stringResource(R.string.theme_high_contrast)
-                    },
-                    onClick = { showThemeDialog = true }
-                )
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 4.dp),
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                )
-
-                SettingsRow(
-                    icon = Icons.Default.FormatSize,
-                    iconColor = MaterialTheme.colorScheme.primary,
-                    title = stringResource(R.string.font_size),
-                    subtitle = when (state.fontScale) {
-                        com.example.appgasto.domain.model.FontScale.SMALL -> stringResource(R.string.font_scale_small)
-                        com.example.appgasto.domain.model.FontScale.NORMAL -> stringResource(R.string.font_scale_normal)
-                        com.example.appgasto.domain.model.FontScale.LARGE -> stringResource(R.string.font_scale_large)
-                        com.example.appgasto.domain.model.FontScale.EXTRA_LARGE -> stringResource(R.string.font_scale_extra_large)
-                    },
-                    onClick = { showFontScaleDialog = true }
-                )
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 4.dp),
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                )
-
-                SettingsRow(
-                    icon = Icons.Default.Language,
-                    iconColor = GradientTertiary,
-                    title = stringResource(R.string.language),
-                    subtitle = when (state.language) {
-                        com.example.appgasto.domain.model.AppLanguage.SPANISH -> stringResource(R.string.lang_es)
-                        com.example.appgasto.domain.model.AppLanguage.ENGLISH -> stringResource(R.string.lang_en)
-                        com.example.appgasto.domain.model.AppLanguage.PORTUGUESE -> stringResource(R.string.lang_pt)
-                        com.example.appgasto.domain.model.AppLanguage.ITALIAN -> stringResource(R.string.lang_it)
-                        com.example.appgasto.domain.model.AppLanguage.GERMAN -> stringResource(R.string.lang_de)
-                        com.example.appgasto.domain.model.AppLanguage.JAPANESE -> stringResource(R.string.lang_ja)
-                        com.example.appgasto.domain.model.AppLanguage.KOREAN -> stringResource(R.string.lang_ko)
-                        com.example.appgasto.domain.model.AppLanguage.QUECHUA -> stringResource(R.string.lang_qu)
-                        else -> stringResource(R.string.lang_system)
-                    },
-                    onClick = { showLanguageDialog = true }
-                )
-            }
-
-            // ── DATOS ──
             Spacer(modifier = Modifier.height(12.dp))
-            SettingsSectionHeader(stringResource(R.string.section_data))
-
-            SettingsSection(
-                title = stringResource(R.string.backup),
-                icon = Icons.Default.CloudUpload,
-                iconColor = GradientTertiary
-            ) {
-                SettingsRow(
-                    icon = Icons.Default.CloudUpload,
-                    iconColor = GradientTertiary,
-                    title = stringResource(R.string.export_data),
-                    subtitle = stringResource(R.string.export_description),
-                    onClick = {
-                        val dateStr = java.time.LocalDateTime.now()
-                            .format(backupDateFormatter)
-                        exportLauncher.launch("appgasto_backup_$dateStr.json")
-                    }
-                )
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 4.dp),
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                )
-
-                SettingsRow(
-                    icon = Icons.Default.CloudDownload,
-                    iconColor = MaterialTheme.colorScheme.primary,
-                    title = stringResource(R.string.import_data),
-                    subtitle = stringResource(R.string.import_description),
-                    onClick = { importLauncher.launch("*/*") }
-                )
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 4.dp),
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                )
-
-                SettingsRow(
-                    icon = Icons.Default.TableChart,
-                    iconColor = MaterialTheme.colorScheme.tertiary,
-                    title = stringResource(R.string.export_csv),
-                    subtitle = stringResource(R.string.export_csv_description),
-                    onClick = {
-                        val dateStr = java.time.LocalDateTime.now()
-                            .format(backupDateFormatter)
-                        csvExportLauncher.launch("appgasto_$dateStr.csv")
-                    }
-                )
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 4.dp),
-                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                )
-
-                SettingsRow(
-                    icon = Icons.Default.DeleteForever,
-                    iconColor = MaterialTheme.colorScheme.error,
-                    title = stringResource(R.string.reset_data),
-                    subtitle = stringResource(R.string.reset_data_description),
-                    onClick = { showResetDialog = true }
-                )
-            }
-
-            // ── INFORMACIÓN ──
-            Spacer(modifier = Modifier.height(12.dp))
-            SettingsSectionHeader(stringResource(R.string.section_info))
-
-            SettingsSection(
-                title = stringResource(R.string.about),
-                icon = Icons.Default.Info,
-                iconColor = MaterialTheme.colorScheme.onSurfaceVariant
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(50.dp)
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(
-                                Brush.horizontalGradient(listOf(GradientStart, GradientEnd))
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "A",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color.White
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(14.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.app_name),
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Text(
-                            text = "v${BuildConfig.VERSION_NAME}",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            text = stringResource(R.string.made_with),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
+            InfoSettingsSection()
 
             Spacer(modifier = Modifier.height(24.dp))
         }
@@ -778,6 +492,361 @@ private fun SettingsRow(
                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
                 modifier = Modifier.size(20.dp)
             )
+        }
+    }
+}
+
+@Composable
+private fun GeneralSettingsSection(
+    budgetEnabled: Boolean,
+    monthlyBudget: Double,
+    monthlyExpenseTotal: Double,
+    baseCurrency: com.example.appgasto.domain.model.Currency,
+    onBudgetToggle: (Boolean) -> Unit,
+    onBudgetClick: () -> Unit
+) {
+    SettingsSectionHeader(stringResource(R.string.section_general))
+
+    SettingsSection(
+        title = stringResource(R.string.monthly_budget),
+        icon = Icons.Default.MonetizationOn,
+        iconColor = MaterialTheme.colorScheme.primary
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.monthly_budget),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                if (budgetEnabled && monthlyBudget > 0) {
+                    Text(
+                        text = baseCurrency.format(monthlyBudget),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+            Switch(
+                checked = budgetEnabled,
+                onCheckedChange = onBudgetToggle,
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                    checkedTrackColor = MaterialTheme.colorScheme.primary
+                )
+            )
+        }
+
+        AnimatedVisibility(
+            visible = budgetEnabled,
+            enter = expandVertically(),
+            exit = shrinkVertically()
+        ) {
+            Column {
+                Spacer(modifier = Modifier.height(12.dp))
+
+                if (monthlyBudget > 0) {
+                    val ratio = (monthlyExpenseTotal / monthlyBudget).toFloat().coerceIn(0f, 1.5f)
+                    val progressColor = when {
+                        ratio >= 1f -> MaterialTheme.colorScheme.error
+                        ratio >= 0.8f -> Color(0xFFFF9800)
+                        else -> MaterialTheme.colorScheme.primary
+                    }
+
+                    LinearProgressIndicator(
+                        progress = { ratio.coerceAtMost(1f) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(8.dp)
+                            .clip(MaterialTheme.shapes.small),
+                        color = progressColor,
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = if (ratio >= 1f) stringResource(R.string.budget_exceeded)
+                               else "${baseCurrency.format(monthlyExpenseTotal)} de ${baseCurrency.format(monthlyBudget)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = progressColor,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                SettingsRow(
+                    icon = Icons.Default.MonetizationOn,
+                    iconColor = MaterialTheme.colorScheme.primary,
+                    title = if (monthlyBudget > 0) stringResource(R.string.change_amount)
+                            else stringResource(R.string.set_budget),
+                    onClick = onBudgetClick,
+                    showArrow = true
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CurrencySettingsSection(
+    baseCurrency: com.example.appgasto.domain.model.Currency,
+    isRefreshingRates: Boolean,
+    ratesUpdatedAt: Long,
+    onBaseCurrencyClick: () -> Unit,
+    onRefreshRates: () -> Unit
+) {
+    SettingsSection(
+        title = stringResource(R.string.currency),
+        icon = Icons.Default.CurrencyExchange,
+        iconColor = MaterialTheme.colorScheme.primary
+    ) {
+        SettingsRow(
+            icon = Icons.Default.CurrencyExchange,
+            iconColor = MaterialTheme.colorScheme.primary,
+            title = stringResource(R.string.base_currency),
+            subtitle = "${baseCurrency.symbol}  ${baseCurrency.code}",
+            onClick = onBaseCurrencyClick,
+            showArrow = true
+        )
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 4.dp),
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Spacer(modifier = Modifier.width(8.dp))
+            Button(
+                onClick = onRefreshRates,
+                enabled = !isRefreshingRates,
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                if (isRefreshingRates) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Icon(
+                        Icons.Default.Refresh,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(stringResource(R.string.refresh_rates))
+                }
+            }
+        }
+
+        if (ratesUpdatedAt > 0) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = stringResource(
+                    R.string.last_update,
+                    settingsDateFormat.format(Date(ratesUpdatedAt))
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun AppearanceSettingsSection(
+    themeMode: com.example.appgasto.domain.model.ThemeMode,
+    fontScale: com.example.appgasto.domain.model.FontScale,
+    language: com.example.appgasto.domain.model.AppLanguage,
+    onThemeClick: () -> Unit,
+    onFontScaleClick: () -> Unit,
+    onLanguageClick: () -> Unit
+) {
+    SettingsSectionHeader(stringResource(R.string.section_appearance))
+
+    SettingsSection(
+        title = stringResource(R.string.appearance),
+        icon = Icons.Default.DarkMode,
+        iconColor = MaterialTheme.colorScheme.secondary
+    ) {
+        SettingsRow(
+            icon = Icons.Default.DarkMode,
+            iconColor = MaterialTheme.colorScheme.secondary,
+            title = stringResource(R.string.theme),
+            subtitle = when (themeMode) {
+                com.example.appgasto.domain.model.ThemeMode.LIGHT -> stringResource(R.string.theme_light)
+                com.example.appgasto.domain.model.ThemeMode.DARK -> stringResource(R.string.theme_dark)
+                com.example.appgasto.domain.model.ThemeMode.SYSTEM -> stringResource(R.string.theme_system)
+                com.example.appgasto.domain.model.ThemeMode.MATRIX -> stringResource(R.string.theme_matrix)
+                com.example.appgasto.domain.model.ThemeMode.HIGH_CONTRAST -> stringResource(R.string.theme_high_contrast)
+            },
+            onClick = onThemeClick
+        )
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 4.dp),
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+        )
+
+        SettingsRow(
+            icon = Icons.Default.FormatSize,
+            iconColor = MaterialTheme.colorScheme.primary,
+            title = stringResource(R.string.font_size),
+            subtitle = when (fontScale) {
+                com.example.appgasto.domain.model.FontScale.SMALL -> stringResource(R.string.font_scale_small)
+                com.example.appgasto.domain.model.FontScale.NORMAL -> stringResource(R.string.font_scale_normal)
+                com.example.appgasto.domain.model.FontScale.LARGE -> stringResource(R.string.font_scale_large)
+                com.example.appgasto.domain.model.FontScale.EXTRA_LARGE -> stringResource(R.string.font_scale_extra_large)
+            },
+            onClick = onFontScaleClick
+        )
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 4.dp),
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+        )
+
+        SettingsRow(
+            icon = Icons.Default.Language,
+            iconColor = GradientTertiary,
+            title = stringResource(R.string.language),
+            subtitle = when (language) {
+                com.example.appgasto.domain.model.AppLanguage.SPANISH -> stringResource(R.string.lang_es)
+                com.example.appgasto.domain.model.AppLanguage.ENGLISH -> stringResource(R.string.lang_en)
+                com.example.appgasto.domain.model.AppLanguage.PORTUGUESE -> stringResource(R.string.lang_pt)
+                com.example.appgasto.domain.model.AppLanguage.ITALIAN -> stringResource(R.string.lang_it)
+                com.example.appgasto.domain.model.AppLanguage.GERMAN -> stringResource(R.string.lang_de)
+                com.example.appgasto.domain.model.AppLanguage.JAPANESE -> stringResource(R.string.lang_ja)
+                com.example.appgasto.domain.model.AppLanguage.KOREAN -> stringResource(R.string.lang_ko)
+                com.example.appgasto.domain.model.AppLanguage.QUECHUA -> stringResource(R.string.lang_qu)
+                else -> stringResource(R.string.lang_system)
+            },
+            onClick = onLanguageClick
+        )
+    }
+}
+
+@Composable
+private fun DataSettingsSection(
+    onExportClick: () -> Unit,
+    onImportClick: () -> Unit,
+    onCsvExportClick: () -> Unit,
+    onResetClick: () -> Unit
+) {
+    SettingsSectionHeader(stringResource(R.string.section_data))
+
+    SettingsSection(
+        title = stringResource(R.string.backup),
+        icon = Icons.Default.CloudUpload,
+        iconColor = GradientTertiary
+    ) {
+        SettingsRow(
+            icon = Icons.Default.CloudUpload,
+            iconColor = GradientTertiary,
+            title = stringResource(R.string.export_data),
+            subtitle = stringResource(R.string.export_description),
+            onClick = onExportClick
+        )
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 4.dp),
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+        )
+
+        SettingsRow(
+            icon = Icons.Default.CloudDownload,
+            iconColor = MaterialTheme.colorScheme.primary,
+            title = stringResource(R.string.import_data),
+            subtitle = stringResource(R.string.import_description),
+            onClick = onImportClick
+        )
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 4.dp),
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+        )
+
+        SettingsRow(
+            icon = Icons.Default.TableChart,
+            iconColor = MaterialTheme.colorScheme.tertiary,
+            title = stringResource(R.string.export_csv),
+            subtitle = stringResource(R.string.export_csv_description),
+            onClick = onCsvExportClick
+        )
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 4.dp),
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+        )
+
+        SettingsRow(
+            icon = Icons.Default.DeleteForever,
+            iconColor = MaterialTheme.colorScheme.error,
+            title = stringResource(R.string.reset_data),
+            subtitle = stringResource(R.string.reset_data_description),
+            onClick = onResetClick
+        )
+    }
+}
+
+@Composable
+private fun InfoSettingsSection() {
+    SettingsSectionHeader(stringResource(R.string.section_info))
+
+    SettingsSection(
+        title = stringResource(R.string.about),
+        icon = Icons.Default.Info,
+        iconColor = MaterialTheme.colorScheme.onSurfaceVariant
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(50.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(
+                        Brush.horizontalGradient(listOf(GradientStart, GradientEnd))
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "A",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color.White
+                )
+            }
+            Spacer(modifier = Modifier.width(14.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.app_name),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = "v${BuildConfig.VERSION_NAME}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = stringResource(R.string.made_with),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }

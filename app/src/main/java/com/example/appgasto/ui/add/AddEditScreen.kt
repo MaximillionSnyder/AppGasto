@@ -163,89 +163,17 @@ fun AddEditScreen(
             ) {
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            brush = Brush.horizontalGradient(
-                                colors = listOf(GradientStart, GradientEnd)
-                            ),
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = stringResource(R.string.amount),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = Color.White.copy(alpha = 0.8f)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Box {
-                                OutlinedButton(
-                                    onClick = { currencyMenuExpanded = true },
-                                    border = null,
-                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                                    colors = ButtonDefaults.outlinedButtonColors(
-                                        containerColor = Color.White.copy(alpha = 0.15f)
-                                    )
-                                ) {
-                                    Text(
-                                        text = state.currency,
-                                        color = Color.White,
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
-                                }
-                                DropdownMenu(
-                                    expanded = currencyMenuExpanded,
-                                    onDismissRequest = { currencyMenuExpanded = false }
-                                ) {
-                                    Currency.entries.forEach { currency ->
-                                        DropdownMenuItem(
-                                            text = { Text(currency.code) },
-                                            onClick = {
-                                                viewModel.updateCurrency(currency.code)
-                                                currencyMenuExpanded = false
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(2.dp))
-                        OutlinedTextField(
-                            value = state.amount,
-                            onValueChange = viewModel::updateAmount,
-                            placeholder = {
-                                Text(
-                                    stringResource(R.string.amount_hint),
-                                    color = Color.White.copy(alpha = 0.5f),
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true,
-                            textStyle = MaterialTheme.typography.headlineMedium.copy(
-                                color = Color.White,
-                                textAlign = TextAlign.Center
-                            ),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color.White,
-                                unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
-                                cursorColor = Color.White,
-                                focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent
-                            )
-                        )
-                    }
-                }
+                AmountCurrencyBox(
+                    amount = state.amount,
+                    currency = state.currency,
+                    currencyMenuExpanded = currencyMenuExpanded,
+                    onAmountChange = viewModel::updateAmount,
+                    onCurrencyChange = { code ->
+                        viewModel.updateCurrency(code)
+                        currencyMenuExpanded = false
+                    },
+                    onCurrencyMenuToggle = { currencyMenuExpanded = it }
+                )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -414,6 +342,97 @@ fun AddEditScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
+        }
+    }
+}
+
+@Composable
+private fun AmountCurrencyBox(
+    amount: String,
+    currency: String,
+    currencyMenuExpanded: Boolean,
+    onAmountChange: (String) -> Unit,
+    onCurrencyChange: (String) -> Unit,
+    onCurrencyMenuToggle: (Boolean) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(GradientStart, GradientEnd)
+                ),
+                shape = RoundedCornerShape(16.dp)
+            )
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.amount),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Color.White.copy(alpha = 0.8f)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Box {
+                    OutlinedButton(
+                        onClick = { onCurrencyMenuToggle(true) },
+                        border = null,
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = Color.White.copy(alpha = 0.15f)
+                        )
+                    ) {
+                        Text(
+                            text = currency,
+                            color = Color.White,
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = currencyMenuExpanded,
+                        onDismissRequest = { onCurrencyMenuToggle(false) }
+                    ) {
+                        Currency.entries.forEach { c ->
+                            DropdownMenuItem(
+                                text = { Text(c.code) },
+                                onClick = { onCurrencyChange(c.code) }
+                            )
+                        }
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(2.dp))
+            OutlinedTextField(
+                value = amount,
+                onValueChange = onAmountChange,
+                placeholder = {
+                    Text(
+                        stringResource(R.string.amount_hint),
+                        color = Color.White.copy(alpha = 0.5f),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                textStyle = MaterialTheme.typography.headlineMedium.copy(
+                    color = Color.White,
+                    textAlign = TextAlign.Center
+                ),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color.White,
+                    unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                    cursorColor = Color.White,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent
+                )
+            )
         }
     }
 }

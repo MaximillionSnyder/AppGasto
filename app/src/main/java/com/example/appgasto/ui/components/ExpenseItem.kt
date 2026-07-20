@@ -29,6 +29,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -69,9 +70,15 @@ fun ExpenseItem(
     showDelete: Boolean = true,
     modifier: Modifier = Modifier
 ) {
-    val catColor = category?.let {
-        CategoryColors.getById(category.id, isDark, isMatrix, LocalIsHighContrast.current)
-    } ?: Color.Gray
+    val isHighContrast = LocalIsHighContrast.current
+    val catColor = remember(category?.id, isDark, isMatrix, isHighContrast) {
+        category?.let { CategoryColors.getById(category.id, isDark, isMatrix, isHighContrast) } ?: Color.Gray
+    }
+    val formattedDate = remember(expense.createdAt) { expense.createdAt.format(itemDateFormatter) }
+    val formattedAmount = remember(expense.currency, expense.amount) {
+        Currency.fromCode(expense.currency).format(expense.amount)
+    }
+    val localizedCategoryName = remember(category) { category?.localizedName() ?: "—" }
 
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -105,7 +112,7 @@ fun ExpenseItem(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = category?.localizedName() ?: "—",
+                    text = localizedCategoryName,
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -118,7 +125,7 @@ fun ExpenseItem(
                     )
                 }
                 Text(
-                    text = expense.createdAt.format(itemDateFormatter),
+                    text = formattedDate,
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
@@ -126,7 +133,7 @@ fun ExpenseItem(
 
             Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = Currency.fromCode(expense.currency).format(expense.amount),
+                    text = formattedAmount,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface

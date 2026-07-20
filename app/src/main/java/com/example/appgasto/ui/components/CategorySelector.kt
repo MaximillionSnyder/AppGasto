@@ -30,6 +30,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -68,9 +69,12 @@ fun CategorySelector(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
+        val isHighContrast = LocalIsHighContrast.current
         categories.forEach { category ->
             val isSelected = category.id == selectedCategoryId
-            val catColor = CategoryColors.getById(category.id, isDark, isMatrix, LocalIsHighContrast.current)
+            val catColor = remember(category.id, isDark, isMatrix, isHighContrast) {
+                CategoryColors.getById(category.id, isDark, isMatrix, isHighContrast)
+            }
 
             val containerColor by animateColorAsState(
                 targetValue = if (isSelected) catColor.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
