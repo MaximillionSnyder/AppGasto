@@ -145,4 +145,16 @@
 
     <!-- Accessibility: theme -->
     <string name="theme_high_contrast">Contrasto elevato</string>
+
+    <!-- Update checker -->
+    <string name="check_update">Cerca aggiornamenti</string>
+    <string name="checking_update">Ricerca…</string>
+    <string name="current_version">Corrente: v%s</string>
+    <string name="update_available_title">Aggiornamento disponibile: %s</string>
+    <string name="update_not_available">Hai già l\'ultima versione</string>
+    <string name="update_downloading">Scaricamento…</string>
+    <string name="update_action">Aggiorna</string>
+    <string name="later">Dopo</string>
+    <string name="update_error">Errore aggiornamento: %s</string>
+    <string name="update_no_changelog">Nessun registro modifiche</string>
 </resources>

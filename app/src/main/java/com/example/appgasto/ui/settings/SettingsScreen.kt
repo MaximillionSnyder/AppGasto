@@ -60,6 +60,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -113,6 +114,23 @@ fun SettingsScreen(
     var showResetDialog by remember { mutableStateOf(false) }
     var showBaseCurrencyDialog by remember { mutableStateOf(false) }
     var showFontScaleDialog by remember { mutableStateOf(false) }
+    var showUpdateDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.updateEvent.collect { event ->
+            when (event) {
+                is UpdateEvent.NoUpdate -> {
+                    snackbarHostState.showSnackbar(context.getString(R.string.update_not_available))
+                }
+                is UpdateEvent.Available -> {
+                    showUpdateDialog = true
+                }
+                is UpdateEvent.Error -> {
+                    snackbarHostState.showSnackbar(event.message)
+                }
+            }
+        }
+    }
 
     val importLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -267,7 +285,10 @@ fun SettingsScreen(
             )
 
             Spacer(modifier = Modifier.height(12.dp))
-            InfoSettingsSection()
+            InfoSettingsSection(
+                isCheckingUpdate = state.isCheckingUpdate,
+                onCheckUpdateClick = { viewModel.checkForUpdate() }
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
         }
@@ -360,6 +381,76 @@ fun SettingsScreen(
                 },
                 shape = MaterialTheme.shapes.large
             )
+        }
+
+        if (showUpdateDialog) {
+            val release = state.updateRelease
+            if (release != null) {
+                AlertDialog(
+                    onDismissRequest = {
+                        showUpdateDialog = false
+                        viewModel.dismissUpdateDialog()
+                    },
+                    title = {
+                        Text(
+                            text = context.getString(R.string.update_available_title, release.tagName),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    text = {
+                        Column {
+                            if (state.isDownloading) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(20.dp),
+                                        strokeWidth = 2.dp
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(stringResource(R.string.update_downloading))
+                                }
+                            } else {
+                                Text(
+                                    text = release.body?.take(500) ?: stringResource(R.string.update_no_changelog),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                viewModel.downloadAndInstall { error ->
+                                    scope.launch {
+                                        showUpdateDialog = false
+                                        viewModel.dismissUpdateDialog()
+                                        if (error.isNotEmpty()) {
+                                            snackbarHostState.showSnackbar(
+                                                context.getString(R.string.update_error, error)
+                                            )
+                                        }
+                                    }
+                                }
+                            },
+                            enabled = !state.isDownloading
+                        ) {
+                            Text(stringResource(R.string.update_action))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = {
+                                showUpdateDialog = false
+                                viewModel.dismissUpdateDialog()
+                            },
+                            enabled = !state.isDownloading
+                        ) {
+                            Text(stringResource(R.string.later))
+                        }
+                    },
+                    shape = MaterialTheme.shapes.large
+                )
+            }
         }
     }
 }
@@ -801,7 +892,10 @@ private fun DataSettingsSection(
 }
 
 @Composable
-private fun InfoSettingsSection() {
+private fun InfoSettingsSection(
+    isCheckingUpdate: Boolean,
+    onCheckUpdateClick: () -> Unit
+) {
     SettingsSectionHeader(stringResource(R.string.section_info))
 
     SettingsSection(
@@ -848,5 +942,19 @@ private fun InfoSettingsSection() {
                 )
             }
         }
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 4.dp),
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+        )
+
+        SettingsRow(
+            icon = Icons.Default.CloudDownload,
+            iconColor = MaterialTheme.colorScheme.primary,
+            title = stringResource(R.string.check_update),
+            subtitle = if (isCheckingUpdate) stringResource(R.string.checking_update) else stringResource(R.string.current_version, BuildConfig.VERSION_NAME),
+            onClick = onCheckUpdateClick,
+            showArrow = true
+        )
     }
 }

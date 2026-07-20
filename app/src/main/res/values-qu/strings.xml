@@ -145,4 +145,16 @@
 
     <!-- Accessibility: theme -->
     <string name="theme_high_contrast">Aswan contrasta</string>
+
+    <!-- Update checker -->
+    <string name="check_update">Musuqyayta maskay</string>
+    <string name="checking_update">Maskaspa…</string>
+    <string name="current_version">Kunan: v%s</string>
+    <string name="update_available_title">Musuqyay kachkan: %s</string>
+    <string name="update_not_available">Qanqa musuq versiyuntam kanki</string>
+    <string name="update_downloading">Uraykuchispa…</string>
+    <string name="update_action">Musuqyay</string>
+    <string name="later">Qhipaman</string>
+    <string name="update_error">Musuqyay pantasqa: %s</string>
+    <string name="update_no_changelog">Manam cambiosqa qillqasqachu kachkan</string>
 </resources>

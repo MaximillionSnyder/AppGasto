@@ -145,4 +145,16 @@
 
     <!-- Accessibility: theme -->
     <string name="theme_high_contrast">ハイコントラスト</string>
+
+    <!-- Update checker -->
+    <string name="check_update">アップデートを確認</string>
+    <string name="checking_update">確認中…</string>
+    <string name="current_version">現在: v%s</string>
+    <string name="update_available_title">アップデートがあります: %s</string>
+    <string name="update_not_available">最新バージョンです</string>
+    <string name="update_downloading">ダウンロード中…</string>
+    <string name="update_action">アップデート</string>
+    <string name="later">後で</string>
+    <string name="update_error">アップデートエラー: %s</string>
+    <string name="update_no_changelog">変更履歴はありません</string>
 </resources>

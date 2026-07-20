@@ -241,10 +241,50 @@
 
 ---
 
+## Versión 14 — 2026-07-19
+
+### 14.1 Onboarding: selección de moneda base al primer inicio
+- **Archivos:** `UserPreferences.kt`, `PreferencesRepository.kt`, `MainActivity.kt`, `ui/onboarding/OnboardingScreen.kt` (nuevo), todos los `strings.xml` (8 idiomas)
+- **Problema:** La app usaba PEN por defecto. Si el usuario no cambiaba la moneda base en Ajustes, los totales y conversiones podían mostrarse en la moneda equivocada.
+- **Solución:**
+  - Nuevo flag `onboardingCompleted` en DataStore (`onboarding_completed`, default `false`)
+  - `MainActivity` muestra `OnboardingScreen` si el onboarding no se completó; al terminar, entra a la navegación principal
+  - `OnboardingScreen`: bienvenida + lista scrolleable de las 25 monedas (radio + check) + botón "Comenzar" (deshabilitado hasta elegir una)
+  - `completeOnboarding(currency)` guarda moneda base y marca onboarding en una sola escritura DataStore
+  - Strings localizados: `welcome_title`, `welcome_description`, `welcome_confirm` (es, en, de, pt, it, ja, ko, qu)
+  - La moneda sigue siendo editable después en Ajustes
+
+### 14.2 UI: box de monto más compacto en Agregar gasto
+- **Archivo:** `AddEditScreen.kt`
+- **Problema:** El box del monto ocupaba demasiado espacio vertical en el formulario.
+- **Solución:** Menos padding (16×12 dp), tipografía `headlineMedium` (antes `displayMedium`), labels y botón de moneda más pequeños, esquinas 16 dp.
+
+---
+
+## Versión 15 — 2026-07-20
+
+### 15.1 Actualizador in-app vía GitHub Releases + auto-versionCode + CI de releases
+- **Archivos:** `app/build.gradle.kts`, `AndroidManifest.xml`, `data/updater/GitHubRelease.kt` (nuevo), `res/xml/file_paths.xml` (nuevo), `SettingsViewModel.kt`, `SettingsScreen.kt`, `.github/workflows/release.yml` (nuevo), `.github/workflows/build.yml`, todos los `strings.xml` (8 idiomas)
+- **Problema:** Después de cada nueva feature había que desinstalar la app e instalar el APK nuevo manualmente.
+- **Solución:**
+  - **Auto-versionCode:** `getAutoVersionCode()` en Gradle usa `git rev-list --count HEAD` (con `directory(rootDir)`), así cada build tiene versionCode mayor y `installDebug` instala encima sin desinstalar. `versionName` configurable vía `-PversionName=X.Y` para CI.
+  - **Firma unificada:** `signingConfigs` opcional en Gradle: si existe `keystore/appgasto.jks`, se usa para debug y release (misma firma en local y CI → las actualizaciones no se rechazan por firma). Sin el keystore, comportamiento anterior.
+  - **Updater in-app:** `SettingsViewModel.checkForUpdate()` consulta `api.github.com/.../releases/latest` con OkHttp, parsea con Gson (`GitHubRelease`/`GitHubAsset`), compara versiones semánticas (quitando prefijo `v`). `downloadAndInstall()` descarga el primer asset `.apk` a `cacheDir/update.apk` y lanza `ACTION_VIEW` con `FileProvider` (autoridad `${applicationId}.fileprovider`).
+  - **UI:** fila "Buscar actualizaciones" en sección INFORMACIÓN de Ajustes con estado "Buscando…"; diálogo con changelog (hasta 500 chars), spinner durante descarga, botones Actualizar/Más tarde. Eventos vía `Channel` + `receiveAsFlow` (`UpdateEvent.NoUpdate/Available/Error`).
+  - **Permisos/manifest:** `REQUEST_INSTALL_PACKAGES` + `<queries>` para `INSTALL_PACKAGE` (targetSdk 35) + `FileProvider` con `file_paths.xml` (`cache-path .`).
+  - **CI release:** `.github/workflows/release.yml` al pushear tag `v*`: checkout `fetch-depth: 0` (necesario para el versionCode por conteo de commits), compila `assembleRelease -PversionName=<tag sin v>` y publica GitHub Release con `softprops/action-gh-release@v2` subiendo el APK. `build.yml` también con `fetch-depth: 0`.
+  - Responses OkHttp cerrados con `.use {}` en fetch y descarga.
+  - Strings de actualización localizados en los 8 idiomas.
+- **Nota:** Requiere generar `keystore/appgasto.jks` una vez (keytool) para que local y CI firmen igual; la primera instalación firmada con el keystore nuevo sobre una instalación vieja requiere desinstalar una última vez (firma distinta).
+
+---
+
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
 |:-------:|:-----:|:--------|
+| 15 | 2026-07-20 | Actualizador in-app vía GitHub Releases + versionCode auto (git count) + firma unificada opcional + CI release por tags |
+| 14 | 2026-07-19 | Onboarding moneda base al primer inicio + box de monto más compacto en Agregar gasto |
 | 13 | 2026-07-19 | Fix importación de backup: adapter LocalDateTime, MIME picker `*/*`, mensajes de error detallados |
 | 12 | 2026-07-19 | Accesibilidad: content descriptions, semántica, fontScale, touch targets 48dp, tema alto contraste + fix strings hardcodeados de Lista |
 | 11 | 2026-07-15 | Barra progreso presupuesto, restablecer datos, preview visual temas/banderas |

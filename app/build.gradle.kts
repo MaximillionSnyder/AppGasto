@@ -7,16 +7,43 @@ plugins {
     alias(libs.plugins.baselineprofile)
 }
 
+fun getAutoVersionCode(): Int {
+    return try {
+        val process = ProcessBuilder("git", "rev-list", "--count", "HEAD")
+            .directory(rootDir)
+            .redirectErrorStream(true)
+            .start()
+        val count = process.inputStream.bufferedReader().readText().trim().toInt()
+        process.waitFor()
+        count
+    } catch (e: Exception) {
+        1
+    }
+}
+
+val appKeystore = rootProject.file("keystore/appgasto.jks")
+
 android {
     namespace = "com.example.appgasto"
     compileSdk = 35
+
+    signingConfigs {
+        if (appKeystore.exists()) {
+            create("app") {
+                storeFile = appKeystore
+                storePassword = (project.findProperty("APPGASTO_STORE_PASSWORD") as String?) ?: "appgasto123"
+                keyAlias = (project.findProperty("APPGASTO_KEY_ALIAS") as String?) ?: "appgasto"
+                keyPassword = (project.findProperty("APPGASTO_KEY_PASSWORD") as String?) ?: "appgasto123"
+            }
+        }
+    }
 
     defaultConfig {
         applicationId = "com.example.appgasto"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.2"
+        versionCode = getAutoVersionCode()
+        versionName = (project.findProperty("versionName") as String?) ?: "0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -25,12 +52,20 @@ android {
     }
 
     buildTypes {
+        debug {
+            if (appKeystore.exists()) {
+                signingConfig = signingConfigs.getByName("app")
+            }
+        }
         release {
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            if (appKeystore.exists()) {
+                signingConfig = signingConfigs.getByName("app")
+            }
         }
     }
 

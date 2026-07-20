@@ -1,0 +1,51 @@
+name: Release APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Verify signing keystore
+        run: |
+          if [ ! -f keystore/appgasto.jks ]; then
+            echo "::error::keystore/appgasto.jks no existe. Genera el keystore y commitealo antes de crear tags."
+            exit 1
+          fi
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease -PversionName=${GITHUB_REF_NAME#v}
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            app/build/outputs/apk/release/*.apk
+          fail_on_unmatched_files: true

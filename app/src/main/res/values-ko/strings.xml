@@ -145,4 +145,16 @@
 
     <!-- Accessibility: theme -->
     <string name="theme_high_contrast">고대비</string>
+
+    <!-- Update checker -->
+    <string name="check_update">업데이트 확인</string>
+    <string name="checking_update">확인 중…</string>
+    <string name="current_version">현재: v%s</string>
+    <string name="update_available_title">업데이트 가능: %s</string>
+    <string name="update_not_available">최신 버전입니다</string>
+    <string name="update_downloading">다운로드 중…</string>
+    <string name="update_action">업데이트</string>
+    <string name="later">나중에</string>
+    <string name="update_error">업데이트 오류: %s</string>
+    <string name="update_no_changelog">변경 내역 없음</string>
 </resources>

@@ -193,4 +193,16 @@
 
     <!-- Accessibility: theme -->
     <string name="theme_high_contrast">High contrast</string>
+
+    <!-- Update checker -->
+    <string name="check_update">Check for updates</string>
+    <string name="checking_update">Checking…</string>
+    <string name="current_version">Current: v%s</string>
+    <string name="update_available_title">Update available: %s</string>
+    <string name="update_not_available">You have the latest version</string>
+    <string name="update_downloading">Downloading…</string>
+    <string name="update_action">Update</string>
+    <string name="later">Later</string>
+    <string name="update_error">Update error: %s</string>
+    <string name="update_no_changelog">No changelog available</string>
 </resources>
