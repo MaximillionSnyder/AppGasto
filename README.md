@@ -30,7 +30,7 @@
 
 <br><br>
 
-**App Android nativa** para registrar gastos pequeños del día a día con widget, temas claro/oscuro/matrix, soporte multi-idioma, multi-moneda con tasas de cambio en tiempo real y escaneo inteligente de recibos.
+**App Android nativa** para registrar gastos pequeños del día a día con widget, 5 temas (claro/oscuro/sistema/matrix/alto contraste), soporte multi-idioma, multi-moneda (25 divisas + onboarding de moneda base), tasas de cambio en tiempo real y escaneo inteligente de recibos.
 
 <br>
 
@@ -47,8 +47,8 @@
 
 | 📱 | 🌟 | 💰 | 🌍 |
 |:--:|:--:|:--:|:--:|
-| **5 Pantallas** | **3 Temas** | **Multi-Moneda** | **8 Idiomas** |
-| Inicio • Lista • Agregar<br>Estadísticas • Ajustes | Claro • Oscuro<br>🟢 Matrix (Neon) | PEN • USD • EUR • JPY • GBP • BRL<br>Tasas en tiempo real | Español • English • Português • Italiano<br>Deutsch • 日本語 • 한국어 • Runasimi |
+| **5 Pantallas** | **5 Temas** | **Multi-Moneda** | **8 Idiomas** |
+| Inicio • Lista • Agregar<br>Estadísticas • Ajustes | Claro • Oscuro • Sistema<br>🟢 Matrix • Alto contraste | 25 divisas + moneda base<br>Onboarding al primer uso | Español • English • Português • Italiano<br>Deutsch • 日本語 • 한국어 • Runasimi |
 
 | 📸 | 💾 | 📊 | 🏷️ |
 |:--:|:--:|:--:|:--:|

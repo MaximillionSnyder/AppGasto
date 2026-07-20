@@ -270,6 +270,18 @@
 - `[ ]` `ReceiptImageManagerTest.kt` — save/get/delete de imagen, compresión (resultado ≤ 1920px), borrado de carpeta completa
 - `[ ]` `AutoBackupStorageTest.kt` (o Robolectric) — escritura y limpieza de N backups mockeando ContentResolver
 
+### 3.5 Onboarding de moneda base (primer inicio)
+
+- **Estado:** `[x]` Implementado (2026-07-19)
+- **Objetivo:** Obligar al usuario a elegir su moneda base la primera vez que abre la app, para que totales y conversiones no usen PEN por error.
+- **Implementación:**
+  - `[x]` Flag `onboardingCompleted` en `UserPreferences` + DataStore key `onboarding_completed`
+  - `[x]` `PreferencesRepository.completeOnboarding(currency)` — guarda moneda base y marca onboarding
+  - `[x]` `MainActivity` muestra `OnboardingScreen` si `!onboardingCompleted`, si no la app normal
+  - `[x]` `ui/onboarding/OnboardingScreen.kt` — lista de 25 monedas + botón "Comenzar"
+  - `[x]` Strings `welcome_title` / `welcome_description` / `welcome_confirm` en 8 idiomas
+  - La moneda se puede cambiar después en Ajustes (sin cambios en ese flujo)
+
 ### Archivos a crear (estimado ~10 nuevos)
 - `di/ReceiptModule.kt` — módulo Hilt para ReceiptImageManager
 - `data/receipt/ReceiptImageManager.kt` — guardar/cargar/borrar imágenes de recibos
@@ -320,3 +332,4 @@
 | 3 | 2026-07-16 | Accesibilidad (TalkBack, fontScale, alto contraste) + Auto-backup + Guardar recibos |
 | 3-rev | 2026-07-19 | Revisión del plan V3: fix Scoped Storage en auto-backup (MediaStore/permiso legacy), imágenes con UUID (sin expenseId), backup v3 como ZIP (no Base64), Coil para thumbnails, canal backup_reminders, fontScale con LocalDensity, sección 3.4 Tests |
 | 3.1 | 2026-07-19 | ✅ Accesibilidad implementada: content descriptions, semántica (heading/liveRegion/clickLabel), fontScale vía LocalDensity, touch targets 48dp, tema HIGH_CONTRAST con paleta de categorías propia + strings hardcodeados de Lista localizados (filter_by_month, this_month) |
+| 3.5 | 2026-07-19 | ✅ Onboarding de moneda base al primer inicio (`OnboardingScreen` + flag DataStore `onboarding_completed`) — evita totales en moneda incorrecta |
