@@ -10,6 +10,7 @@ import com.example.appgasto.data.local.Category
 import com.example.appgasto.data.local.Expense
 import com.example.appgasto.data.ocr.ReceiptOcrService
 import com.example.appgasto.data.repository.ExpenseRepository
+import com.example.appgasto.data.repository.PreferencesRepository
 import com.example.appgasto.domain.model.Currency
 import com.example.appgasto.widget.ExpenseWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -50,7 +51,8 @@ class AddEditViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val expenseRepository: ExpenseRepository,
     private val exchangeRateRepository: ExchangeRateRepository,
-    private val receiptOcrService: ReceiptOcrService
+    private val receiptOcrService: ReceiptOcrService,
+    private val preferencesRepository: PreferencesRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddEditUiState())
@@ -59,7 +61,13 @@ class AddEditViewModel @Inject constructor(
     fun loadExpense(expenseId: Long?) {
         viewModelScope.launch {
             val categories = expenseRepository.getAllCategories().first()
-            _uiState.value = _uiState.value.copy(categories = categories, isLoading = false)
+            val prefs = preferencesRepository.preferencesFlow.first()
+            val baseCurrency = prefs.baseCurrency.code
+            _uiState.value = _uiState.value.copy(
+                categories = categories,
+                currency = baseCurrency,
+                isLoading = false
+            )
 
             if (expenseId != null) {
                 val expense = expenseRepository.getExpenseById(expenseId)
