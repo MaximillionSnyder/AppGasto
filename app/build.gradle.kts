@@ -29,9 +29,9 @@ android {
         if (appKeystore.exists()) {
             create("app") {
                 storeFile = appKeystore
-                storePassword = (project.findProperty("APPGASTO_STORE_PASSWORD") as String?) ?: "appgasto123"
-                keyAlias = (project.findProperty("APPGASTO_KEY_ALIAS") as String?) ?: "appgasto"
-                keyPassword = (project.findProperty("APPGASTO_KEY_PASSWORD") as String?) ?: "appgasto123"
+                storePassword = project.findProperty("APPGASTO_STORE_PASSWORD") as String?
+                keyAlias = project.findProperty("APPGASTO_KEY_ALIAS") as String?
+                keyPassword = project.findProperty("APPGASTO_KEY_PASSWORD") as String?
             }
         }
     }

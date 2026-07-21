@@ -30,15 +30,18 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Verify signing keystore
+      - name: Recreate keystore from secret
         run: |
-          if [ ! -f keystore/appgasto.jks ]; then
-            echo "::error::keystore/appgasto.jks no existe. Genera el keystore y commitealo antes de crear tags."
-            exit 1
-          fi
+          mkdir -p keystore
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > keystore/appgasto.jks
 
       - name: Build Release APK
-        run: ./gradlew assembleRelease -PversionName=${GITHUB_REF_NAME#v}
+        run: |
+          ./gradlew assembleRelease \
+            -PversionName=${GITHUB_REF_NAME#v} \
+            -PAPPGASTO_STORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }} \
+            -PAPPGASTO_KEY_ALIAS=${{ secrets.KEY_ALIAS }} \
+            -PAPPGASTO_KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
