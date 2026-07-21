@@ -11,7 +11,13 @@ val gitCommitCount = providers.exec {
     commandLine("git", "rev-list", "--count", "HEAD")
     workingDir = rootDir
     isIgnoreExitValue = true
-}.standardOutput.asText.orElse("0")
+}.standardOutput.asText.map { output ->
+    try {
+        output.trim().toInt()
+    } catch (e: Exception) {
+        1
+    }
+}.orElse(1)
 
 val appKeystore = rootProject.file("keystore/appgasto.jks")
 
@@ -34,13 +40,7 @@ android {
         applicationId = "com.example.appgasto"
         minSdk = 26
         targetSdk = 35
-        versionCode = gitCommitCount.map { output ->
-            try {
-                output.trim().toInt()
-            } catch (e: Exception) {
-                1
-            }
-        }.orElse(1)
+        versionCode = 1
         versionName = (project.findProperty("versionName") as String?) ?: "0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -89,6 +89,14 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+}
+
+androidComponents {
+    onVariants(selector().all()) { variant ->
+        variant.outputs.forEach { output ->
+            output.versionCode.set(gitCommitCount)
         }
     }
 }
