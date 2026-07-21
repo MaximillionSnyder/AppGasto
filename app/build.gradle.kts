@@ -7,19 +7,11 @@ plugins {
     alias(libs.plugins.baselineprofile)
 }
 
-fun getAutoVersionCode(): Int {
-    return try {
-        val process = ProcessBuilder("git", "rev-list", "--count", "HEAD")
-            .directory(rootDir)
-            .redirectErrorStream(true)
-            .start()
-        val count = process.inputStream.bufferedReader().readText().trim().toInt()
-        process.waitFor()
-        count
-    } catch (e: Exception) {
-        1
-    }
-}
+val gitCommitCount = providers.exec {
+    commandLine("git", "rev-list", "--count", "HEAD")
+    workingDir = rootDir
+    isIgnoreExitValue = true
+}.standardOutput.asText.orElse("0")
 
 val appKeystore = rootProject.file("keystore/appgasto.jks")
 
@@ -42,7 +34,13 @@ android {
         applicationId = "com.example.appgasto"
         minSdk = 26
         targetSdk = 35
-        versionCode = getAutoVersionCode()
+        versionCode = gitCommitCount.map { output ->
+            try {
+                output.trim().toInt()
+            } catch (e: Exception) {
+                1
+            }
+        }.orElse(1)
         versionName = (project.findProperty("versionName") as String?) ?: "0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

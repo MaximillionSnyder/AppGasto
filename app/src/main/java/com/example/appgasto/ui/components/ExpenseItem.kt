@@ -78,7 +78,7 @@ fun ExpenseItem(
     val formattedAmount = remember(expense.currency, expense.amount) {
         Currency.fromCode(expense.currency).format(expense.amount)
     }
-    val localizedCategoryName = remember(category) { category?.localizedName() ?: "—" }
+    val localizedCategoryName = category?.localizedName() ?: "—"
 
     Surface(
         modifier = modifier.fillMaxWidth(),
