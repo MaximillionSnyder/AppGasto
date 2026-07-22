@@ -55,9 +55,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -93,6 +96,8 @@ fun AddEditScreen(
     var showDatePicker by remember { mutableStateOf(false) }
     var currencyMenuExpanded by remember { mutableStateOf(false) }
     var noteExpanded by remember { mutableStateOf(false) }
+    val amountFocusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     val context = LocalContext.current
     val scanLauncher = rememberLauncherForActivityResult(
@@ -107,6 +112,13 @@ fun AddEditScreen(
 
     LaunchedEffect(expenseId) {
         viewModel.loadExpense(expenseId)
+    }
+
+    LaunchedEffect(state.isLoading, state.isEditing) {
+        if (!state.isLoading && !state.isEditing) {
+            amountFocusRequester.requestFocus()
+            keyboardController?.show()
+        }
     }
 
     LaunchedEffect(state.isSaved) {
@@ -172,7 +184,8 @@ fun AddEditScreen(
                         viewModel.updateCurrency(code)
                         currencyMenuExpanded = false
                     },
-                    onCurrencyMenuToggle = { currencyMenuExpanded = it }
+                    onCurrencyMenuToggle = { currencyMenuExpanded = it },
+                    amountFocusRequester = amountFocusRequester
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -353,7 +366,8 @@ private fun AmountCurrencyBox(
     currencyMenuExpanded: Boolean,
     onAmountChange: (String) -> Unit,
     onCurrencyChange: (String) -> Unit,
-    onCurrencyMenuToggle: (Boolean) -> Unit
+    onCurrencyMenuToggle: (Boolean) -> Unit,
+    amountFocusRequester: FocusRequester = remember { FocusRequester() }
 ) {
     Box(
         modifier = Modifier
@@ -419,7 +433,9 @@ private fun AmountCurrencyBox(
                     )
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(amountFocusRequester),
                 singleLine = true,
                 textStyle = MaterialTheme.typography.headlineMedium.copy(
                     color = Color.White,

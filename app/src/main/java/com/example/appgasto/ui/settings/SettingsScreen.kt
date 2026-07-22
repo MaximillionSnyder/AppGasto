@@ -84,6 +84,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.appgasto.BuildConfig
 import com.example.appgasto.R
+import com.example.appgasto.ui.theme.Dimens
 import com.example.appgasto.ui.theme.GradientEnd
 import com.example.appgasto.ui.theme.GradientStart
 import com.example.appgasto.ui.theme.GradientTertiary
@@ -221,10 +222,10 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = Dimens.spaceLg)
                 .verticalScroll(rememberScrollState())
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Dimens.spaceSm))
 
             AppearanceSettingsSection(
                 themeMode = state.themeMode,
@@ -235,7 +236,7 @@ fun SettingsScreen(
                 onLanguageClick = { showLanguageDialog = true }
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(Dimens.spaceMd))
 
             GeneralSettingsSection(
                 budgetEnabled = state.budgetEnabled,
@@ -251,7 +252,7 @@ fun SettingsScreen(
                 onBudgetClick = { showBudgetDialog = true }
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(Dimens.spaceMd))
 
             CurrencySettingsSection(
                 baseCurrency = state.baseCurrency,
@@ -271,7 +272,7 @@ fun SettingsScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(Dimens.spaceMd))
             DataSettingsSection(
                 onExportClick = {
                     val dateStr = java.time.LocalDateTime.now().format(backupDateFormatter)
@@ -285,13 +286,13 @@ fun SettingsScreen(
                 onResetClick = { showResetDialog = true }
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(Dimens.spaceMd))
             InfoSettingsSection(
                 isCheckingUpdate = state.isCheckingUpdate,
                 onCheckUpdateClick = { viewModel.checkForUpdate() }
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(Dimens.spaceXl))
         }
 
         if (showThemeDialog) {
@@ -464,7 +465,11 @@ private fun SettingsSectionHeader(title: String) {
         fontWeight = FontWeight.Bold,
         color = MaterialTheme.colorScheme.primary,
         modifier = Modifier
-            .padding(start = 4.dp, bottom = 4.dp, top = 4.dp)
+            .padding(
+                start = Dimens.spaceXs,
+                bottom = Dimens.spaceXs,
+                top = Dimens.spaceXs
+            )
             .semantics { heading() }
     )
 }
@@ -486,7 +491,7 @@ private fun SettingsSection(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
         )
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(Dimens.spaceLg)) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -495,7 +500,7 @@ private fun SettingsSection(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(Dimens.spaceXxl)
                         .clip(CircleShape)
                         .background(iconColor.copy(alpha = 0.12f)),
                     contentAlignment = Alignment.Center
@@ -507,7 +512,7 @@ private fun SettingsSection(
                         modifier = Modifier.size(18.dp)
                     )
                 }
-                Spacer(modifier = Modifier.width(10.dp))
+                Spacer(modifier = Modifier.width(Dimens.spaceMd))
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
@@ -520,12 +525,12 @@ private fun SettingsSection(
                         if (expanded) R.string.cd_collapse else R.string.cd_expand
                     ),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                    modifier = Modifier.size(22.dp)
+                    modifier = Modifier.size(Dimens.iconMd)
                 )
             }
             AnimatedVisibility(visible = expanded) {
                 Column {
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(Dimens.spaceMd))
                     content()
                 }
             }

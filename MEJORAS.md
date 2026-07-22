@@ -294,6 +294,8 @@
   - Add/Edit: orden monto → scan → categoría → fecha → notas → guardar
   - Settings: orden Apariencia → Dinero/presupuesto → Moneda → Datos → Info
   - String nuevo `no_filter_results` en 8 idiomas
+  - Add: foco automático + teclado en el monto al crear gasto
+  - Settings: espaciado unificado con `Dimens`
 
 ---
 
