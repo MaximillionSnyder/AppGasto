@@ -1,6 +1,7 @@
 package com.example.appgasto.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,6 +45,7 @@ import com.example.appgasto.data.local.Expense
 import com.example.appgasto.data.local.localizedName
 import com.example.appgasto.domain.model.Currency
 import com.example.appgasto.ui.theme.CategoryColors
+import com.example.appgasto.ui.theme.Dimens
 import com.example.appgasto.ui.theme.LocalIsHighContrast
 import java.time.format.DateTimeFormatter
 
@@ -66,7 +68,8 @@ fun ExpenseItem(
     isDark: Boolean,
     isMatrix: Boolean = false,
     onEdit: () -> Unit,
-    onDelete: () -> Unit,
+    onDelete: () -> Unit = {},
+    showActions: Boolean = true,
     showDelete: Boolean = true,
     modifier: Modifier = Modifier
 ) {
@@ -81,7 +84,15 @@ fun ExpenseItem(
     val localizedCategoryName = category?.localizedName() ?: "—"
 
     Surface(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .then(
+                if (!showActions) {
+                    Modifier.clickable(onClick = onEdit)
+                } else {
+                    Modifier
+                }
+            ),
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surface,
         shadowElevation = 2.dp,
@@ -90,12 +101,12 @@ fun ExpenseItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp),
+                .padding(Dimens.cardPadding),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .size(44.dp)
+                    .size(Dimens.categoryIconSize)
                     .clip(CircleShape)
                     .background(catColor.copy(alpha = 0.15f)),
                 contentAlignment = Alignment.Center
@@ -104,11 +115,11 @@ fun ExpenseItem(
                     imageVector = category?.let { categoryIcon(it.id) } ?: Icons.Default.MoreHoriz,
                     contentDescription = null,
                     tint = catColor,
-                    modifier = Modifier.size(22.dp)
+                    modifier = Modifier.size(Dimens.iconMd)
                 )
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(Dimens.spaceMd))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -138,30 +149,36 @@ fun ExpenseItem(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Spacer(modifier = Modifier.height(2.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(0.dp)) {
-                    IconButton(
-                        onClick = onEdit,
-                        modifier = Modifier.size(28.dp).minimumInteractiveComponentSize()
-                    ) {
-                        Icon(
-                            Icons.Default.Edit,
-                            contentDescription = stringResource(R.string.cd_edit),
-                            modifier = Modifier.size(16.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    if (showDelete) {
+                if (showActions) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(0.dp)) {
                         IconButton(
-                            onClick = onDelete,
-                            modifier = Modifier.size(28.dp).minimumInteractiveComponentSize()
+                            onClick = onEdit,
+                            modifier = Modifier
+                                .size(28.dp)
+                                .minimumInteractiveComponentSize()
                         ) {
                             Icon(
-                                Icons.Default.Delete,
-                                contentDescription = stringResource(R.string.cd_delete),
-                                modifier = Modifier.size(16.dp),
-                                tint = MaterialTheme.colorScheme.error
+                                Icons.Default.Edit,
+                                contentDescription = stringResource(R.string.cd_edit),
+                                modifier = Modifier.size(Dimens.iconSm),
+                                tint = MaterialTheme.colorScheme.primary
                             )
+                        }
+                        if (showDelete) {
+                            IconButton(
+                                onClick = onDelete,
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .minimumInteractiveComponentSize()
+                            ) {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = stringResource(R.string.cd_delete),
+                                    modifier = Modifier.size(Dimens.iconSm),
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                            }
                         }
                     }
                 }

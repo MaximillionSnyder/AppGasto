@@ -32,7 +32,9 @@ data class HomeUiState(
     val categories: Map<Long, Category> = emptyMap(),
     val isLoading: Boolean = true,
     val baseCurrency: Currency = Currency.PEN,
-    val rateToBase: Double = 1.0
+    val rateToBase: Double = 1.0,
+    val budgetEnabled: Boolean = false,
+    val monthlyBudget: Double = 0.0
 )
 
 @HiltViewModel
@@ -79,7 +81,9 @@ class HomeViewModel @Inject constructor(
                                 categories = categories.associateBy { it.id },
                                 isLoading = false,
                                 baseCurrency = baseCurrency,
-                                rateToBase = rateToBase
+                                rateToBase = rateToBase,
+                                budgetEnabled = prefs.budgetEnabled,
+                                monthlyBudget = prefs.monthlyBudget
                             )
                         }
                     }

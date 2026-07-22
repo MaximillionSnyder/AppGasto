@@ -11,13 +11,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.ReceiptLong
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -42,13 +44,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.appgasto.R
+import com.example.appgasto.data.local.Expense
 import com.example.appgasto.data.local.localizedName
+import com.example.appgasto.ui.components.ConfirmDeleteDialog
+import com.example.appgasto.ui.components.EmptyState
 import com.example.appgasto.ui.components.ExpenseItem
+import com.example.appgasto.ui.theme.Dimens
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ListScreen(
     isDark: Boolean,
@@ -61,126 +67,142 @@ fun ListScreen(
     var selectedFilterCategory by remember { mutableStateOf<Long?>(null) }
     var selectedMonth by remember { mutableStateOf<YearMonth?>(null) }
     var showFilters by remember { mutableStateOf(false) }
+    var expensePendingDelete by remember { mutableStateOf<Expense?>(null) }
     val monthFormatter = remember { DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault()) }
     val currentMonth = remember { YearMonth.now() }
+    val hasActiveFilters = selectedFilterCategory != null || selectedMonth != null
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                IconButton(onClick = { showFilters = !showFilters }) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Dimens.spaceSm),
+            horizontalArrangement = Arrangement.End
+        ) {
+            IconButton(onClick = { showFilters = !showFilters }) {
+                BadgedBox(
+                    badge = {
+                        if (hasActiveFilters) {
+                            Badge()
+                        }
+                    }
+                ) {
                     Icon(
                         Icons.Default.FilterList,
                         contentDescription = stringResource(R.string.cd_filter),
-                        tint = if (showFilters) MaterialTheme.colorScheme.primary
-                               else MaterialTheme.colorScheme.onSurfaceVariant
+                        tint = if (showFilters || hasActiveFilters) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        }
                     )
                 }
             }
+        }
 
-            if (showFilters) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
+        if (showFilters) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = Dimens.spaceLg, vertical = Dimens.spaceSm)
+            ) {
+                Text(
+                    stringResource(R.string.filter_category),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(Dimens.spaceSm))
+
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(Dimens.spaceSm),
+                    verticalArrangement = Arrangement.spacedBy(Dimens.spaceSm)
                 ) {
-                    Text(
-                        stringResource(R.string.filter_category),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    FilterChip(
+                        selected = selectedFilterCategory == null,
+                        onClick = {
+                            selectedFilterCategory = null
+                            viewModel.applyFilters(null, selectedMonth?.atDay(1), selectedMonth?.atEndOfMonth())
+                        },
+                        label = { Text(stringResource(R.string.filter_all)) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.primary,
+                            selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                        )
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
+                    state.categories.values.forEach { cat ->
                         FilterChip(
-                            selected = selectedFilterCategory == null,
+                            selected = selectedFilterCategory == cat.id,
                             onClick = {
-                                selectedFilterCategory = null
-                                viewModel.applyFilters(null, null, null)
+                                selectedFilterCategory = cat.id
+                                viewModel.applyFilters(
+                                    cat.id,
+                                    selectedMonth?.atDay(1),
+                                    selectedMonth?.atEndOfMonth()
+                                )
                             },
-                            label = { Text(stringResource(R.string.filter_all)) },
+                            label = { Text(cat.localizedName()) },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = MaterialTheme.colorScheme.primary,
                                 selectedLabelColor = MaterialTheme.colorScheme.onPrimary
                             )
                         )
-                        state.categories.values.forEach { cat ->
-                            FilterChip(
-                                selected = selectedFilterCategory == cat.id,
-                                onClick = {
-                                    selectedFilterCategory = cat.id
-                                    viewModel.applyFilters(cat.id, null, null)
-                                },
-                                label = { Text(cat.localizedName()) },
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary
-                                )
-                            )
-                        }
                     }
+                }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(Dimens.spaceMd))
 
-                    Text(
-                        stringResource(R.string.filter_by_month),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                Text(
+                    stringResource(R.string.filter_by_month),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(Dimens.spaceSm))
+
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(Dimens.spaceSm),
+                    verticalArrangement = Arrangement.spacedBy(Dimens.spaceSm)
+                ) {
+                    FilterChip(
+                        selected = selectedMonth == null,
+                        onClick = {
+                            selectedMonth = null
+                            viewModel.applyFilters(selectedFilterCategory, null, null)
+                        },
+                        label = { Text(stringResource(R.string.filter_all)) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.primary,
+                            selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                        )
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
+                    state.availableMonths.forEach { month ->
                         FilterChip(
-                            selected = selectedMonth == null,
+                            selected = selectedMonth == month,
                             onClick = {
-                                selectedMonth = null
-                                viewModel.applyFilters(selectedFilterCategory, null, null)
+                                selectedMonth = month
+                                viewModel.applyFilters(
+                                    selectedFilterCategory,
+                                    month.atDay(1),
+                                    month.atEndOfMonth()
+                                )
                             },
-                            label = { Text(stringResource(R.string.filter_all)) },
+                            label = {
+                                Text(
+                                    if (month == currentMonth) stringResource(R.string.this_month)
+                                    else month.format(monthFormatter)
+                                )
+                            },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = MaterialTheme.colorScheme.primary,
                                 selectedLabelColor = MaterialTheme.colorScheme.onPrimary
                             )
                         )
-                        state.availableMonths.forEach { month ->
-                            FilterChip(
-                                selected = selectedMonth == month,
-                                onClick = {
-                                    selectedMonth = month
-                                    viewModel.applyFilters(
-                                        selectedFilterCategory,
-                                        month.atDay(1),
-                                        month.atEndOfMonth()
-                                    )
-                                },
-                                label = {
-                                    Text(
-                                        if (month == currentMonth) stringResource(R.string.this_month)
-                                        else month.format(monthFormatter)
-                                    )
-                                },
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary
-                                )
-                            )
-                        }
                     }
+                }
 
-                    Spacer(modifier = Modifier.height(4.dp))
-
+                if (hasActiveFilters) {
+                    Spacer(modifier = Modifier.height(Dimens.spaceXs))
                     TextButton(onClick = {
                         selectedFilterCategory = null
                         selectedMonth = null
@@ -190,75 +212,94 @@ fun ListScreen(
                     }
                 }
             }
+        }
 
-            if (state.isLoading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .semantics { liveRegion = LiveRegionMode.Polite },
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
+        if (state.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .semantics { liveRegion = LiveRegionMode.Polite },
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else if (state.expenses.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                EmptyState(
+                    icon = Icons.Default.ReceiptLong,
+                    message = stringResource(
+                        if (hasActiveFilters) R.string.no_filter_results else R.string.no_expenses
+                    ),
+                    actionLabel = if (hasActiveFilters) stringResource(R.string.clear) else null,
+                    onAction = if (hasActiveFilters) {
+                        {
+                            selectedFilterCategory = null
+                            selectedMonth = null
+                            viewModel.applyFilters(null, null, null)
+                        }
+                    } else {
+                        null
+                    }
+                )
+            }
+        } else {
+            val groupedExpenses = remember(state.expenses) {
+                state.expenses.groupBy { YearMonth.from(it.createdAt) }
+                    .toSortedMap(Comparator.reverseOrder())
+            }
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = Dimens.spaceLg),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                item(contentType = "spacer_top") {
+                    Spacer(modifier = Modifier.height(Dimens.spaceXs))
                 }
-            } else if (state.expenses.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            Icons.Default.ReceiptLong,
-                            contentDescription = null,
-                            modifier = Modifier.size(48.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
+                groupedExpenses.forEach { (month, expenses) ->
+                    item(contentType = "month_header") {
                         Text(
-                            stringResource(R.string.no_expenses),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            text = if (month == currentMonth) stringResource(R.string.this_month)
+                            else month.format(monthFormatter),
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .padding(vertical = Dimens.spaceSm, horizontal = Dimens.spaceXs)
+                                .semantics { heading() }
+                        )
+                    }
+                    items(expenses, key = { it.id }, contentType = { "expense" }) { expense ->
+                        ExpenseItem(
+                            expense = expense,
+                            category = state.categories[expense.categoryId],
+                            isDark = isDark,
+                            isMatrix = isMatrix,
+                            onEdit = { onNavigateToEdit(expense.id) },
+                            onDelete = { expensePendingDelete = expense },
+                            showActions = true,
+                            showDelete = true
                         )
                     }
                 }
-            } else {
-                val groupedExpenses = remember(state.expenses) {
-                    state.expenses.groupBy { YearMonth.from(it.createdAt) }
-                        .toSortedMap(Comparator.reverseOrder())
-                }
-
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    item(contentType = "spacer_top") { Spacer(modifier = Modifier.height(4.dp)) }
-                    groupedExpenses.forEach { (month, expenses) ->
-                        item(contentType = "month_header") {
-                            Text(
-                                text = if (month == currentMonth) stringResource(R.string.this_month)
-                                       else month.format(monthFormatter),
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier
-                                    .padding(vertical = 8.dp, horizontal = 4.dp)
-                                    .semantics { heading() }
-                            )
-                        }
-                        items(expenses, key = { it.id }, contentType = { "expense" }) { expense ->
-                            ExpenseItem(
-                                expense = expense,
-                                category = state.categories[expense.categoryId],
-                                isDark = isDark,
-                                isMatrix = isMatrix,
-                                onEdit = { onNavigateToEdit(expense.id) },
-                                onDelete = { viewModel.deleteExpense(expense) }
-                            )
-                        }
-                    }
-                    item(contentType = "spacer_bottom") { Spacer(modifier = Modifier.height(16.dp)) }
+                item(contentType = "spacer_bottom") {
+                    Spacer(modifier = Modifier.height(Dimens.fabClearance))
                 }
             }
+        }
+    }
+
+    expensePendingDelete?.let { expense ->
+        ConfirmDeleteDialog(
+            onConfirm = {
+                viewModel.deleteExpense(expense)
+                expensePendingDelete = null
+            },
+            onDismiss = { expensePendingDelete = null }
+        )
     }
 }

@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -41,13 +43,14 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.appgasto.R
 import com.example.appgasto.data.local.localizedName
+import com.example.appgasto.ui.components.EmptyState
+import com.example.appgasto.ui.components.SectionHeader
+import com.example.appgasto.ui.components.TotalHeroCard
 import com.example.appgasto.ui.theme.CategoryColors
-import com.example.appgasto.ui.theme.GradientEnd
-import com.example.appgasto.ui.theme.GradientStart
+import com.example.appgasto.ui.theme.Dimens
 import com.example.appgasto.ui.theme.LocalIsHighContrast
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,171 +83,159 @@ fun StatsScreen(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = Dimens.spaceLg)
                 .verticalScroll(rememberScrollState())
         ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    StatsPeriod.entries.forEach { period ->
-                        FilterChip(
-                            selected = state.period == period,
-                            onClick = { viewModel.loadStats(period) },
-                            label = {
-                                Text(
-                                    when (period) {
-                                        StatsPeriod.DAILY -> stringResource(R.string.daily)
-                                        StatsPeriod.WEEKLY -> stringResource(R.string.weekly)
-                                        StatsPeriod.MONTHLY -> stringResource(R.string.monthly)
-                                    }
-                                )
-                            },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+            Spacer(modifier = Modifier.height(Dimens.spaceSm))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Dimens.spaceSm)
+            ) {
+                StatsPeriod.entries.forEach { period ->
+                    FilterChip(
+                        selected = state.period == period,
+                        onClick = { viewModel.loadStats(period) },
+                        label = {
+                            Text(
+                                when (period) {
+                                    StatsPeriod.DAILY -> stringResource(R.string.daily)
+                                    StatsPeriod.WEEKLY -> stringResource(R.string.weekly)
+                                    StatsPeriod.MONTHLY -> stringResource(R.string.monthly)
+                                }
                             )
+                        },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.primary,
+                            selectedLabelColor = MaterialTheme.colorScheme.onPrimary
                         )
-                    }
+                    )
                 }
+            }
 
-                Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Dimens.spaceLg))
 
+            val formattedTotal = remember(state.totalExpenses, state.baseCurrency) {
+                state.baseCurrency.format(state.totalExpenses)
+            }
+            TotalHeroCard(
+                label = stringResource(R.string.total),
+                amountText = formattedTotal,
+                centered = true
+            )
+
+            Spacer(modifier = Modifier.height(Dimens.spaceXl))
+
+            SectionHeader(title = stringResource(R.string.by_category))
+
+            Spacer(modifier = Modifier.height(Dimens.spaceLg))
+
+            if (state.categoryTotals.isNotEmpty() && state.totalExpenses > 0) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.large,
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                    )
                 ) {
-                    Box(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(
-                                Brush.horizontalGradient(
-                                    colors = listOf(GradientStart, GradientEnd)
+                            .padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        val isHighContrast = LocalIsHighContrast.current
+                        val donutSlices = remember(state.categoryTotals, isDark, isMatrix, isHighContrast) {
+                            state.categoryTotals.map { catTotal ->
+                                DonutSlice(
+                                    color = CategoryColors.getById(
+                                        catTotal.category.id,
+                                        isDark,
+                                        isMatrix,
+                                        isHighContrast
+                                    ),
+                                    percentage = (catTotal.total / state.totalExpenses * 100).toFloat()
                                 )
-                            )
-                            .padding(24.dp)
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                            Text(
-                                text = stringResource(R.string.total),
-                                style = MaterialTheme.typography.labelLarge,
-                                color = Color.White.copy(alpha = 0.8f)
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = state.baseCurrency.format(state.totalExpenses),
-                                style = MaterialTheme.typography.displayLarge,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = Color.White
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    text = stringResource(R.string.by_category),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                if (state.categoryTotals.isNotEmpty() && state.totalExpenses > 0) {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = MaterialTheme.shapes.large,
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
-                        )
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(20.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            val isHighContrast = LocalIsHighContrast.current
-                            val donutSlices = remember(state.categoryTotals, isDark, isMatrix, isHighContrast) {
-                                state.categoryTotals.map { catTotal ->
-                                    DonutSlice(
-                                        color = CategoryColors.getById(catTotal.category.id, isDark, isMatrix, isHighContrast),
-                                        percentage = (catTotal.total / state.totalExpenses * 100).toFloat()
-                                    )
-                                }
                             }
-                            DonutChart(
-                                categoryTotals = donutSlices,
-                                modifier = Modifier.size(180.dp)
-                            )
+                        }
+                        DonutChart(
+                            categoryTotals = donutSlices,
+                            modifier = Modifier.size(180.dp)
+                        )
 
-                            Spacer(modifier = Modifier.height(20.dp))
+                        Spacer(modifier = Modifier.height(20.dp))
 
-                            state.categoryTotals.zip(donutSlices) { catTotal, slice ->
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 6.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(12.dp)
-                                            .clip(CircleShape)
-                                            .background(slice.color)
-                                    )
-                                    Spacer(modifier = Modifier.width(10.dp))
-                                    Text(
-                                        text = catTotal.category.localizedName(),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                    Text(
-                                        text = "${String.format("%.1f", slice.percentage)}%",
-                                        style = MaterialTheme.typography.labelMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.padding(end = 8.dp)
-                                    )
-                                    val formattedTotal = remember(catTotal.total, state.baseCurrency) {
-                                        state.baseCurrency.format(catTotal.total)
-                                    }
-                                    Text(
-                                        text = formattedTotal,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                }
-
+                        state.categoryTotals.zip(donutSlices) { catTotal, slice ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 Box(
                                     modifier = Modifier
-                                        .fillMaxWidth()
+                                        .size(12.dp)
+                                        .clip(CircleShape)
+                                        .background(slice.color)
+                                )
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Text(
+                                    text = catTotal.category.localizedName(),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Text(
+                                    text = "${String.format("%.1f", slice.percentage)}%",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(end = Dimens.spaceSm)
+                                )
+                                val formattedCatTotal = remember(catTotal.total, state.baseCurrency) {
+                                    state.baseCurrency.format(catTotal.total)
+                                }
+                                Text(
+                                    text = formattedCatTotal,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(6.dp)
+                                    .clip(MaterialTheme.shapes.extraSmall)
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth(slice.percentage / 100f)
                                         .height(6.dp)
                                         .clip(MaterialTheme.shapes.extraSmall)
-                                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth(slice.percentage / 100f)
-                                            .height(6.dp)
-                                            .clip(MaterialTheme.shapes.extraSmall)
-                                            .background(
-                                                Brush.horizontalGradient(
-                                                    colors = listOf(slice.color, slice.color.copy(alpha = 0.6f))
+                                        .background(
+                                            Brush.horizontalGradient(
+                                                colors = listOf(
+                                                    slice.color,
+                                                    slice.color.copy(alpha = 0.6f)
                                                 )
                                             )
-                                    )
-                                }
-
-                                Spacer(modifier = Modifier.height(4.dp))
+                                        )
+                                )
                             }
+
+                            Spacer(modifier = Modifier.height(Dimens.spaceXs))
                         }
                     }
                 }
+            } else {
+                EmptyState(
+                    icon = Icons.Default.BarChart,
+                    message = stringResource(R.string.no_expenses)
+                )
+            }
 
-                Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(Dimens.spaceXl))
         }
     }
 }

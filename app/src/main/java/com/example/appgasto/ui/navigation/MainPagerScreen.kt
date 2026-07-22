@@ -12,13 +12,12 @@ import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -37,7 +36,6 @@ import com.example.appgasto.ui.stats.StatsPeriod
 import com.example.appgasto.ui.stats.StatsScreen
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPagerScreen(
     isDark: Boolean,
@@ -50,24 +48,37 @@ fun MainPagerScreen(
 
     var pendingStatsPeriod by remember { mutableStateOf<StatsPeriod?>(null) }
 
-    val pageTitles = listOf(R.string.home_title, R.string.list_title, R.string.stats_title, R.string.settings_title)
-    val pageIcons = listOf(Icons.Default.Home, Icons.Default.FormatListBulleted, Icons.Default.BarChart, Icons.Default.Settings)
+    val pageTitles = listOf(
+        R.string.home_title,
+        R.string.list_title,
+        R.string.stats_title,
+        R.string.settings_title
+    )
+    val pageIcons = listOf(
+        Icons.Default.Home,
+        Icons.Default.FormatListBulleted,
+        Icons.Default.BarChart,
+        Icons.Default.Settings
+    )
+
+    val showFab = pagerState.currentPage == 0 || pagerState.currentPage == 1
 
     Scaffold(
-        topBar = {
-            TabRow(selectedTabIndex = pagerState.currentPage) {
+        bottomBar = {
+            NavigationBar {
                 pageTitles.forEachIndexed { index, title ->
-                    Tab(
+                    NavigationBarItem(
                         selected = pagerState.currentPage == index,
-                        onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                        onClick = {
+                            scope.launch { pagerState.animateScrollToPage(index) }
+                        },
                         icon = {
                             Icon(
-                                pageIcons[index],
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp)
+                                imageVector = pageIcons[index],
+                                contentDescription = stringResource(title)
                             )
                         },
-                        text = {
+                        label = {
                             Text(
                                 text = stringResource(title),
                                 style = MaterialTheme.typography.labelSmall
@@ -78,17 +89,17 @@ fun MainPagerScreen(
             }
         },
         floatingActionButton = {
-            if (pagerState.currentPage == 0) {
-                LargeFloatingActionButton(
+            if (showFab) {
+                FloatingActionButton(
                     onClick = onNavigateToAdd,
                     containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
                     shape = CircleShape
                 ) {
                     Icon(
                         Icons.Default.Add,
                         contentDescription = stringResource(R.string.cd_add_expense),
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(28.dp)
                     )
                 }
             }

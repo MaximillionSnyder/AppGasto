@@ -29,6 +29,7 @@
     <string name="expense_deleted">支出を削除しました</string>
     <string name="no_expenses">記録された支出はありません</string>
     <string name="no_expenses_today">今日の支出はありません</string>
+    <string name="no_filter_results">フィルターに一致する結果がありません</string>
     <string name="confirm_delete">この支出を削除しますか？</string>
     <string name="confirm">確認</string>
     <string name="backup_success">バックアップをエクスポートしました</string>

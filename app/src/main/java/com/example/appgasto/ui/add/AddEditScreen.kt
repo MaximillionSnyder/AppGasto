@@ -213,7 +213,7 @@ fun AddEditScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 Text(
                     text = stringResource(R.string.category),
@@ -228,42 +228,6 @@ fun AddEditScreen(
                     isMatrix = isMatrix,
                     onCategorySelected = viewModel::updateCategory
                 )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { noteExpanded = !noteExpanded }
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(R.string.note),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Icon(
-                        imageVector = if (noteExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                        contentDescription = stringResource(
-                            if (noteExpanded) R.string.cd_collapse else R.string.cd_expand
-                        ),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                AnimatedVisibility(visible = noteExpanded) {
-                    OutlinedTextField(
-                        value = state.note,
-                        onValueChange = viewModel::updateNote,
-                        label = { Text(stringResource(R.string.note)) },
-                        placeholder = { Text(stringResource(R.string.note_hint)) },
-                        modifier = Modifier.fillMaxWidth(),
-                        minLines = 2,
-                        shape = MaterialTheme.shapes.medium
-                    )
-                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -310,6 +274,42 @@ fun AddEditScreen(
                     ) {
                         DatePicker(state = datePickerState)
                     }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { noteExpanded = !noteExpanded }
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.note),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Icon(
+                        imageVector = if (noteExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                        contentDescription = stringResource(
+                            if (noteExpanded) R.string.cd_collapse else R.string.cd_expand
+                        ),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                AnimatedVisibility(visible = noteExpanded) {
+                    OutlinedTextField(
+                        value = state.note,
+                        onValueChange = viewModel::updateNote,
+                        label = { Text(stringResource(R.string.note)) },
+                        placeholder = { Text(stringResource(R.string.note_hint)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 2,
+                        shape = MaterialTheme.shapes.medium
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(28.dp))

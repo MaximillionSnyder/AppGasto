@@ -29,6 +29,7 @@
     <string name="expense_deleted">Ausgabe gelöscht</string>
     <string name="no_expenses">Keine Ausgaben erfasst</string>
     <string name="no_expenses_today">Heute keine Ausgaben</string>
+    <string name="no_filter_results">Keine Treffer für diese Filter</string>
     <string name="confirm_delete">Diese Ausgabe löschen?</string>
     <string name="confirm">Bestätigen</string>
     <string name="backup_success">Backup erfolgreich exportiert</string>

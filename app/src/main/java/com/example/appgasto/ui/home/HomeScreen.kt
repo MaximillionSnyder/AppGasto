@@ -1,5 +1,6 @@
 package com.example.appgasto.ui.home
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,15 +28,12 @@ import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,24 +41,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.appgasto.R
 import com.example.appgasto.domain.model.Currency
+import com.example.appgasto.ui.components.BudgetProgressCard
+import com.example.appgasto.ui.components.EmptyState
 import com.example.appgasto.ui.components.ExpenseItem
-import com.example.appgasto.ui.theme.GradientEnd
-import com.example.appgasto.ui.theme.GradientStart
-import com.example.appgasto.ui.theme.GradientTertiary
+import com.example.appgasto.ui.components.SectionHeader
+import com.example.appgasto.ui.components.TotalHeroCard
 import com.example.appgasto.ui.stats.StatsPeriod
+import com.example.appgasto.ui.theme.Dimens
+import com.example.appgasto.ui.theme.GradientTertiary
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -87,108 +86,89 @@ fun HomeScreen(
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(horizontal = Dimens.spaceLg),
+            verticalArrangement = Arrangement.spacedBy(Dimens.spaceMd)
         ) {
-                item(contentType = "header") {
-                    Spacer(modifier = Modifier.height(8.dp))
+            item(contentType = "header") {
+                Spacer(modifier = Modifier.height(Dimens.spaceSm))
 
-                    Card(
+                val formattedMonthTotal = remember(state.monthTotal, state.baseCurrency) {
+                    state.baseCurrency.format(state.monthTotal)
+                }
+                TotalHeroCard(
+                    label = stringResource(R.string.total_month),
+                    amountText = formattedMonthTotal,
+                    onClickLabel = stringResource(R.string.stats_title),
+                    onClick = { onNavigateToStats(StatsPeriod.MONTHLY) }
+                )
+
+                if (state.budgetEnabled && state.monthlyBudget > 0) {
+                    Spacer(modifier = Modifier.height(Dimens.spaceMd))
+                    BudgetProgressCard(
+                        spent = state.monthTotal,
+                        budget = state.monthlyBudget,
+                        currency = state.baseCurrency
+                    )
+                }
+
+                if (state.monthCurrencyBreakdown.size > 1 ||
+                    (state.monthCurrencyBreakdown.isNotEmpty() &&
+                        state.monthCurrencyBreakdown.first().currency != state.baseCurrency.code)
+                ) {
+                    var currencyExpanded by remember { mutableStateOf(false) }
+                    Spacer(modifier = Modifier.height(Dimens.spaceSm))
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable(
-                                onClickLabel = stringResource(R.string.stats_title)
-                            ) { onNavigateToStats(StatsPeriod.MONTHLY) },
-                        shape = MaterialTheme.shapes.large,
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
+                            .clickable { currencyExpanded = !currencyExpanded }
+                            .padding(vertical = Dimens.spaceXs),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(
-                                    Brush.horizontalGradient(
-                                        colors = listOf(GradientStart, GradientEnd)
-                                    )
-                                )
-                                .padding(24.dp)
-                        ) {
-                            Column {
-                                Text(
-                                    text = stringResource(R.string.total_month),
-                                    style = MaterialTheme.typography.labelLarge,
-                                    color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.8f)
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                val formattedMonthTotal = remember(state.monthTotal, state.baseCurrency) {
-                                    state.baseCurrency.format(state.monthTotal)
-                                }
-                                Text(
-                                    text = formattedMonthTotal,
-                                    style = MaterialTheme.typography.displayMedium,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = androidx.compose.ui.graphics.Color.White
-                                )
-                            }
-                        }
+                        Text(
+                            text = stringResource(R.string.currency_breakdown),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Icon(
+                            imageVector = if (currencyExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                            contentDescription = stringResource(
+                                if (currencyExpanded) R.string.cd_collapse else R.string.cd_expand
+                            ),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
-
-                    if (state.monthCurrencyBreakdown.size > 1 ||
-                        (state.monthCurrencyBreakdown.isNotEmpty() && state.monthCurrencyBreakdown.first().currency != Currency.PEN.code)
-                    ) {
-                        var currencyExpanded by remember { mutableStateOf(false) }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { currencyExpanded = !currencyExpanded }
-                                .padding(vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                    AnimatedVisibility(visible = currencyExpanded) {
+                        FlowRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(Dimens.spaceSm),
+                            verticalArrangement = Arrangement.spacedBy(Dimens.spaceXs)
                         ) {
-                            Text(
-                                text = stringResource(R.string.currency_breakdown),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.weight(1f)
-                            )
-                            Icon(
-                                imageVector = if (currencyExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                                contentDescription = stringResource(
-                                    if (currencyExpanded) R.string.cd_collapse else R.string.cd_expand
-                                ),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        AnimatedVisibility(visible = currencyExpanded) {
-                            FlowRow(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                state.monthCurrencyBreakdown.forEach { tuple ->
-                                    val breakdownText = remember(tuple, state.baseCurrency, state.rateToBase) {
-                                        val tupleCurrency = Currency.fromCode(tuple.currency)
-                                        "${tupleCurrency.format(tuple.totalOriginal)} = ${state.baseCurrency.format(tuple.totalInPEN * state.rateToBase)}"
+                            state.monthCurrencyBreakdown.forEach { tuple ->
+                                val breakdownText = remember(tuple, state.baseCurrency, state.rateToBase) {
+                                    val tupleCurrency = Currency.fromCode(tuple.currency)
+                                    "${tupleCurrency.format(tuple.totalOriginal)} = ${state.baseCurrency.format(tuple.totalInPEN * state.rateToBase)}"
+                                }
+                                SuggestionChip(
+                                    onClick = { },
+                                    label = {
+                                        Text(
+                                            text = breakdownText,
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
                                     }
-                                    SuggestionChip(
-                                        onClick = { },
-                                        label = {
-                                            Text(
-                                                text = breakdownText,
-                                                style = MaterialTheme.typography.labelMedium
-                                            )
-                                        }
-                                    )
-                                }
+                                )
                             }
                         }
                     }
+                }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(Dimens.spaceSm))
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
                     MiniSummaryCard(
                         title = stringResource(R.string.total_today),
                         amount = state.todayTotal,
@@ -207,60 +187,37 @@ fun HomeScreen(
                         onClick = { onNavigateToStats(StatsPeriod.WEEKLY) },
                         currency = state.baseCurrency
                     )
-                    }
+                }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(Dimens.spaceSm))
+                SectionHeader(title = stringResource(R.string.today_expenses))
+            }
 
-                    Text(
-                        text = stringResource(R.string.today_expenses),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
+            if (state.todayExpenses.isEmpty()) {
+                item(contentType = "empty") {
+                    EmptyState(
+                        icon = Icons.Default.CalendarToday,
+                        message = stringResource(R.string.no_expenses_today)
                     )
                 }
-
-                if (state.todayExpenses.isEmpty()) {
-                    item(contentType = "empty") {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(120.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Icon(
-                                    Icons.Default.CalendarToday,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(40.dp),
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = stringResource(R.string.no_expenses_today),
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    textAlign = TextAlign.Center
-                                )
-                            }
-                        }
-                    }
-                } else {
-                    items(state.todayExpenses, key = { it.id }, contentType = { "expense" }) { expense ->
-                        ExpenseItem(
-                            expense = expense,
-                            category = state.categories[expense.categoryId],
-                            isDark = isDark,
-                            isMatrix = isMatrix,
-                            onEdit = { onNavigateToEdit(expense.id) },
-                            onDelete = { viewModel.deleteExpense(expense) },
-                            showDelete = false
-                        )
-                    }
+            } else {
+                items(state.todayExpenses, key = { it.id }, contentType = { "expense" }) { expense ->
+                    ExpenseItem(
+                        expense = expense,
+                        category = state.categories[expense.categoryId],
+                        isDark = isDark,
+                        isMatrix = isMatrix,
+                        onEdit = { onNavigateToEdit(expense.id) },
+                        showActions = false
+                    )
                 }
+            }
 
-                item(contentType = "footer") { Spacer(modifier = Modifier.height(80.dp)) }
+            item(contentType = "footer") {
+                Spacer(modifier = Modifier.height(Dimens.fabClearance))
             }
         }
+    }
 }
 
 @Composable
@@ -283,7 +240,7 @@ private fun MiniSummaryCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp)
+                .padding(Dimens.cardPadding)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
@@ -297,17 +254,17 @@ private fun MiniSummaryCard(
                         imageVector = icon,
                         contentDescription = null,
                         tint = color,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(Dimens.iconSm)
                     )
                 }
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(Dimens.spaceSm))
                 Text(
                     text = title,
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Dimens.spaceSm))
             Text(
                 text = currency.format(amount),
                 style = MaterialTheme.typography.titleLarge,

@@ -29,6 +29,7 @@
     <string name="expense_deleted">지출이 삭제되었습니다</string>
     <string name="no_expenses">기록된 지출이 없습니다</string>
     <string name="no_expenses_today">오늘 지출이 없습니다</string>
+    <string name="no_filter_results">필터와 일치하는 결과가 없습니다</string>
     <string name="confirm_delete">이 지출을 삭제하시겠습니까?</string>
     <string name="confirm">확인</string>
     <string name="backup_success">백업이 내보내졌습니다</string>

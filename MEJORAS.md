@@ -279,10 +279,29 @@
 
 ---
 
+## Versión 16 — 2026-07-22
+
+### 16.1 Rediseño UI/UX Material 3 (pack completo)
+- **Rama:** `master` (copia de trabajo desde `dev`; `dev` intacta hasta aprobación)
+- **Archivos nuevos:** `ui/theme/Dimens.kt`, `ui/components/EmptyState.kt`, `TotalHeroCard.kt`, `SectionHeader.kt`, `ConfirmDeleteDialog.kt`, `BudgetProgressCard.kt`
+- **Archivos editados:** `MainPagerScreen.kt`, `HomeScreen.kt`, `HomeViewModel.kt`, `ListScreen.kt`, `StatsScreen.kt`, `AddEditScreen.kt`, `SettingsScreen.kt`, `ExpenseItem.kt`, `strings.xml` (8 idiomas)
+- **Cambios:**
+  - Sistema de tokens de espaciado (`Dimens`) y componentes compartidos
+  - Navegación: `TabRow` superior → `NavigationBar` inferior M3; FAB en Home y Lista
+  - Home: hero reutilizable, barra de presupuesto si está activo, empty state, items sin acciones (tap → editar)
+  - Lista: badge de filtros activos, empty distinto con/sin filtros, delete con `ConfirmDeleteDialog`
+  - Stats: `TotalHeroCard` + empty state unificado
+  - Add/Edit: orden monto → scan → categoría → fecha → notas → guardar
+  - Settings: orden Apariencia → Dinero/presupuesto → Moneda → Datos → Info
+  - String nuevo `no_filter_results` en 8 idiomas
+
+---
+
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
 |:-------:|:-----:|:--------|
+| 16 | 2026-07-22 | Rediseño UI/UX M3: bottom nav, componentes compartidos, Home presupuesto, delete con confirmación, polish pantallas |
 | 15 | 2026-07-20 | Actualizador in-app vía GitHub Releases + versionCode auto (git count) + firma unificada opcional + CI release por tags |
 | 14 | 2026-07-19 | Onboarding moneda base al primer inicio + box de monto más compacto en Agregar gasto |
 | 13 | 2026-07-19 | Fix importación de backup: adapter LocalDateTime, MIME picker `*/*`, mensajes de error detallados |

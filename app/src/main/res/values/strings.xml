@@ -39,6 +39,7 @@
     <string name="expense_deleted">Gasto eliminado</string>
     <string name="no_expenses">Sin gastos registrados</string>
     <string name="no_expenses_today">Sin gastos hoy</string>
+    <string name="no_filter_results">Sin coincidencias con los filtros</string>
     <string name="confirm_delete">¿Eliminar este gasto?</string>
     <string name="confirm">Confirmar</string>
     <string name="backup_success">Respaldo exportado correctamente</string>

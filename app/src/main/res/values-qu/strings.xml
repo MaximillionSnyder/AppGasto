@@ -29,6 +29,7 @@
     <string name="expense_deleted">Gastu qulluchisqa</string>
     <string name="no_expenses">Manan gastu kanchu</string>
     <string name="no_expenses_today">Kunan p\'unchaw manan gastu kanchu</string>
+    <string name="no_filter_results">Kay filtrokunawan manan tarikunchu</string>
     <string name="confirm_delete">Kay gastuta qulluchiychu?</string>
     <string name="confirm">Hinallataq</string>
     <string name="backup_success">Backup apachisqa</string>

@@ -39,6 +39,7 @@
     <string name="expense_deleted">Expense deleted</string>
     <string name="no_expenses">No expenses recorded</string>
     <string name="no_expenses_today">No expenses today</string>
+    <string name="no_filter_results">No matches for these filters</string>
     <string name="confirm_delete">Delete this expense?</string>
     <string name="confirm">Confirm</string>
     <string name="backup_success">Backup exported successfully</string>

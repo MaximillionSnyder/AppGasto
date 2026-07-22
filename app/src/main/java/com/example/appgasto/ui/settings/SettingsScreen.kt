@@ -226,6 +226,17 @@ fun SettingsScreen(
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
+            AppearanceSettingsSection(
+                themeMode = state.themeMode,
+                fontScale = state.fontScale,
+                language = state.language,
+                onThemeClick = { showThemeDialog = true },
+                onFontScaleClick = { showFontScaleDialog = true },
+                onLanguageClick = { showLanguageDialog = true }
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             GeneralSettingsSection(
                 budgetEnabled = state.budgetEnabled,
                 monthlyBudget = state.monthlyBudget,
@@ -258,16 +269,6 @@ fun SettingsScreen(
                         }
                     }
                 }
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-            AppearanceSettingsSection(
-                themeMode = state.themeMode,
-                fontScale = state.fontScale,
-                language = state.language,
-                onThemeClick = { showThemeDialog = true },
-                onFontScaleClick = { showFontScaleDialog = true },
-                onLanguageClick = { showLanguageDialog = true }
             )
 
             Spacer(modifier = Modifier.height(12.dp))
