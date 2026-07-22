@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.appgasto.domain.model.AppLanguage
+import com.example.appgasto.domain.model.BudgetChartStyle
 import com.example.appgasto.domain.model.Currency
 import com.example.appgasto.domain.model.FontScale
 import com.example.appgasto.domain.model.ThemeMode
@@ -32,6 +33,7 @@ class PreferencesRepository @Inject constructor(
         val LANGUAGE = stringPreferencesKey("language")
         val MONTHLY_BUDGET = doublePreferencesKey("monthly_budget")
         val BUDGET_ENABLED = booleanPreferencesKey("budget_enabled")
+        val BUDGET_CHART_STYLE = stringPreferencesKey("budget_chart_style")
         val BUDGET_ALERT_80_MONTH = stringPreferencesKey("budget_alert_80_month")
         val BUDGET_ALERT_100_MONTH = stringPreferencesKey("budget_alert_100_month")
         val RATES_UPDATED_AT = longPreferencesKey("rates_updated_at")
@@ -46,6 +48,8 @@ class PreferencesRepository @Inject constructor(
             language = prefs[Keys.LANGUAGE]?.let { safeValueOf<AppLanguage>(it) } ?: AppLanguage.SYSTEM,
             monthlyBudget = prefs[Keys.MONTHLY_BUDGET] ?: 0.0,
             budgetEnabled = prefs[Keys.BUDGET_ENABLED] ?: false,
+            budgetChartStyle = prefs[Keys.BUDGET_CHART_STYLE]?.let { safeValueOf<BudgetChartStyle>(it) }
+                ?: BudgetChartStyle.CIRCULAR,
             ratesUpdatedAt = prefs[Keys.RATES_UPDATED_AT] ?: 0L,
             baseCurrency = prefs[Keys.BASE_CURRENCY]?.let { Currency.fromCode(it) } ?: Currency.PEN,
             fontScale = prefs[Keys.FONT_SCALE]?.let { safeValueOf<FontScale>(it) } ?: FontScale.NORMAL,
@@ -74,6 +78,12 @@ class PreferencesRepository @Inject constructor(
     suspend fun setBudgetEnabled(enabled: Boolean) {
         context.dataStore.edit { prefs ->
             prefs[Keys.BUDGET_ENABLED] = enabled
+        }
+    }
+
+    suspend fun setBudgetChartStyle(style: BudgetChartStyle) {
+        context.dataStore.edit { prefs ->
+            prefs[Keys.BUDGET_CHART_STYLE] = style.name
         }
     }
 

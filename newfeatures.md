@@ -323,6 +323,18 @@
 
 ---
 
+
+---
+
+## Versión 4 — 2026-07-22
+
+### 4.1 Gráfico interactivo de presupuesto en Estadísticas
+
+- **Estado:** `[x]` Implementado (2026-07-22)
+- **Objetivo:** Gráfico interactivo del presupuesto mensual en Estadísticas (debajo del donut), con 4 estilos seleccionables desde Ajustes.
+- **Archivos:** `BudgetChartStyle.kt`, `BudgetCharts.kt`, `BudgetChartStyleDialog.kt`, prefs, Stats/Settings VM+UI, strings 8 idiomas
+- **Comportamiento:** visible si presupuesto activo; datos = mes actual; estilos CIRCULAR/BAR/SPEEDOMETER/COMPACT; tap alterna Gastado-Restante ↔ Disponible-%
+
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
@@ -332,4 +344,5 @@
 | 3 | 2026-07-16 | Accesibilidad (TalkBack, fontScale, alto contraste) + Auto-backup + Guardar recibos |
 | 3-rev | 2026-07-19 | Revisión del plan V3: fix Scoped Storage en auto-backup (MediaStore/permiso legacy), imágenes con UUID (sin expenseId), backup v3 como ZIP (no Base64), Coil para thumbnails, canal backup_reminders, fontScale con LocalDensity, sección 3.4 Tests |
 | 3.1 | 2026-07-19 | ✅ Accesibilidad implementada: content descriptions, semántica (heading/liveRegion/clickLabel), fontScale vía LocalDensity, touch targets 48dp, tema HIGH_CONTRAST con paleta de categorías propia + strings hardcodeados de Lista localizados (filter_by_month, this_month) |
+| 4 | 2026-07-22 | ✅ Gráfico interactivo de presupuesto (4 estilos) en Stats + selector en Ajustes |
 | 3.5 | 2026-07-19 | ✅ Onboarding de moneda base al primer inicio (`OnboardingScreen` + flag DataStore `onboarding_completed`) — evita totales en moneda incorrecta |

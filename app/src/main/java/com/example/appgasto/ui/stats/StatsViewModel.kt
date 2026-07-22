@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appgasto.data.currency.ExchangeRateRepository
 import com.example.appgasto.data.local.Category
-import com.example.appgasto.data.local.Expense
 import com.example.appgasto.data.repository.ExpenseRepository
 import com.example.appgasto.data.repository.PreferencesRepository
+import com.example.appgasto.domain.model.BudgetChartStyle
 import com.example.appgasto.domain.model.Currency
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -33,7 +33,11 @@ data class StatsUiState(
     val dailyTotals: List<Pair<String, Double>> = emptyList(),
     val totalExpenses: Double = 0.0,
     val isLoading: Boolean = true,
-    val baseCurrency: Currency = Currency.PEN
+    val baseCurrency: Currency = Currency.PEN,
+    val budgetEnabled: Boolean = false,
+    val monthlyBudget: Double = 0.0,
+    val monthlyExpenseTotal: Double = 0.0,
+    val budgetChartStyle: BudgetChartStyle = BudgetChartStyle.CIRCULAR
 )
 
 @HiltViewModel
@@ -87,13 +91,22 @@ class StatsViewModel @Inject constructor(
 
                         val totalExpenses = categoryTotals.sumOf { it.total }
 
+                        val monthStart = LocalDate.now().withDayOfMonth(1)
+                        val monthlyExpenseTotal = expenses
+                            .filter { !it.createdAt.toLocalDate().isBefore(monthStart) }
+                            .sumOf { it.amountInPEN } * rateToBase
+
                         _uiState.value = StatsUiState(
                             period = period,
                             categoryTotals = categoryTotals,
                             dailyTotals = emptyList(),
                             totalExpenses = totalExpenses,
                             isLoading = false,
-                            baseCurrency = baseCurrency
+                            baseCurrency = baseCurrency,
+                            budgetEnabled = prefs.budgetEnabled,
+                            monthlyBudget = prefs.monthlyBudget,
+                            monthlyExpenseTotal = monthlyExpenseTotal,
+                            budgetChartStyle = prefs.budgetChartStyle
                         )
                     }
             } catch (e: Exception) {

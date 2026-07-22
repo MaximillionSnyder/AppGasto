@@ -235,6 +235,16 @@ fun StatsScreen(
                 )
             }
 
+            if (state.budgetEnabled && state.monthlyBudget > 0) {
+                Spacer(modifier = Modifier.height(Dimens.spaceXl))
+                BudgetChartSection(
+                    spent = state.monthlyExpenseTotal,
+                    budget = state.monthlyBudget,
+                    currency = state.baseCurrency,
+                    style = state.budgetChartStyle
+                )
+            }
+
             Spacer(modifier = Modifier.height(Dimens.spaceXl))
         }
     }

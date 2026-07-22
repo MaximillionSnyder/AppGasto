@@ -16,6 +16,7 @@ import com.example.appgasto.data.repository.ExpenseRepository
 import com.example.appgasto.data.repository.PreferencesRepository
 import com.example.appgasto.data.updater.GitHubRelease
 import com.example.appgasto.domain.model.AppLanguage
+import com.example.appgasto.domain.model.BudgetChartStyle
 import com.example.appgasto.domain.model.Currency
 import com.example.appgasto.domain.model.FontScale
 import com.example.appgasto.domain.model.ThemeMode
@@ -50,6 +51,7 @@ data class SettingsUiState(
     val language: AppLanguage = AppLanguage.SYSTEM,
     val monthlyBudget: Double = 0.0,
     val budgetEnabled: Boolean = false,
+    val budgetChartStyle: BudgetChartStyle = BudgetChartStyle.CIRCULAR,
     val monthlyExpenseTotal: Double = 0.0,
     val ratesUpdatedAt: Long = 0L,
     val isRefreshingRates: Boolean = false,
@@ -92,6 +94,7 @@ class SettingsViewModel @Inject constructor(
                     language = prefs.language,
                     monthlyBudget = prefs.monthlyBudget,
                     budgetEnabled = prefs.budgetEnabled,
+                    budgetChartStyle = prefs.budgetChartStyle,
                     monthlyExpenseTotal = monthTotal,
                     ratesUpdatedAt = prefs.ratesUpdatedAt,
                     baseCurrency = prefs.baseCurrency,
@@ -262,6 +265,12 @@ class SettingsViewModel @Inject constructor(
     fun setBudgetEnabled(enabled: Boolean) {
         viewModelScope.launch {
             preferencesRepository.setBudgetEnabled(enabled)
+        }
+    }
+
+    fun setBudgetChartStyle(style: BudgetChartStyle) {
+        viewModelScope.launch {
+            preferencesRepository.setBudgetChartStyle(style)
         }
     }
 

@@ -26,6 +26,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.CurrencyExchange
@@ -112,6 +113,7 @@ fun SettingsScreen(
     var showThemeDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showBudgetDialog by remember { mutableStateOf(false) }
+    var showBudgetChartStyleDialog by remember { mutableStateOf(false) }
     var showResetDialog by remember { mutableStateOf(false) }
     var showBaseCurrencyDialog by remember { mutableStateOf(false) }
     var showFontScaleDialog by remember { mutableStateOf(false) }
@@ -243,13 +245,15 @@ fun SettingsScreen(
                 monthlyBudget = state.monthlyBudget,
                 monthlyExpenseTotal = state.monthlyExpenseTotal,
                 baseCurrency = state.baseCurrency,
+                budgetChartStyle = state.budgetChartStyle,
                 onBudgetToggle = { enabled ->
                     viewModel.setBudgetEnabled(enabled)
                     if (enabled && state.monthlyBudget <= 0) {
                         showBudgetDialog = true
                     }
                 },
-                onBudgetClick = { showBudgetDialog = true }
+                onBudgetClick = { showBudgetDialog = true },
+                onBudgetChartStyleClick = { showBudgetChartStyleDialog = true }
             )
 
             Spacer(modifier = Modifier.height(Dimens.spaceMd))
@@ -341,6 +345,17 @@ fun SettingsScreen(
                 currentBudget = state.monthlyBudget,
                 onSave = { viewModel.setMonthlyBudget(it) },
                 onDismiss = { showBudgetDialog = false }
+            )
+        }
+
+        if (showBudgetChartStyleDialog) {
+            BudgetChartStyleDialog(
+                currentStyle = state.budgetChartStyle,
+                onSelect = {
+                    viewModel.setBudgetChartStyle(it)
+                    showBudgetChartStyleDialog = false
+                },
+                onDismiss = { showBudgetChartStyleDialog = false }
             )
         }
 
@@ -599,8 +614,10 @@ private fun GeneralSettingsSection(
     monthlyBudget: Double,
     monthlyExpenseTotal: Double,
     baseCurrency: com.example.appgasto.domain.model.Currency,
+    budgetChartStyle: com.example.appgasto.domain.model.BudgetChartStyle,
     onBudgetToggle: (Boolean) -> Unit,
-    onBudgetClick: () -> Unit
+    onBudgetClick: () -> Unit,
+    onBudgetChartStyleClick: () -> Unit
 ) {
     SettingsSectionHeader(stringResource(R.string.section_general))
 
@@ -681,6 +698,20 @@ private fun GeneralSettingsSection(
                     title = if (monthlyBudget > 0) stringResource(R.string.change_amount)
                             else stringResource(R.string.set_budget),
                     onClick = onBudgetClick,
+                    showArrow = true
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                )
+
+                SettingsRow(
+                    icon = Icons.Default.BarChart,
+                    iconColor = MaterialTheme.colorScheme.tertiary,
+                    title = stringResource(R.string.budget_chart_style),
+                    subtitle = budgetChartStyleLabel(budgetChartStyle),
+                    onClick = onBudgetChartStyleClick,
                     showArrow = true
                 )
             }

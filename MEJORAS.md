@@ -299,10 +299,22 @@
 
 ---
 
+## Versión 17 — 2026-07-22
+
+### 17.1 Gráfico interactivo de presupuesto en Estadísticas
+- **Archivos:** `BudgetChartStyle.kt`, `BudgetCharts.kt`, `BudgetChartStyleDialog.kt`, `UserPreferences`, `PreferencesRepository`, `StatsViewModel`/`StatsScreen`, `SettingsViewModel`/`SettingsScreen`, strings (8 idiomas)
+- **Qué:** sección de presupuesto bajo el donut en Stats con 4 estilos (circular, barra, velocímetro, compacto)
+- **Datos:** siempre mes calendario actual en moneda base (independiente del chip Día/Semana/Mes de Stats)
+- **UX:** tap alterna Gastado/Restante ↔ Disponible/%; colores por umbral; selector de estilo en Ajustes → Presupuesto
+- **Visibilidad:** solo si presupuesto activo y monto > 0
+
+---
+
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
 |:-------:|:-----:|:--------|
+| 17 | 2026-07-22 | Gráfico interactivo de presupuesto en Stats (4 estilos) + selector en Ajustes |
 | 16 | 2026-07-22 | Rediseño UI/UX M3: bottom nav, componentes compartidos, Home presupuesto, delete con confirmación, polish pantallas |
 | 15 | 2026-07-20 | Actualizador in-app vía GitHub Releases + versionCode auto (git count) + firma unificada opcional + CI release por tags |
 | 14 | 2026-07-19 | Onboarding moneda base al primer inicio + box de monto más compacto en Agregar gasto |
