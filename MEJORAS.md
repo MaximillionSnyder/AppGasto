@@ -337,6 +337,15 @@
   - Snackbars de error ahora muestran `localizedMessage` (detalle del error) en vez de mensaje genérico
   - Strings `export_error_detail` en 8 idiomas (reutilizados para JSON y CSV)
 
+### 18.3 Fix: Gson TypeAdapter para LocalDateTime (fix R8)
+- **Archivos:** `BackupManager.kt`, `proguard-rules.pro`
+- **Problema:** `JsonSerializer`/`JsonDeserializer` eran eliminados por R8 en release, causando "Unsupported field: HourOfDay" al serializar `LocalDateTime`
+- **Solución:**
+  - Reemplazado `JsonSerializer`/`JsonDeserializer` por `TypeAdapter<LocalDateTime>` (R8 no puede eliminar la clase porque es el tipo que Gson espera directamente)
+  - `write()`: serializa como ISO-8601 string
+  - `read()`: soporta formato string (nuevo) y legado (objeto JSON con date/time) para backwards compatibility
+  - ProGuard: `-keep class * extends com.google.gson.TypeAdapter { *; }`
+
 ---
 
 ## Registro de Versiones
