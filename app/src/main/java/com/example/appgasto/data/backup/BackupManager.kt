@@ -134,6 +134,14 @@ class BackupManager @Inject constructor(
         return withContext(Dispatchers.IO) {
             try {
                 val json = inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
+
+                if (json.isBlank()) {
+                    return@withContext Result.failure(IllegalStateException("El archivo está vacío (0 KB)"))
+                }
+                if (!json.trimStart().startsWith("{")) {
+                    return@withContext Result.failure(IllegalStateException("No es un backup JSON válido. Selecciona el archivo appgasto_backup_*.json"))
+                }
+
                 val type = object : TypeToken<BackupData>() {}.type
                 val backupData: BackupData? = gson.fromJson(json, type)
 

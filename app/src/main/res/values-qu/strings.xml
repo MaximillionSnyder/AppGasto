@@ -38,6 +38,7 @@
     <string name="import_error_detail">Apachiypi pantay: %1$s</string>
     <string name="export_success">Backup apachisqa</string>
     <string name="export_error">Apachiy pantay</string>
+    <string name="export_error_detail">Apachiy pantay: %1$s</string>
     <string name="restore_success">Willakuykuna apamusqa</string>
     <string name="error_save">Waqaychaypi pantasqa</string>
     <string name="error_invalid_amount">Allin chaniyuq qullqita qillqay</string>

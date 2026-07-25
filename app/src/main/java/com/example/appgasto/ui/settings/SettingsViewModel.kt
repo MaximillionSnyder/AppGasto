@@ -322,12 +322,14 @@ class SettingsViewModel @Inject constructor(
     }
 
     suspend fun exportCsv(outputStream: OutputStream): Result<String> {
-        return try {
-            val expenses = expenseRepository.getAllExpenses().first()
-            val categories = expenseRepository.getAllCategoriesSnapshot()
-            ExpenseCsvExporter.export(expenses, categories, outputStream)
-        } catch (e: Exception) {
-            Result.failure(e)
+        return withContext(Dispatchers.IO) {
+            try {
+                val expenses = expenseRepository.getAllExpenses().first()
+                val categories = expenseRepository.getAllCategoriesSnapshot()
+                ExpenseCsvExporter.export(expenses, categories, outputStream)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
         }
     }
 }

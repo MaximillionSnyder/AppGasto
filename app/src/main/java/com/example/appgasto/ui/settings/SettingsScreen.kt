@@ -140,8 +140,13 @@ fun SettingsScreen(
     ) { uri: Uri? ->
         uri?.let {
             scope.launch {
-                context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                    val result = viewModel.importData(inputStream)
+                val inputStream = context.contentResolver.openInputStream(uri)
+                if (inputStream == null) {
+                    snackbarHostState.showSnackbar(context.getString(R.string.import_error))
+                    return@launch
+                }
+                inputStream.use {
+                    val result = viewModel.importData(it)
                     val message = if (result.isSuccess) {
                         context.getString(R.string.import_success)
                     } else {
@@ -163,10 +168,24 @@ fun SettingsScreen(
     ) { uri: Uri? ->
         uri?.let {
             scope.launch {
-                context.contentResolver.openOutputStream(uri)?.use { outputStream ->
-                    val result = viewModel.exportData(outputStream)
+                val outputStream = context.contentResolver.openOutputStream(uri, "wt")
+                if (outputStream == null) {
+                    snackbarHostState.showSnackbar(context.getString(R.string.export_error))
+                    return@launch
+                }
+                outputStream.use {
+                    val result = viewModel.exportData(it)
                     snackbarHostState.showSnackbar(
-                        if (result.isSuccess) context.getString(R.string.export_success) else context.getString(R.string.export_error)
+                        if (result.isSuccess) {
+                            context.getString(R.string.export_success)
+                        } else {
+                            val error = result.exceptionOrNull()?.localizedMessage
+                            if (error.isNullOrBlank()) {
+                                context.getString(R.string.export_error)
+                            } else {
+                                context.getString(R.string.export_error_detail, error)
+                            }
+                        }
                     )
                 }
             }
@@ -178,10 +197,24 @@ fun SettingsScreen(
     ) { uri: Uri? ->
         uri?.let {
             scope.launch {
-                context.contentResolver.openOutputStream(uri)?.use { outputStream ->
-                    val result = viewModel.exportCsv(outputStream)
+                val outputStream = context.contentResolver.openOutputStream(uri, "wt")
+                if (outputStream == null) {
+                    snackbarHostState.showSnackbar(context.getString(R.string.csv_export_error))
+                    return@launch
+                }
+                outputStream.use {
+                    val result = viewModel.exportCsv(it)
                     snackbarHostState.showSnackbar(
-                        if (result.isSuccess) context.getString(R.string.csv_export_success) else context.getString(R.string.csv_export_error)
+                        if (result.isSuccess) {
+                            context.getString(R.string.csv_export_success)
+                        } else {
+                            val error = result.exceptionOrNull()?.localizedMessage
+                            if (error.isNullOrBlank()) {
+                                context.getString(R.string.csv_export_error)
+                            } else {
+                                context.getString(R.string.export_error_detail, error)
+                            }
+                        }
                     )
                 }
             }

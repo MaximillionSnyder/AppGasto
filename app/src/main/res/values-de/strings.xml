@@ -38,6 +38,7 @@
     <string name="import_error_detail">Fehler beim Importieren: %1$s</string>
     <string name="export_success">Backup exportiert</string>
     <string name="export_error">Fehler beim Exportieren</string>
+    <string name="export_error_detail">Fehler beim Exportieren: %1$s</string>
     <string name="restore_success">Daten erfolgreich wiederhergestellt</string>
     <string name="error_save">Fehler beim Speichern</string>
     <string name="error_invalid_amount">Geben Sie einen gültigen Betrag ein</string>

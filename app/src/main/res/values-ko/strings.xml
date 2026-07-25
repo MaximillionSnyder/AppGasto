@@ -38,6 +38,7 @@
     <string name="import_error_detail">가져오기 중 오류가 발생했습니다: %1$s</string>
     <string name="export_success">백업이 날아냈졌습니다</string>
     <string name="export_error">날아내기 중 오류가 발생했습니다</string>
+    <string name="export_error_detail">날아내기 중 오류가 발생했습니다: %1$s</string>
     <string name="restore_success">데이터가 복원되었습니다</string>
     <string name="error_save">저장 중 오류가 발생했습니다</string>
     <string name="error_invalid_amount">유효한 금액을 입력하세요</string>

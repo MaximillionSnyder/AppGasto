@@ -325,13 +325,25 @@
   - FAB y swipe del pager sin cambios
   - Spec de diseño: `docs/superpowers/specs/2026-07-25-floating-nav-bar-design.md`
 
+### 18.2 Fix: exportación 0KB y error de importación CSV
+- **Archivos:** `BackupManager.kt`, `SettingsScreen.kt`, `SettingsViewModel.kt`, strings.xml (8 idiomas)
+- **Problema:** exportación guardaba archivo 0KB sin mostrar error; importar CSV daba error java.lang.IllegalStateException sin contexto útil
+- **Solución:**
+  - `SettingsViewModel.exportCsv`: `withContext(Dispatchers.IO)` para escritura en IO thread
+  - `SettingsScreen`: null check en todos los launchers (export JSON, export CSV, import) — si `openOutputStream`/`openInputStream` retorna null, muestra error específico
+  - `BackupManager.importFromJson`: pre-validación antes de Gson:
+    - Archivo vacío → "El archivo está vacío (0 KB)"
+    - No empieza con `{` → "No es un backup JSON válido. Selecciona el archivo appgasto_backup_*.json"
+  - Snackbars de error ahora muestran `localizedMessage` (detalle del error) en vez de mensaje genérico
+  - Strings `export_error_detail` en 8 idiomas (reutilizados para JSON y CSV)
+
 ---
 
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
 |:-------:|:-----:|:--------|
-| 18 | 2026-07-25 | Barra de navegación flotante M3 Expressive (píldora, iconos outlined→filled, etiqueta en activo, háptica) |
+| 18 | 2026-07-25 | Barra de navegación flotante M3 Expressive + fix exportación 0KB y error importación CSV |
 | 17 | 2026-07-22 | Gráfico interactivo de presupuesto en Stats (4 estilos) + selector en Ajustes |
 | 16 | 2026-07-22 | Rediseño UI/UX M3: bottom nav, componentes compartidos, Home presupuesto, delete con confirmación, polish pantallas |
 | 15 | 2026-07-20 | Actualizador in-app vía GitHub Releases + versionCode auto (git count) + firma unificada opcional + CI release por tags |

@@ -38,6 +38,7 @@
     <string name="import_error_detail">インポート中にエラーが発生しました: %1$s</string>
     <string name="export_success">バックアップをエクスポートしました</string>
     <string name="export_error">エクスポート中にエラーが発生しました</string>
+    <string name="export_error_detail">エクスポート中にエラーが発生しました: %1$s</string>
     <string name="restore_success">データを復元しました</string>
     <string name="error_save">保存中にエラーが発生しました</string>
     <string name="error_invalid_amount">有効な金額を入力してください</string>

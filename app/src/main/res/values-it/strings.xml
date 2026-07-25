@@ -38,6 +38,7 @@
     <string name="import_error_detail">Errore durante l\'importazione: %1$s</string>
     <string name="export_success">Backup esportato</string>
     <string name="export_error">Errore durante l\'esportazione</string>
+    <string name="export_error_detail">Errore durante l\'esportazione: %1$s</string>
     <string name="restore_success">Dati ripristinati con successo</string>
     <string name="error_save">Errore durante il salvataggio</string>
     <string name="error_invalid_amount">Inserisci un importo valido</string>
