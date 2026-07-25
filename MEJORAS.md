@@ -310,10 +310,28 @@
 
 ---
 
+## Versión 18 — 2026-07-25
+
+### 18.1 Barra de navegación flotante estilo M3 Expressive
+- **Rama:** `dev`
+- **Archivos nuevos:** `ui/navigation/FloatingNavBar.kt`
+- **Archivos editados:** `MainPagerScreen.kt` (solo el slot `bottomBar`)
+- **Cambios:**
+  - `NavigationBar` estándar → píldora flotante: márgenes laterales, esquinas totalmente redondeadas, sombra 12dp, altura 64dp
+  - Etiqueta solo en el ítem activo (`alwaysShowLabel = false`)
+  - Iconos outlined (inactivo) → filled (activo) con `Crossfade` de 200ms
+  - Vibración háptica sutil al cambiar de sección
+  - Colores 100% por tema (`surfaceContainerHigh` + defaults M3): funciona en claro/oscuro/Matrix/alto contraste sin tocar `Theme.kt`
+  - FAB y swipe del pager sin cambios
+  - Spec de diseño: `docs/superpowers/specs/2026-07-25-floating-nav-bar-design.md`
+
+---
+
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
 |:-------:|:-----:|:--------|
+| 18 | 2026-07-25 | Barra de navegación flotante M3 Expressive (píldora, iconos outlined→filled, etiqueta en activo, háptica) |
 | 17 | 2026-07-22 | Gráfico interactivo de presupuesto en Stats (4 estilos) + selector en Ajustes |
 | 16 | 2026-07-22 | Rediseño UI/UX M3: bottom nav, componentes compartidos, Home presupuesto, delete con confirmación, polish pantallas |
 | 15 | 2026-07-20 | Actualizador in-app vía GitHub Releases + versionCode auto (git count) + firma unificada opcional + CI release por tags |
