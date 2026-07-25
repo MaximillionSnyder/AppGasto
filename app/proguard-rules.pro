@@ -15,6 +15,7 @@
 -keep class com.example.appgasto.data.backup.BackupManager$BackupData { *; }
 -keep class com.google.gson.reflect.TypeToken { *; }
 -keepclassmembers class * extends com.google.gson.reflect.TypeToken { *; }
+-keep class * extends com.google.gson.TypeAdapter { *; }
 -keepclassmembers,allowobfuscation class * {
     @com.google.gson.annotations.SerializedName <fields>;
 }

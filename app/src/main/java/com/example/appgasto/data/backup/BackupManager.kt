@@ -8,24 +8,19 @@ import com.example.appgasto.data.local.Expense
 import com.example.appgasto.domain.model.Currency
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
-import com.google.gson.JsonPrimitive
-import java.time.Month
-import com.google.gson.JsonSerializationContext
-import com.google.gson.JsonSerializer
 import com.google.gson.reflect.TypeToken
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
+import com.google.gson.stream.JsonWriter
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.io.InputStream
 import java.io.OutputStream
-import java.lang.reflect.Type
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Month
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -42,64 +37,74 @@ class BackupManager @Inject constructor(
      * Imports support both the new string format and the legacy object format
      * produced by Gson's default reflection (nested `date` and `time` fields).
      */
-    private val localDateTimeAdapter = object : JsonSerializer<LocalDateTime>,
-        JsonDeserializer<LocalDateTime> {
+    private val localDateTimeAdapter = object : com.google.gson.TypeAdapter<LocalDateTime>() {
 
         private val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
-        override fun serialize(
-            src: LocalDateTime?,
-            typeOfSrc: Type?,
-            context: JsonSerializationContext?
-        ): JsonElement = JsonPrimitive(src?.format(formatter))
+        override fun write(out: JsonWriter, value: LocalDateTime?) {
+            out.value(value?.format(formatter))
+        }
 
-        override fun deserialize(
-            json: JsonElement?,
-            typeOfT: Type?,
-            context: JsonDeserializationContext?
-        ): LocalDateTime? = when {
-            json == null || json.isJsonNull -> null
-            json.isJsonPrimitive -> {
-                val string = json.asString
-                if (string.isNullOrBlank()) null else LocalDateTime.parse(string, formatter)
+        override fun read(`in`: JsonReader): LocalDateTime? {
+            return when (`in`.peek()) {
+                JsonToken.STRING -> {
+                    val string = `in`.nextString()
+                    if (string.isNullOrBlank()) null else LocalDateTime.parse(string, formatter)
+                }
+                JsonToken.BEGIN_OBJECT -> {
+                    `in`.beginObject()
+                    var year = 0; var month = 0; var day = 0
+                    var hour = 0; var minute = 0; var second = 0; var nano = 0
+                    while (`in`.hasNext()) {
+                        when (`in`.nextName()) {
+                            "date" -> {
+                                `in`.beginObject()
+                                while (`in`.hasNext()) {
+                                    when (`in`.nextName()) {
+                                        "year" -> year = `in`.nextInt()
+                                        "month" -> {
+                                            if (`in`.peek() == JsonToken.STRING) {
+                                                month = Month.valueOf(`in`.nextString().uppercase()).value
+                                            } else {
+                                                month = `in`.nextInt()
+                                            }
+                                        }
+                                        "day" -> day = `in`.nextInt()
+                                        else -> `in`.skipValue()
+                                    }
+                                }
+                                `in`.endObject()
+                            }
+                            "time" -> {
+                                `in`.beginObject()
+                                while (`in`.hasNext()) {
+                                    when (`in`.nextName()) {
+                                        "hour" -> hour = `in`.nextInt()
+                                        "minute" -> minute = `in`.nextInt()
+                                        "second" -> second = `in`.nextInt()
+                                        "nano" -> nano = `in`.nextInt()
+                                        else -> `in`.skipValue()
+                                    }
+                                }
+                                `in`.endObject()
+                            }
+                            else -> `in`.skipValue()
+                        }
+                    }
+                    `in`.endObject()
+                    LocalDateTime.of(year, month, day, hour, minute, second, nano)
+                }
+                else -> {
+                    `in`.skipValue()
+                    null
+                }
             }
-            json.isJsonObject -> {
-                val obj = json.asJsonObject
-                val dateObj = obj.getAsJsonObject("date")
-                val timeObj = obj.getAsJsonObject("time")
-                LocalDateTime.of(
-                    dateObj.getInt("year"),
-                    dateObj.parseMonth("month"),
-                    dateObj.getInt("day"),
-                    timeObj.getInt("hour"),
-                    timeObj.getInt("minute"),
-                    timeObj.getIntOrDefault("second", 0),
-                    timeObj.getIntOrDefault("nano", 0)
-                )
-            }
-            else -> null
         }
     }
 
     private val gson: Gson = GsonBuilder()
         .registerTypeAdapter(LocalDateTime::class.java, localDateTimeAdapter)
         .create()
-
-    private fun JsonObject.getInt(memberName: String): Int =
-        get(memberName).asInt
-
-    private fun JsonObject.getIntOrDefault(memberName: String, default: Int): Int =
-        if (has(memberName)) get(memberName).asInt else default
-
-    private fun JsonObject.parseMonth(memberName: String): Int {
-        val element = get(memberName)
-        return when {
-            element.isJsonPrimitive && element.asJsonPrimitive.isString -> {
-                Month.valueOf(element.asString.uppercase()).value
-            }
-            else -> element.asInt
-        }
-    }
 
     data class BackupData(
         val version: Int = 2,
