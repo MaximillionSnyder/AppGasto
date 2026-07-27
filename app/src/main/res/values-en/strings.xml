@@ -132,6 +132,15 @@
     <string name="reset_data_confirm">Are you sure? All expenses will be deleted and the budget will be reset. This action cannot be undone.</string>
     <string name="reset_done">Data reset</string>
 
+    <!-- Advanced budget -->
+    <string name="advanced_budget_tab">Budget</string>
+    <string name="advanced_budget_title">Budget by categories</string>
+    <string name="advanced_budget_toggle">Budget by categories</string>
+    <string name="advanced_budget_desc">Distribute your monthly budget across categories</string>
+    <string name="advanced_budget_allocated">Allocated: %1$s of %2$s</string>
+    <string name="advanced_budget_total_exceeded">Total allocated exceeds the monthly budget</string>
+    <string name="advanced_budget_not_configured">Set up a monthly budget in Settings</string>
+
     <!-- Theme -->
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>

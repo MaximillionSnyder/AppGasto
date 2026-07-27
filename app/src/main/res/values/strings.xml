@@ -139,6 +139,15 @@
     <string name="reset_data_confirm">¿Estás seguro? Se borrarán todos los gastos y se reiniciará el presupuesto. Esta acción no se puede deshacer.</string>
     <string name="reset_done">Datos restablecidos</string>
 
+    <!-- Presupuesto avanzado -->
+    <string name="advanced_budget_tab">Presupuesto</string>
+    <string name="advanced_budget_title">Presupuesto por categorías</string>
+    <string name="advanced_budget_toggle">Presupuesto por categorías</string>
+    <string name="advanced_budget_desc">Distribuye tu presupuesto mensual en cada categoría</string>
+    <string name="advanced_budget_allocated">Asignado: %1$s de %2$s</string>
+    <string name="advanced_budget_total_exceeded">El total asignado excede el presupuesto mensual</string>
+    <string name="advanced_budget_not_configured">Activa un presupuesto mensual en Ajustes</string>
+
     <!-- Theme -->
     <string name="theme_light">Claro</string>
     <string name="theme_dark">Oscuro</string>

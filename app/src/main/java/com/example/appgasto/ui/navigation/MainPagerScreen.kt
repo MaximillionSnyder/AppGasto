@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.appgasto.R
+import com.example.appgasto.ui.advancedbudget.AdvancedBudgetScreen
 import com.example.appgasto.ui.home.HomeScreen
 import com.example.appgasto.ui.list.ListScreen
 import com.example.appgasto.ui.settings.SettingsScreen
@@ -33,10 +34,11 @@ import kotlinx.coroutines.launch
 fun MainPagerScreen(
     isDark: Boolean,
     isMatrix: Boolean,
+    advancedBudgetEnabled: Boolean = false,
     onNavigateToAdd: () -> Unit,
     onNavigateToEdit: (Long) -> Unit
 ) {
-    val pagerState = rememberPagerState(pageCount = { 4 })
+    val pagerState = rememberPagerState(pageCount = { if (advancedBudgetEnabled) 5 else 4 })
     val scope = rememberCoroutineScope()
 
     var pendingStatsPeriod by remember { mutableStateOf<StatsPeriod?>(null) }
@@ -49,7 +51,8 @@ fun MainPagerScreen(
                 selectedIndex = pagerState.currentPage,
                 onItemSelected = { index ->
                     scope.launch { pagerState.animateScrollToPage(index) }
-                }
+                },
+                showExtraTab = advancedBudgetEnabled
             )
         },
         floatingActionButton = {
@@ -99,6 +102,10 @@ fun MainPagerScreen(
                 3 -> SettingsScreen(
                     isDark = isDark,
                     embeddedInPager = true
+                )
+                4 -> AdvancedBudgetScreen(
+                    isDark = isDark,
+                    isMatrix = isMatrix
                 )
             }
         }

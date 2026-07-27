@@ -75,7 +75,8 @@ class MainActivity : AppCompatActivity() {
                             AppNavigation(
                                 navController = navController,
                                 isDark = isDark,
-                                isMatrix = isMatrix
+                                isMatrix = isMatrix,
+                                advancedBudgetEnabled = prefs?.advancedBudgetEnabled ?: false
                             )
                         }
                     }

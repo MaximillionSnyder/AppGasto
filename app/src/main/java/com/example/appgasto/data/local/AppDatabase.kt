@@ -9,8 +9,8 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [Expense::class, Category::class, ExchangeRateEntity::class],
-    version = 3,
+    entities = [Expense::class, Category::class, ExchangeRateEntity::class, CategoryBudget::class],
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -19,6 +19,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun expenseDao(): ExpenseDao
     abstract fun categoryDao(): CategoryDao
     abstract fun exchangeRateDao(): ExchangeRateDao
+    abstract fun categoryBudgetDao(): CategoryBudgetDao
 
     companion object {
         const val DATABASE_NAME = "appgasto_database"
@@ -47,13 +48,26 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS category_budgets (
+                        categoryId INTEGER NOT NULL PRIMARY KEY,
+                        amount REAL NOT NULL
+                    )
+                    """.trimIndent()
+                )
+            }
+        }
+
         fun create(context: Context): AppDatabase {
             return Room.databaseBuilder(
                 context.applicationContext,
                 AppDatabase::class.java,
                 DATABASE_NAME
             )
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                 .addCallback(SeedCallback())
                 .build()
         }

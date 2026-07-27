@@ -335,14 +335,49 @@
 - **Archivos:** `BudgetChartStyle.kt`, `BudgetCharts.kt`, `BudgetChartStyleDialog.kt`, prefs, Stats/Settings VM+UI, strings 8 idiomas
 - **Comportamiento:** visible si presupuesto activo; datos = mes actual; estilos CIRCULAR/BAR/SPEEDOMETER/COMPACT; tap alterna Gastado-Restante ↔ Disponible-%
 
+---
+
+## Versión 5 — 2026-07-27
+
+### 5.1 Presupuesto mensual avanzado por categorías
+
+- **Estado:** `[ ]` Pendiente
+- **Objetivo:** Permitir al usuario distribuir su presupuesto mensual en cada categoría (Comida, Transporte, etc.). Feature visible solo si el usuario la activa desde Ajustes — aparece como 5° tab en la barra inferior con icono PieChart.
+- **Stack técnico:**
+  - Room Entity `CategoryBudget` (categoryId PK, amount) + DAO
+  - Migration DB v3→v4: nueva tabla `category_budgets`
+  - Feature flag `advancedBudgetEnabled` en DataStore
+- **UI:**
+  - Toggle "Presupuesto por categorías" en Ajustes (General → Presupuesto mensual)
+  - 5° tab condicional con icono `PieChart` en FloatingNavBar (solo si feature activada)
+  - Pantalla `AdvancedBudgetScreen` con campos editables por categoría + total asignado vs presupuesto general + warning si excede
+  - Auto-guardado al perder foco en cada campo
+- **Archivos nuevos:**
+  - `data/local/CategoryBudget.kt` — Entity Room
+  - `data/local/CategoryBudgetDao.kt` — DAO
+  - `ui/advancedbudget/AdvancedBudgetScreen.kt` — pantalla de presupuesto por categorías
+  - `ui/advancedbudget/AdvancedBudgetViewModel.kt` — ViewModel
+- **Archivos a modificar:**
+  - `data/local/AppDatabase.kt` — +entity, +migration v3→v4, +abstract DAO
+  - `di/DatabaseModule.kt` — +proveer CategoryBudgetDao
+  - `domain/model/UserPreferences.kt` — +advancedBudgetEnabled
+  - `data/repository/PreferencesRepository.kt` — +key + setter + flow
+  - `ui/settings/SettingsViewModel.kt` — +advancedBudgetEnabled state + setter
+  - `ui/settings/SettingsScreen.kt` — +toggle en GeneralSettingsSection
+  - `ui/navigation/FloatingNavBar.kt` — +parámetro extraDestination
+  - `ui/navigation/MainPagerScreen.kt` — pageCount dinámico, case 5, sin FAB en page 4
+  - `ui/navigation/AppNavigation.kt` — pasar advancedBudgetEnabled
+  - `MainActivity.kt` — pasar advancedBudgetEnabled a AppNavigation
+  - `res/values/strings.xml` — +7 strings (y resto de idiomas)
+
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
 |:-------:|:-----:|:--------|
-| 1 | 2026-07-05 | Receipt Scanning con ML Kit Document Scanner + Text Recognition + Parser |
-| 2 | 2026-07-05 | Multi-moneda con tasas de cambio + Receipt Scanning multi-moneda |
-| 3 | 2026-07-16 | Accesibilidad (TalkBack, fontScale, alto contraste) + Auto-backup + Guardar recibos |
-| 3-rev | 2026-07-19 | Revisión del plan V3: fix Scoped Storage en auto-backup (MediaStore/permiso legacy), imágenes con UUID (sin expenseId), backup v3 como ZIP (no Base64), Coil para thumbnails, canal backup_reminders, fontScale con LocalDensity, sección 3.4 Tests |
-| 3.1 | 2026-07-19 | ✅ Accesibilidad implementada: content descriptions, semántica (heading/liveRegion/clickLabel), fontScale vía LocalDensity, touch targets 48dp, tema HIGH_CONTRAST con paleta de categorías propia + strings hardcodeados de Lista localizados (filter_by_month, this_month) |
+| 5 | 2026-07-27 | Presupuesto mensual avanzado: distribución por categoría, 5° tab condicional, toggle en Ajustes |
 | 4 | 2026-07-22 | ✅ Gráfico interactivo de presupuesto (4 estilos) en Stats + selector en Ajustes |
-| 3.5 | 2026-07-19 | ✅ Onboarding de moneda base al primer inicio (`OnboardingScreen` + flag DataStore `onboarding_completed`) — evita totales en moneda incorrecta |
+| 3.1 | 2026-07-19 | ✅ Accesibilidad implementada: content descriptions, semántica, fontScale, touch targets 48dp, tema alto contraste + fix strings hardcodeados |
+| 3.5 | 2026-07-19 | ✅ Onboarding de moneda base al primer inicio |
+| 3 | 2026-07-16 | Accesibilidad + Auto-backup + Guardar recibos (plan) |
+| 2 | 2026-07-05 | Multi-moneda con tasas de cambio + Receipt Scanning multi-moneda |
+| 1 | 2026-07-05 | Receipt Scanning con ML Kit |

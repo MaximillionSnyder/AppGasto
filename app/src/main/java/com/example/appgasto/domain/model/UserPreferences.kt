@@ -9,5 +9,6 @@ data class UserPreferences(
     val ratesUpdatedAt: Long = 0L,
     val baseCurrency: Currency = Currency.PEN,
     val fontScale: FontScale = FontScale.NORMAL,
-    val onboardingCompleted: Boolean = false
+    val onboardingCompleted: Boolean = false,
+    val advancedBudgetEnabled: Boolean = false
 )

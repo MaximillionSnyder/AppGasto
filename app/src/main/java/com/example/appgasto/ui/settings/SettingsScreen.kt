@@ -275,6 +275,7 @@ fun SettingsScreen(
 
             GeneralSettingsSection(
                 budgetEnabled = state.budgetEnabled,
+                advancedBudgetEnabled = state.advancedBudgetEnabled,
                 monthlyBudget = state.monthlyBudget,
                 monthlyExpenseTotal = state.monthlyExpenseTotal,
                 baseCurrency = state.baseCurrency,
@@ -284,6 +285,9 @@ fun SettingsScreen(
                     if (enabled && state.monthlyBudget <= 0) {
                         showBudgetDialog = true
                     }
+                },
+                onAdvancedBudgetToggle = { enabled ->
+                    viewModel.setAdvancedBudgetEnabled(enabled)
                 },
                 onBudgetClick = { showBudgetDialog = true },
                 onBudgetChartStyleClick = { showBudgetChartStyleDialog = true }
@@ -644,11 +648,13 @@ private fun SettingsRow(
 @Composable
 private fun GeneralSettingsSection(
     budgetEnabled: Boolean,
+    advancedBudgetEnabled: Boolean,
     monthlyBudget: Double,
     monthlyExpenseTotal: Double,
     baseCurrency: com.example.appgasto.domain.model.Currency,
     budgetChartStyle: com.example.appgasto.domain.model.BudgetChartStyle,
     onBudgetToggle: (Boolean) -> Unit,
+    onAdvancedBudgetToggle: (Boolean) -> Unit,
     onBudgetClick: () -> Unit,
     onBudgetChartStyleClick: () -> Unit
 ) {
@@ -747,6 +753,39 @@ private fun GeneralSettingsSection(
                     onClick = onBudgetChartStyleClick,
                     showArrow = true
                 )
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.advanced_budget_toggle),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Text(
+                            text = stringResource(R.string.advanced_budget_desc),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(
+                        checked = advancedBudgetEnabled,
+                        onCheckedChange = onAdvancedBudgetToggle,
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
+                            checkedTrackColor = MaterialTheme.colorScheme.primary
+                        )
+                    )
+                }
             }
         }
     }

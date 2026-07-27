@@ -51,6 +51,7 @@ data class SettingsUiState(
     val language: AppLanguage = AppLanguage.SYSTEM,
     val monthlyBudget: Double = 0.0,
     val budgetEnabled: Boolean = false,
+    val advancedBudgetEnabled: Boolean = false,
     val budgetChartStyle: BudgetChartStyle = BudgetChartStyle.CIRCULAR,
     val monthlyExpenseTotal: Double = 0.0,
     val ratesUpdatedAt: Long = 0L,
@@ -94,6 +95,7 @@ class SettingsViewModel @Inject constructor(
                     language = prefs.language,
                     monthlyBudget = prefs.monthlyBudget,
                     budgetEnabled = prefs.budgetEnabled,
+                    advancedBudgetEnabled = prefs.advancedBudgetEnabled,
                     budgetChartStyle = prefs.budgetChartStyle,
                     monthlyExpenseTotal = monthTotal,
                     ratesUpdatedAt = prefs.ratesUpdatedAt,
@@ -265,6 +267,12 @@ class SettingsViewModel @Inject constructor(
     fun setBudgetEnabled(enabled: Boolean) {
         viewModelScope.launch {
             preferencesRepository.setBudgetEnabled(enabled)
+        }
+    }
+
+    fun setAdvancedBudgetEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.setAdvancedBudgetEnabled(enabled)
         }
     }
 

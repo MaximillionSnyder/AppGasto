@@ -20,7 +20,8 @@ object Routes {
 fun AppNavigation(
     navController: NavHostController,
     isDark: Boolean,
-    isMatrix: Boolean = false
+    isMatrix: Boolean = false,
+    advancedBudgetEnabled: Boolean = false
 ) {
     NavHost(
         navController = navController,
@@ -30,6 +31,7 @@ fun AppNavigation(
             MainPagerScreen(
                 isDark = isDark,
                 isMatrix = isMatrix,
+                advancedBudgetEnabled = advancedBudgetEnabled,
                 onNavigateToAdd = { navController.navigate(Routes.addExpense()) },
                 onNavigateToEdit = { expenseId -> navController.navigate(Routes.addExpense(expenseId)) }
             )

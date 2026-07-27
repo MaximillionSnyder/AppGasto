@@ -13,9 +13,11 @@ import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.PieChart
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.FormatListBulleted
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.PieChart
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -41,7 +43,7 @@ private data class NavDestination(
     val outlinedIcon: ImageVector
 )
 
-private val destinations = listOf(
+private val baseDestinations = listOf(
     NavDestination(R.string.home_title, Icons.Filled.Home, Icons.Outlined.Home),
     NavDestination(R.string.list_title, Icons.Filled.FormatListBulleted, Icons.Outlined.FormatListBulleted),
     NavDestination(R.string.stats_title, Icons.Filled.BarChart, Icons.Outlined.BarChart),
@@ -58,9 +60,17 @@ private val destinations = listOf(
 fun FloatingNavBar(
     selectedIndex: Int,
     onItemSelected: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showExtraTab: Boolean = false
 ) {
     val haptics = LocalHapticFeedback.current
+
+    val destinations = buildList {
+        addAll(baseDestinations)
+        if (showExtraTab) {
+            add(NavDestination(R.string.advanced_budget_tab, Icons.Filled.PieChart, Icons.Outlined.PieChart))
+        }
+    }
 
     NavigationBar(
         modifier = modifier

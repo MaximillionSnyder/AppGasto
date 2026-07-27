@@ -40,6 +40,7 @@ class PreferencesRepository @Inject constructor(
         val BASE_CURRENCY = stringPreferencesKey("base_currency")
         val FONT_SCALE = stringPreferencesKey("font_scale")
         val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
+        val ADVANCED_BUDGET_ENABLED = booleanPreferencesKey("advanced_budget_enabled")
     }
 
     val preferencesFlow: Flow<UserPreferences> = context.dataStore.data.map { prefs ->
@@ -53,7 +54,8 @@ class PreferencesRepository @Inject constructor(
             ratesUpdatedAt = prefs[Keys.RATES_UPDATED_AT] ?: 0L,
             baseCurrency = prefs[Keys.BASE_CURRENCY]?.let { Currency.fromCode(it) } ?: Currency.PEN,
             fontScale = prefs[Keys.FONT_SCALE]?.let { safeValueOf<FontScale>(it) } ?: FontScale.NORMAL,
-            onboardingCompleted = prefs[Keys.ONBOARDING_COMPLETED] ?: false
+            onboardingCompleted = prefs[Keys.ONBOARDING_COMPLETED] ?: false,
+            advancedBudgetEnabled = prefs[Keys.ADVANCED_BUDGET_ENABLED] ?: false
         )
     }
 
@@ -118,6 +120,12 @@ class PreferencesRepository @Inject constructor(
     suspend fun setOnboardingCompleted(completed: Boolean) {
         context.dataStore.edit { prefs ->
             prefs[Keys.ONBOARDING_COMPLETED] = completed
+        }
+    }
+
+    suspend fun setAdvancedBudgetEnabled(enabled: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[Keys.ADVANCED_BUDGET_ENABLED] = enabled
         }
     }
 
