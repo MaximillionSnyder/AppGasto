@@ -129,9 +129,10 @@ class PreferencesRepository @Inject constructor(
         }
     }
 
-    suspend fun completeOnboarding(currency: Currency) {
+    suspend fun completeOnboarding(currency: Currency, themeMode: ThemeMode = ThemeMode.SYSTEM) {
         context.dataStore.edit { prefs ->
             prefs[Keys.BASE_CURRENCY] = currency.code
+            prefs[Keys.THEME_MODE] = themeMode.name
             prefs[Keys.ONBOARDING_COMPLETED] = true
         }
     }

@@ -64,9 +64,9 @@ class MainActivity : AppCompatActivity() {
                         prefs == null -> Unit
                         !prefs.onboardingCompleted -> {
                             OnboardingScreen(
-                                onCurrencyConfirmed = { currency ->
+                                onComplete = { currency, themeMode ->
                                     scope.launch {
-                                        preferencesRepository.completeOnboarding(currency)
+                                        preferencesRepository.completeOnboarding(currency, themeMode)
                                     }
                                 }
                             )

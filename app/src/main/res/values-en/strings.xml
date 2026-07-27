@@ -4,7 +4,7 @@
 
     <!-- Onboarding -->
     <string name="welcome_title">Welcome to AppGasto</string>
-    <string name="welcome_description">Select your base currency to start tracking your expenses. You can change it later in Settings.</string>
+    <string name="welcome_description">Select a theme and your base currency to start tracking your expenses. You can change them later in Settings.</string>
     <string name="welcome_confirm">Get started</string>
 
     <!-- Screens -->
