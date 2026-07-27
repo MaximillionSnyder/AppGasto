@@ -14,6 +14,8 @@
 # --- Gson (reflection) ---
 -keep class com.example.appgasto.data.backup.BackupManager$BackupData { *; }
 -keep class com.example.appgasto.data.backup.LocalDateTimeTypeAdapter
+-keep class com.example.appgasto.data.updater.GitHubRelease { *; }
+-keep class com.example.appgasto.data.updater.GitHubAsset { *; }
 -keep class com.google.gson.reflect.TypeToken { *; }
 -keepclassmembers class * extends com.google.gson.reflect.TypeToken { *; }
 -keep class * extends com.google.gson.TypeAdapter { *; }
