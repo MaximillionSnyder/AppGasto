@@ -348,10 +348,37 @@
 
 ---
 
+## Versión 19 — 2026-07-27
+
+### 19.1 Fix definitivo: CSV 0KB en exportación
+- **Archivos:** `ExpenseCsvExporter.kt`, `BackupManager.kt`
+- **Problema:** `outputStream.bufferedWriter().use { }` cerraba el OutputStream subyacente prematuramente en el exporter, causando que el archivo SAF quedara vacío (0KB)
+- **Solución:**
+  - CSV: se construye el contenido como string con `buildString`, se convierte a bytes y se escribe directo al OutputStream con `write()` + `flush()`, sin usar `.use()` que cierra el stream
+  - JSON: mismo fix en `exportToJson` (antes `outputStream.use { it.write(...) }`, ahora `write()` + `flush()`)
+  - El `outputStream.use { }` del `SettingsScreen` se encarga del cierre
+
+### 19.2 Fix definitivo: "Unsupported field: HourOfDay" en JSON export (R8)
+- **Archivos:** `LocalDateTimeTypeAdapter.kt` (nuevo), `BackupManager.kt`, `proguard-rules.pro`
+- **Problema:** el `TypeAdapter<LocalDateTime>` anónimo seguía siendo eliminado por R8 en release a pesar de la regla wildcard, provocando que Gson cayera en serialización reflexiva de `LocalDateTime` → error `Unsupported field: HourOfDay`
+- **Solución:**
+  - `LocalDateTimeTypeAdapter.kt`: clase top-level con nombre en vez de `object : TypeAdapter<LocalDateTime>()` anónimo
+  - Misma lógica: escribe ISO-8601, lee string + formato legacy
+  - ProGuard: regla específica `-keep class com.example.appgasto.data.backup.LocalDateTimeTypeAdapter`
+  - `BackupManager`: usa `LocalDateTimeTypeAdapter()` en vez de la instancia anónima
+
+### 19.3 CI fix: import inválido `java.nio.charset.Charsets`
+- **Archivos:** `ExpenseCsvExporter.kt`, `BackupManager.kt`
+- **Problema:** build fallaba en CI con `Unresolved reference 'Charsets'` al usar `import java.nio.charset.Charsets`
+- **Solución:** eliminado el import; `Charsets` (de `kotlin.text`) ya está auto-importado
+
+---
+
 ## Registro de Versiones
 
 | Versión | Fecha | Cambios |
 |:-------:|:-----:|:--------|
+| 19 | 2026-07-27 | Fix definitivo CSV 0KB + JSON "Unsupported field: HourOfDay" (R8) + fix CI Charsets |
 | 18 | 2026-07-25 | Barra de navegación flotante M3 Expressive + fix exportación 0KB y error importación CSV |
 | 17 | 2026-07-22 | Gráfico interactivo de presupuesto en Stats (4 estilos) + selector en Ajustes |
 | 16 | 2026-07-22 | Rediseño UI/UX M3: bottom nav, componentes compartidos, Home presupuesto, delete con confirmación, polish pantallas |
