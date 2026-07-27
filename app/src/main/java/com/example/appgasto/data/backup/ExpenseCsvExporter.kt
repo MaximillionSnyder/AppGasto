@@ -3,7 +3,6 @@ package com.example.appgasto.data.backup
 import com.example.appgasto.data.local.Category
 import com.example.appgasto.data.local.Expense
 import java.io.OutputStream
-import java.nio.charset.Charsets
 import java.time.format.DateTimeFormatter
 
 object ExpenseCsvExporter {
