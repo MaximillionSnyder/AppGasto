@@ -13,6 +13,7 @@ import androidx.work.WorkManager
 import com.example.appgasto.R
 import com.example.appgasto.data.currency.ExchangeRateWorker
 import com.example.appgasto.notifications.BudgetWorker
+import com.example.appgasto.security.IntegrityMonitor
 import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -23,11 +24,15 @@ class AppGastoApplication : Application(), Configuration.Provider {
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
+    @Inject
+    lateinit var integrityMonitor: IntegrityMonitor
+
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
         scheduleBudgetCheck()
         scheduleExchangeRateRefresh()
+        integrityMonitor.start()
     }
 
     override val workManagerConfiguration: Configuration
