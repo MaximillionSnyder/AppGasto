@@ -12,6 +12,7 @@ android {
         minSdk = 28
         targetSdk = 35
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        missingDimensionStrategy("distribution", "github")
     }
 
     targetProjectPath = ":app"

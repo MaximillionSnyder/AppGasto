@@ -1,5 +1,6 @@
 package com.example.appgasto.di
 
+import com.example.appgasto.BuildConfig
 import com.example.appgasto.data.currency.ExchangeRateApi
 import dagger.Module
 import dagger.Provides
@@ -20,11 +21,13 @@ object CurrencyModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor().apply {
+        val builder = OkHttpClient.Builder()
+        if (BuildConfig.DEBUG) {
+            builder.addInterceptor(HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BASIC
             })
-            .build()
+        }
+        return builder.build()
     }
 
     @Provides
