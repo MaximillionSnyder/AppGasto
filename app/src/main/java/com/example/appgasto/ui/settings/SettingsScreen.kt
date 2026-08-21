@@ -465,7 +465,7 @@ fun SettingsScreen(
                                 }
                             } else {
                                 Text(
-                                    text = release.body?.take(500) ?: stringResource(R.string.update_no_changelog),
+                                    text = release.changelog?.take(500) ?: stringResource(R.string.update_no_changelog),
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             }

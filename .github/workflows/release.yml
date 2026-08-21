@@ -38,9 +38,9 @@ jobs:
           mkdir -p keystore
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > keystore/appgasto.jks
 
-      - name: Build Release APK
+      - name: Build Release APK (GitHub flavor)
         run: |
-          ./gradlew assembleRelease \
+          ./gradlew assembleGithubRelease \
             -PversionName=${GITHUB_REF_NAME#v} \
             -PAPPGASTO_STORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }} \
             -PAPPGASTO_KEY_ALIAS=${{ secrets.KEY_ALIAS }} \
@@ -53,5 +53,5 @@ jobs:
           tag_name: ${{ github.ref_name }}
           generate_release_notes: true
           files: |
-            app/build/outputs/apk/release/*.apk
+            app/build/outputs/apk/github/release/*.apk
           fail_on_unmatched_files: true

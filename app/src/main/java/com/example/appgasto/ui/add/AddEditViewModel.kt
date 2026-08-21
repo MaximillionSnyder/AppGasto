@@ -12,6 +12,7 @@ import com.example.appgasto.data.ocr.ReceiptOcrService
 import com.example.appgasto.data.repository.ExpenseRepository
 import com.example.appgasto.data.repository.PreferencesRepository
 import com.example.appgasto.domain.model.Currency
+import com.example.appgasto.security.TamperResponse
 import com.example.appgasto.widget.ExpenseWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -52,7 +53,8 @@ class AddEditViewModel @Inject constructor(
     private val expenseRepository: ExpenseRepository,
     private val exchangeRateRepository: ExchangeRateRepository,
     private val receiptOcrService: ReceiptOcrService,
-    private val preferencesRepository: PreferencesRepository
+    private val preferencesRepository: PreferencesRepository,
+    private val tamperResponse: TamperResponse
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddEditUiState())
@@ -120,6 +122,13 @@ class AddEditViewModel @Inject constructor(
 
     fun handleScanResult(imageUri: Uri?) {
         if (imageUri == null) return
+        if (tamperResponse.degraded.value) {
+            _uiState.value = _uiState.value.copy(
+                isScanning = false,
+                error = context.getString(R.string.scan_error)
+            )
+            return
+        }
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isScanning = true, error = null)
             try {

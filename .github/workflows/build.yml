@@ -36,9 +36,9 @@ jobs:
           mkdir -p keystore
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > keystore/appgasto.jks
 
-      - name: Build Debug APK
+      - name: Build Debug APKs
         run: |
-          ./gradlew assembleDebug \
+          ./gradlew assembleGithubDebug assemblePlayDebug \
             -PAPPGASTO_STORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }} \
             -PAPPGASTO_KEY_ALIAS=${{ secrets.KEY_ALIAS }} \
             -PAPPGASTO_KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}
@@ -47,12 +47,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          path: app/build/outputs/apk/github/debug/*.apk
           if-no-files-found: error
 
-      - name: Build Release APK
+      - name: Build Release APK (GitHub flavor)
         run: |
-          ./gradlew assembleRelease \
+          ./gradlew assembleGithubRelease \
             -PAPPGASTO_STORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }} \
             -PAPPGASTO_KEY_ALIAS=${{ secrets.KEY_ALIAS }} \
             -PAPPGASTO_KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}
@@ -61,5 +61,19 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
-          path: app/build/outputs/apk/release/*.apk
+          path: app/build/outputs/apk/github/release/*.apk
+          if-no-files-found: error
+
+      - name: Build Play Bundle (AAB)
+        run: |
+          ./gradlew bundlePlayRelease \
+            -PAPPGASTO_STORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }} \
+            -PAPPGASTO_KEY_ALIAS=${{ secrets.KEY_ALIAS }} \
+            -PAPPGASTO_KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}
+
+      - name: Upload Play AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: play-aab
+          path: app/build/outputs/bundle/playRelease/*.aab
           if-no-files-found: error
