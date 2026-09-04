@@ -3,6 +3,7 @@
 > Alcance acordado: 1 producto `inapp` no-consumible `pro_unlock` (~$3.99 USD base).
 > Decisiones cerradas: CSV → Pro, Matrix/HIGH_CONTRAST → gratis siempre, updater GitHub se elimina en track Play (conflicto política self-update).
 > Cuenta Play: aún no creada → usar Billing Library + DataStore `is_pro`, IDs reales al publicar.
+> Refinado sep 2026: PBL 9.1.0 (snippets y API), `applicationId` fijado a `com.appgasto.app`, requery en `onResume`, keeps R8 de billing opcionales.
 
 ---
 
@@ -57,12 +58,15 @@ ui/settings/
   ProSettingsRow.kt     // fila "AppGasto Pro" con badge PRO / Comprado (integrada en SettingsScreen)
 ```
 
-Flujo canónico PBL 8:
+Flujo canónico PBL 9 (refinado sep 2026 — `enablePendingPurchases()` sin args fue eliminado en PBL 9):
 
 ```kotlin
-BillingClient.newBuilder(ctx).enablePendingPurchases().build()
+BillingClient.newBuilder(ctx)
+  .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
+  .enableAutoServiceReconnection()
+  .build()
   → startConnection(BillingClientStateListener)
-  → queryPurchasesAsync(QueryPurchasesParams(INAPP))
+  → queryPurchasesAsync(QueryPurchasesParams(INAPP))   // en PBL 9 no lleva skuType string
   → isPro = purchases.any { it.purchaseState == PURCHASED && (it.isAcknowledged || acknowledge()) }
   → launchBillingFlow(activity, BillingFlowParams(productDetails))
   → onPurchasesUpdated → acknowledgePurchase() → prefs.setPro(true)
@@ -70,6 +74,7 @@ BillingClient.newBuilder(ctx).enablePendingPurchases().build()
 
 Sin backend: `acknowledge` obligatorio en <3 días o Google reembolsa solo.
 Fuente de verdad: `Play queryPurchasesAsync()` en cada arranque + espejo `is_pro` en DataStore para offline.
+Además: **re-query en `MainActivity.onResume()`** para detectar compras `PENDING → PURCHASED` (pagos en efectivo — relevante LATAM).
 
 ---
 
@@ -77,9 +82,9 @@ Fuente de verdad: `Play queryPurchasesAsync()` en cada arranque + espejo `is_pro
 
 ### Fase 0 — Pre-Play (0.5 día, bloqueante)
 
-1. Cambiar `applicationId` en `app/build.gradle.kts:40` de `com.example.appgasto` → ej. `com.appgasto.app`. Sin esto no se pueden crear productos.
+1. Cambiar `applicationId` en `app/build.gradle.kts:40` de `com.example.appgasto` → **`com.appgasto.app`** (decisión fijada sep 2026; irreversible tras publicar). Sin esto no se pueden crear productos.
 2. Play Console: cuenta dev ($25 único) + perfil merchant + app nueva + producto `pro_unlock` inapp no-consumible activo.
-3. `app/proguard-rules.pro`: agregar `-keep class com.android.billingclient.**`.
+3. `app/proguard-rules.pro`: `-keep class com.android.billingclient.**` **opcional** (preventivo). billing-ktx ya incluye consumer rules propias; solo dejarla si `bundleRelease` falla al ofuscar.
 
 ### Fase 1 — Persistencia Pro (0.5 día)
 
@@ -94,13 +99,14 @@ Helper: `isProEffective(prefs) = prefs.isPro || now < prefs.advancedGraceUntil`.
 
 | Archivo | Cambio |
 |---|---|
-| `gradle/libs.versions.toml` | `billingKtx = "8.0.0"` + `billing-ktx = { group = "com.android.billingclient", name = "billing-ktx" }` |
+| `gradle/libs.versions.toml` | `billingKtx = "9.1.0"` + `billing-ktx = { group = "com.android.billingclient", name = "billing-ktx" }` |
 | `app/build.gradle.kts:104` | `implementation(libs.billing.ktx)` |
 | **nuevo** `billing/BillingConfig.kt` | `const val PRODUCT_ID = "pro_unlock"` |
-| **nuevo** `billing/BillingManager.kt` | `@Singleton @Inject`, `StateFlow<BillingState(isPro, ProductDetails?)`, `connectAndQuery()`, `launchProPurchase(activity)`, `restore()` (= `queryPro()`), manejo `PENDING`, `USER_CANCELED`, `ITEM_ALREADY_OWNED` |
+| **nuevo** `billing/BillingManager.kt` | `@Singleton @Inject`, `StateFlow<BillingState(isPro, ProductDetails?)`, `connectAndQuery()`, `requery()` (idempotente, llamar también desde `onResume`), `launchProPurchase(activity)`, `restore()` (= `queryPro()`), manejo `PENDING`, `USER_CANCELED`, `ITEM_ALREADY_OWNED` |
 | **nuevo** `di/BillingModule.kt` | provee `BillingClient` singleton |
 | **nuevo** `billing/BillingViewModel.kt` | expone `isPro`, `priceText`, `launch/restore` para Compose |
 | `AppGastoApplication.kt:26` | `applicationScope.launch { billingManager.connectAndQuery() }` antes de cualquier gating |
+| `MainActivity.kt` | en `onResume()`: `billingManager.requery()` — captura compras `PENDING → PURCHASED` ocurridas con la app cerrada |
 
 ### Fase 3 — Paywall UI (1 día)
 
@@ -113,8 +119,8 @@ Helper: `isProEffective(prefs) = prefs.isPro || now < prefs.advancedGraceUntil`.
 
 ### Fase 4 — Gating (1 día)
 
-1. **Presupuesto avanzado:** `SettingsScreen.kt:289 onAdvancedBudgetToggle` → si `!isProEffective` abre paywall en vez de activar. `MainPagerScreen.kt:41 pageCount` usa `advancedBudgetEnabled && isProEffective`. `AdvancedBudgetScreen.kt:51` muestra `ProLockedPlaceholder` si entra por deep-link.
-2. **Scan cuota:** `AddEditViewModel.handleScanResult():121` → `if (!isPro && !prefs.tryConsumeScanSlot()) { error = scan_limit_pro; return }`. `AddEditScreen.kt:193` botón muestra `"Escanear (3/10)"` y abre paywall al agotar.
+1. **Presupuesto avanzado:** `SettingsScreen.kt:781 onAdvancedBudgetToggle` (drift sep 2026: antes `:289`) → si `!isProEffective` abre paywall en vez de activar. `MainPagerScreen.kt:41 pageCount` + `:55 showExtraTab` usan `advancedBudgetEnabled && isProEffective`. `AdvancedBudgetScreen.kt:51` muestra `ProLockedPlaceholder` si entra por deep-link.
+2. **Scan cuota (Free = 10/mes, fijado sep 2026):** `AddEditViewModel.handleScanResult():121` → `if (!isPro && !prefs.tryConsumeScanSlot()) { error = scan_limit_pro; return }`. `AddEditScreen.kt:193` botón muestra `"Escanear (3/10)"` y abre paywall al agotar.
 3. **CSV:** `SettingsScreen.kt:323 onCsvExportClick` → si `!isPro` paywall.
 4. **Temas:** sin cambios (Matrix/HC gratis por decisión).
 
@@ -135,6 +141,8 @@ Motivo: `REQUEST_INSTALL_PACKAGES` + descarga APK vía `FileProvider` viola pol�
 - `app/src/main/AndroidManifest.xml:7` quitar `REQUEST_INSTALL_PACKAGES`, `:9-13` quitar `<queries> INSTALL_PACKAGE`. **Mantener** `FileProvider:63-71` + `res/xml/file_paths.xml` (se reutiliza para compartir fotos de recibos Pro).
 - `.github/workflows/release.yml:41-56` — ya no `assembleRelease APK + softprops/action-gh-release`. Cambiar a `bundleRelease` + subida a `internal testing` (o archivar si releases solo desde Play Console). `build.yml` sin cambios.
 
+> **Tradeoff documentado (no bloquea):** con `bundleRelease` ya no hay APKs en GitHub Releases para usuarios sideload. A futuro, un flavor `play`/`github` (solo este último conserva updater) permitiría convivir ambas distribuciones; descartado para v1 (ver Alternativas).
+
 ### Fase 6 — Verificación
 
 ```bash
@@ -146,6 +154,7 @@ Checklist manual:
 
 - [ ] Compra test con tester de licencia (tarjeta `Se aprueba siempre`) otorga Pro y persiste tras reinicio
 - [ ] `ITEM_ALREADY_OWNED` → Restaurar otorga Pro sin cobrar de nuevo
+- [ ] PENDING → PURCHASED: compra aprobada fuera de la app se refleja al volver (requery en `onResume`)
 - [ ] Modo avión: `isPro` cacheado en DataStore sigue desbloqueando
 - [ ] R8 release: Billing no crashea (regla keep)
 - [ ] Scan free: 10/10 → 11° abre paywall, al cambiar de mes resetea a 0

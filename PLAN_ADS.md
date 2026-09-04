@@ -4,6 +4,12 @@
 > Alcance acordado: banner adaptativo en las 4 pantallas del pager + rewarded opt-in con 2 recompensas.
 > Cuenta AdMob: aún no creada → se usan IDs de prueba oficiales + constantes centralizadas.
 
+> **⚠️ NOTA (sep 2026, ver `PLAN_PRO.md`):** este plan quedó **postergado** en favor del pago único Pro.
+> La recompensa rewarded "tema Matrix 24 h" (+ su migración de 30 días, sección 1 y Fases 4-5) quedó **descartada**:
+> Matrix/HIGH_CONTRAST permanecen **gratis siempre** por decisión de `PLAN_PRO.md`. Si este plan se retoma,
+> la rewarded solo aplicaría para "sin banner 24 h" y habría que resolver la convivencia con el gating Pro
+> (features free vs desbloqueo por anuncio).
+
 ---
 
 ## 1) Resumen y decisiones
