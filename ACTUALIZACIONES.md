@@ -10,8 +10,8 @@
 |-----------|--------|----------------|---------|:------:|
 | Gradle | 8.11.1 | 8.14.5 | `gradle/wrapper/gradle-wrapper.properties` | `[ ]` |
 | AGP | 8.7.3 | 8.13.2 | `gradle/libs.versions.toml` | `[ ]` |
-| Kotlin | 2.1.0 | 2.4.10 | `gradle/libs.versions.toml` | `[ ]` |
-| KSP | 2.1.0-1.0.29 | (emparejar con Kotlin) | `gradle/libs.versions.toml` | `[ ]` |
+| Kotlin | 2.2.0 | 2.4.10 | `gradle/libs.versions.toml` | `[x]` sep 2026 (para billing-ktx 9.1.0) |
+| KSP | 2.2.0-2.0.2 | (emparejar con Kotlin) | `gradle/libs.versions.toml` | `[x]` sep 2026 |
 | Compose BOM | 2024.12.01 | Buscar 2025.x / 2026.x | `gradle/libs.versions.toml` | `[ ]` |
 
 > **Nota Gradle:** 9.6.1 ya existe, pero AGP 8.13.2 requiere Gradle 8.x. Saltar a Gradle 9.x requiere AGP 9.x (aún en alpha). Mejor quedarse en 8.14.5 por ahora.
@@ -60,7 +60,7 @@ navigationCompose = "2.9.2"   # verificar última estable
 
 | Componente | Actual | Última estable | Estado |
 |-----------|--------|----------------|:------:|
-| Hilt | 2.54 | 2.60.1 | `[ ]` |
+| Hilt | 2.60.1 | 2.60.1 | `[x]` sep 2026 (requerido para Kotlin 2.2) |
 | JUnit | 4.13.2 | 4.13.2 | ✅ Actual |
 | Espresso | 3.6.1 | 3.6.1 | ✅ Actual |
 | AppCompat | 1.7.0 | 1.7.0 | ✅ Actual |
