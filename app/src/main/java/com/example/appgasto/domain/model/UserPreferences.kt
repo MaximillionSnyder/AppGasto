@@ -10,5 +10,12 @@ data class UserPreferences(
     val baseCurrency: Currency = Currency.PEN,
     val fontScale: FontScale = FontScale.NORMAL,
     val onboardingCompleted: Boolean = false,
-    val advancedBudgetEnabled: Boolean = false
+    val advancedBudgetEnabled: Boolean = false,
+    val isPro: Boolean = false,
+    val scanCountMonth: String = "",
+    val scanCount: Int = 0,
+    val advancedGraceUntil: Long = 0L
 )
+
+fun UserPreferences.isProEffective(now: Long = System.currentTimeMillis()): Boolean =
+    isPro || now < advancedGraceUntil

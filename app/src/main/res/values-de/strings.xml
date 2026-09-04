@@ -171,4 +171,22 @@
     <string name="later">Später</string>
     <string name="update_error">Update-Fehler: %s</string>
     <string name="update_no_changelog">Keine Versionshinweise</string>
+    <!-- AppGasto Pro -->
+    <string name="pro_title">AppGasto Pro</string>
+    <string name="pro_desc">Alles mit einer einzigen Zahlung freischalten</string>
+    <string name="pro_benefit_advanced">Erweiterte Kategorien-Budgets</string>
+    <string name="pro_benefit_scan">Unbegrenztes Beleg-Scannen</string>
+    <string name="pro_benefit_csv">Unbegrenzter CSV-Export</string>
+    <string name="pro_benefit_backup">Tägliches Auto-Backup + Belegfotos (bald verfügbar)</string>
+    <string name="pro_benefit_support">Unterstütze die Entwicklung der App</string>
+    <string name="pro_buy">Kaufen</string>
+    <string name="pro_restore">Kauf wiederherstellen</string>
+    <string name="pro_owned">Du bist Pro</string>
+    <string name="pro_badge">PRO</string>
+    <string name="pro_owned_badge">Gekauft</string>
+    <string name="pro_thanks">Danke, dass du AppGasto unterstützt! Alle Pro-Funktionen sind aktiv.</string>
+    <string name="pro_error">Der Kauf konnte nicht abgeschlossen werden. Bitte erneut versuchen.</string>
+    <string name="pro_grace">Erweitertes Budget läuft in einer Gnadenfrist ab (%1$d Tage übrig). Hol dir Pro, um es zu behalten.</string>
+    <string name="pro_scan_limit">Du hast das Monatslimit von %1$d Scans erreicht. Mit Pro scannst du unbegrenzt.</string>
+    <string name="pro_scan_count">Scannen (%1$d/%2$d)</string>
 </resources>

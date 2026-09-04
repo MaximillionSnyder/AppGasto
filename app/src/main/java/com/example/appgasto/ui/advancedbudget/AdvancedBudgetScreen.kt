@@ -18,6 +18,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -51,9 +52,41 @@ import com.example.appgasto.ui.theme.Dimens
 fun AdvancedBudgetScreen(
     isDark: Boolean,
     isMatrix: Boolean = false,
+    isProUnlocked: Boolean = true,
     viewModel: AdvancedBudgetViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
+
+    if (!isProUnlocked) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = Dimens.spaceLg),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                imageVector = Icons.Default.WorkspacePremium,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(56.dp)
+            )
+            Spacer(modifier = Modifier.height(Dimens.spaceMd))
+            Text(
+                text = stringResource(R.string.pro_title),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(Dimens.spaceXs))
+            Text(
+                text = stringResource(R.string.pro_desc),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        return
+    }
 
     Column(
         modifier = Modifier

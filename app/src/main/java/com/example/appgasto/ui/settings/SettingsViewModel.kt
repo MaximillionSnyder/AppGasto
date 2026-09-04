@@ -9,6 +9,7 @@ import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appgasto.BuildConfig
+import com.example.appgasto.billing.BillingManager
 import com.example.appgasto.data.backup.BackupManager
 import com.example.appgasto.data.backup.ExpenseCsvExporter
 import com.example.appgasto.data.currency.ExchangeRateRepository
@@ -58,6 +59,9 @@ data class SettingsUiState(
     val isRefreshingRates: Boolean = false,
     val baseCurrency: Currency = Currency.PEN,
     val fontScale: FontScale = FontScale.NORMAL,
+    val isPro: Boolean = false,
+    val advancedBudgetUnlocked: Boolean = false,
+    val proPriceText: String? = null,
     val isCheckingUpdate: Boolean = false,
     val isDownloading: Boolean = false,
     val updateRelease: GitHubRelease? = null
@@ -69,6 +73,7 @@ class SettingsViewModel @Inject constructor(
     private val backupManager: BackupManager,
     private val exchangeRateRepository: ExchangeRateRepository,
     private val expenseRepository: ExpenseRepository,
+    private val billingManager: BillingManager,
     private val okHttpClient: OkHttpClient,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
@@ -86,23 +91,31 @@ class SettingsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            preferencesRepository.preferencesFlow.collect { prefs ->
-                val rateToBase = if (prefs.baseCurrency == Currency.PEN) 1.0
-                    else exchangeRateRepository.getRateToPen(prefs.baseCurrency.code) ?: 1.0
-                val monthTotal = expenseRepository.getCurrentMonthTotal() * rateToBase
-                _uiState.value = SettingsUiState(
-                    themeMode = prefs.themeMode,
-                    language = prefs.language,
-                    monthlyBudget = prefs.monthlyBudget,
-                    budgetEnabled = prefs.budgetEnabled,
-                    advancedBudgetEnabled = prefs.advancedBudgetEnabled,
-                    budgetChartStyle = prefs.budgetChartStyle,
-                    monthlyExpenseTotal = monthTotal,
-                    ratesUpdatedAt = prefs.ratesUpdatedAt,
-                    baseCurrency = prefs.baseCurrency,
-                    fontScale = prefs.fontScale
-                )
-            }
+            kotlinx.coroutines.flow.combine(
+                preferencesRepository.preferencesFlow,
+                billingManager.state
+            ) { prefs, billing -> prefs to billing }
+                .collect { (prefs, billing) ->
+                    val rateToBase = if (prefs.baseCurrency == Currency.PEN) 1.0
+                        else exchangeRateRepository.getRateToPen(prefs.baseCurrency.code) ?: 1.0
+                    val monthTotal = expenseRepository.getCurrentMonthTotal() * rateToBase
+                    _uiState.value = SettingsUiState(
+                        themeMode = prefs.themeMode,
+                        language = prefs.language,
+                        monthlyBudget = prefs.monthlyBudget,
+                        budgetEnabled = prefs.budgetEnabled,
+                        advancedBudgetEnabled = prefs.advancedBudgetEnabled,
+                        budgetChartStyle = prefs.budgetChartStyle,
+                        monthlyExpenseTotal = monthTotal,
+                        ratesUpdatedAt = prefs.ratesUpdatedAt,
+                        baseCurrency = prefs.baseCurrency,
+                        fontScale = prefs.fontScale,
+                        isPro = prefs.isPro || billing.isPro,
+                        advancedBudgetUnlocked = prefs.advancedBudgetEnabled &&
+                            (prefs.isPro || billing.isPro || System.currentTimeMillis() < prefs.advancedGraceUntil),
+                        proPriceText = billing.priceText
+                    )
+                }
         }
     }
 

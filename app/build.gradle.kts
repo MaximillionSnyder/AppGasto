@@ -37,7 +37,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.appgasto"
+        applicationId = "com.appgasto.app"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
@@ -140,6 +140,7 @@ dependencies {
     implementation(libs.okhttp.logging)
     implementation(libs.mlkit.document.scanner)
     implementation(libs.mlkit.text.recognition)
+    implementation(libs.billing.ktx)
     implementation(libs.androidx.appcompat)
 
     coreLibraryDesugaring(libs.desugar.jdk.libs)

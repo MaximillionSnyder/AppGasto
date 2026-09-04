@@ -228,4 +228,22 @@
     <string name="later">Later</string>
     <string name="update_error">Update error: %s</string>
     <string name="update_no_changelog">No changelog available</string>
+    <!-- AppGasto Pro -->
+    <string name="pro_title">AppGasto Pro</string>
+    <string name="pro_desc">Unlock everything with a single payment</string>
+    <string name="pro_benefit_advanced">Advanced category budgets</string>
+    <string name="pro_benefit_scan">Unlimited receipt scanning</string>
+    <string name="pro_benefit_csv">Unlimited CSV export</string>
+    <string name="pro_benefit_backup">Daily auto-backup + receipt photos (coming soon)</string>
+    <string name="pro_benefit_support">Support the app's development</string>
+    <string name="pro_buy">Buy</string>
+    <string name="pro_restore">Restore purchase</string>
+    <string name="pro_owned">You are Pro</string>
+    <string name="pro_badge">PRO</string>
+    <string name="pro_owned_badge">Owned</string>
+    <string name="pro_thanks">Thanks for supporting AppGasto! All Pro features are active.</string>
+    <string name="pro_error">Purchase could not be completed. Please try again.</string>
+    <string name="pro_grace">Advanced budget is in a grace period (%1$d days left). Get Pro to keep it.</string>
+    <string name="pro_scan_limit">You reached the monthly limit of %1$d scans. Upgrade to Pro for unlimited scans.</string>
+    <string name="pro_scan_count">Scan (%1$d/%2$d)</string>
 </resources>

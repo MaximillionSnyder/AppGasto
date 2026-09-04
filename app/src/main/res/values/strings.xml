@@ -236,4 +236,22 @@
     <string name="later">Más tarde</string>
     <string name="update_error">Error de actualización: %s</string>
     <string name="update_no_changelog">Sin notas de versión</string>
+    <!-- AppGasto Pro -->
+    <string name="pro_title">AppGasto Pro</string>
+    <string name="pro_desc">Desbloquea todo con un solo pago</string>
+    <string name="pro_benefit_advanced">Presupuesto avanzado por categorías</string>
+    <string name="pro_benefit_scan">Escaneo ilimitado de recibos</string>
+    <string name="pro_benefit_csv">Exportación a CSV ilimitada</string>
+    <string name="pro_benefit_backup">Auto-backup diario + fotos de recibos (próximamente)</string>
+    <string name="pro_benefit_support">Apoya el desarrollo de la app</string>
+    <string name="pro_buy">Comprar</string>
+    <string name="pro_restore">Restaurar compra</string>
+    <string name="pro_owned">Ya eres Pro</string>
+    <string name="pro_badge">PRO</string>
+    <string name="pro_owned_badge">Comprado</string>
+    <string name="pro_thanks">¡Gracias por apoyar AppGasto! Todas las funciones Pro están activas.</string>
+    <string name="pro_error">No se pudo completar la compra. Intenta de nuevo.</string>
+    <string name="pro_grace">Presupuesto avanzado en período de gracia (%1$d días restantes). Activa Pro para mantenerlo.</string>
+    <string name="pro_scan_limit">Alcanzaste el límite de %1$d escaneos del mes. Pásate a Pro para escaneos ilimitados.</string>
+    <string name="pro_scan_count">Escanear (%1$d/%2$d)</string>
 </resources>

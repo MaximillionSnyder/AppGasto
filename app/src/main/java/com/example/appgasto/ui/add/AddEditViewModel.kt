@@ -43,6 +43,8 @@ data class AddEditUiState(
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
     val isScanning: Boolean = false,
+    val isPro: Boolean = false,
+    val scanCount: Int = 0,
     val error: String? = null
 )
 
@@ -63,9 +65,13 @@ class AddEditViewModel @Inject constructor(
             val categories = expenseRepository.getAllCategories().first()
             val prefs = preferencesRepository.preferencesFlow.first()
             val baseCurrency = prefs.baseCurrency.code
+            val currentMonth = java.time.YearMonth.now().toString()
+            val scanCount = if (prefs.scanCountMonth == currentMonth) prefs.scanCount else 0
             _uiState.value = _uiState.value.copy(
                 categories = categories,
                 currency = baseCurrency,
+                isPro = prefs.isPro,
+                scanCount = scanCount,
                 isLoading = false
             )
 
@@ -121,6 +127,16 @@ class AddEditViewModel @Inject constructor(
     fun handleScanResult(imageUri: Uri?) {
         if (imageUri == null) return
         viewModelScope.launch {
+            val prefs = preferencesRepository.preferencesFlow.first()
+            if (!prefs.isPro && !preferencesRepository.tryConsumeScanSlot()) {
+                _uiState.value = _uiState.value.copy(
+                    error = context.getString(
+                        R.string.pro_scan_limit,
+                        PreferencesRepository.SCAN_MONTHLY_LIMIT
+                    )
+                )
+                return@launch
+            }
             _uiState.value = _uiState.value.copy(isScanning = true, error = null)
             try {
                 val data = receiptOcrService.parseReceiptImage(imageUri)
@@ -131,11 +147,15 @@ class AddEditViewModel @Inject constructor(
                 }
                 val scannedCurrency = data.currencyCode
                     ?.takeIf { it in Currency.supportedCodes() }
+                val newPrefs = preferencesRepository.preferencesFlow.first()
+                val currentMonth = java.time.YearMonth.now().toString()
                 _uiState.value = current.copy(
                     amount = scannedAmount ?: current.amount,
                     currency = scannedCurrency ?: current.currency,
                     date = data.date ?: current.date,
                     note = data.merchant ?: current.note,
+                    isPro = prefs.isPro,
+                    scanCount = if (newPrefs.scanCountMonth == currentMonth) newPrefs.scanCount else current.scanCount + 1,
                     isScanning = false
                 )
             } catch (e: Exception) {

@@ -66,6 +66,7 @@ navigationCompose = "2.9.2"   # verificar última estable
 | AppCompat | 1.7.0 | 1.7.0 | ✅ Actual |
 | MLKit Doc Scanner | 16.0.0 | 16.0.0 | ✅ Actual |
 | MLKit Text Recognition | 16.0.1 | 16.0.1 | ✅ Actual |
+| Play Billing (billing-ktx) | 9.1.0 (nueva, sep 2026) | 9.1.0 | ✅ Actual |
 
 ### Ya están actualizadas (sin cambios)
 

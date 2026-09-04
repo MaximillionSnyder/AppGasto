@@ -40,6 +40,7 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.TableChart
+import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -85,6 +86,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.appgasto.BuildConfig
 import com.example.appgasto.R
+import com.example.appgasto.billing.BillingViewModel
 import com.example.appgasto.ui.theme.Dimens
 import com.example.appgasto.ui.theme.GradientEnd
 import com.example.appgasto.ui.theme.GradientStart
@@ -117,7 +119,10 @@ fun SettingsScreen(
     var showResetDialog by remember { mutableStateOf(false) }
     var showBaseCurrencyDialog by remember { mutableStateOf(false) }
     var showFontScaleDialog by remember { mutableStateOf(false) }
+    var showProDialog by remember { mutableStateOf(false) }
     var showUpdateDialog by remember { mutableStateOf(false) }
+    val billingViewModel: BillingViewModel = hiltViewModel()
+    val billingState by billingViewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.updateEvent.collect { event ->
@@ -262,6 +267,13 @@ fun SettingsScreen(
         ) {
             Spacer(modifier = Modifier.height(Dimens.spaceSm))
 
+            ProSettingsSection(
+                isPro = state.isPro,
+                onProClick = { showProDialog = true }
+            )
+
+            Spacer(modifier = Modifier.height(Dimens.spaceMd))
+
             AppearanceSettingsSection(
                 themeMode = state.themeMode,
                 fontScale = state.fontScale,
@@ -287,7 +299,11 @@ fun SettingsScreen(
                     }
                 },
                 onAdvancedBudgetToggle = { enabled ->
-                    viewModel.setAdvancedBudgetEnabled(enabled)
+                    if (enabled && !state.isPro && !state.advancedBudgetUnlocked) {
+                        showProDialog = true
+                    } else {
+                        viewModel.setAdvancedBudgetEnabled(enabled)
+                    }
                 },
                 onBudgetClick = { showBudgetDialog = true },
                 onBudgetChartStyleClick = { showBudgetChartStyleDialog = true }
@@ -321,8 +337,12 @@ fun SettingsScreen(
                 },
                 onImportClick = { importLauncher.launch("*/*") },
                 onCsvExportClick = {
-                    val dateStr = java.time.LocalDateTime.now().format(backupDateFormatter)
-                    csvExportLauncher.launch("appgasto_$dateStr.csv")
+                    if (!state.isPro) {
+                        showProDialog = true
+                    } else {
+                        val dateStr = java.time.LocalDateTime.now().format(backupDateFormatter)
+                        csvExportLauncher.launch("appgasto_$dateStr.csv")
+                    }
                 },
                 onResetClick = { showResetDialog = true }
             )
@@ -393,6 +413,19 @@ fun SettingsScreen(
                     showBudgetChartStyleDialog = false
                 },
                 onDismiss = { showBudgetChartStyleDialog = false }
+            )
+        }
+
+        if (showProDialog) {
+            ProPaywallDialog(
+                isPro = state.isPro,
+                priceText = billingState.priceText,
+                connecting = billingState.connecting,
+                purchaseInProgress = billingState.purchaseInProgress,
+                purchaseError = billingState.purchaseError,
+                onBuy = { activity -> billingViewModel.launchProPurchase(activity) },
+                onRestore = { billingViewModel.restore() },
+                onDismiss = { showProDialog = false }
             )
         }
 
@@ -1064,6 +1097,26 @@ private fun InfoSettingsSection(
             subtitle = if (isCheckingUpdate) stringResource(R.string.checking_update) else stringResource(R.string.current_version, BuildConfig.VERSION_NAME),
             onClick = onCheckUpdateClick,
             showArrow = true
+        )
+    }
+}
+
+@Composable
+private fun ProSettingsSection(
+    isPro: Boolean,
+    onProClick: () -> Unit
+) {
+    SettingsSectionHeader(stringResource(R.string.pro_title))
+
+    SettingsSection(
+        title = stringResource(R.string.pro_title),
+        icon = Icons.Default.WorkspacePremium,
+        iconColor = MaterialTheme.colorScheme.primary,
+        initiallyExpanded = true
+    ) {
+        ProSettingsRow(
+            isPro = isPro,
+            onClick = onProClick
         )
     }
 }

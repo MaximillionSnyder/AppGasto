@@ -35,6 +35,7 @@ fun MainPagerScreen(
     isDark: Boolean,
     isMatrix: Boolean,
     advancedBudgetEnabled: Boolean = false,
+    advancedBudgetUnlocked: Boolean = true,
     onNavigateToAdd: () -> Unit,
     onNavigateToEdit: (Long) -> Unit
 ) {
@@ -105,7 +106,8 @@ fun MainPagerScreen(
                 )
                 4 -> AdvancedBudgetScreen(
                     isDark = isDark,
-                    isMatrix = isMatrix
+                    isMatrix = isMatrix,
+                    isProUnlocked = advancedBudgetUnlocked
                 )
             }
         }

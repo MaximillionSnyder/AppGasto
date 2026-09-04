@@ -11,9 +11,15 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.appgasto.R
+import com.example.appgasto.billing.BillingManager
 import com.example.appgasto.data.currency.ExchangeRateWorker
+import com.example.appgasto.data.repository.PreferencesRepository
 import com.example.appgasto.notifications.BudgetWorker
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -23,11 +29,23 @@ class AppGastoApplication : Application(), Configuration.Provider {
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
+    @Inject
+    lateinit var billingManager: BillingManager
+
+    @Inject
+    lateinit var preferencesRepository: PreferencesRepository
+
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
         scheduleBudgetCheck()
         scheduleExchangeRateRefresh()
+        applicationScope.launch {
+            preferencesRepository.migrateLegacyAdvancedUsers()
+            billingManager.connectAndQuery()
+        }
     }
 
     override val workManagerConfiguration: Configuration

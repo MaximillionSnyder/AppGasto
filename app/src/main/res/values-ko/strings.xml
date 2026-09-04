@@ -171,4 +171,22 @@
     <string name="later">나중에</string>
     <string name="update_error">업데이트 오류: %s</string>
     <string name="update_no_changelog">변경 내역 없음</string>
+    <!-- AppGasto Pro -->
+    <string name="pro_title">AppGasto Pro</string>
+    <string name="pro_desc">한 번의 결제로 모두 잠금 해제</string>
+    <string name="pro_benefit_advanced">카테고리별 상세 예산</string>
+    <string name="pro_benefit_scan">영수증 스캔 무제한</string>
+    <string name="pro_benefit_csv">CSV 내보내기 무제한</string>
+    <string name="pro_benefit_backup">매일 자동 백업 + 영수증 사진(곧 제공)</string>
+    <string name="pro_benefit_support">앱 개발 지원</string>
+    <string name="pro_buy">구매</string>
+    <string name="pro_restore">구매 복원</string>
+    <string name="pro_owned">Pro 사용자입니다</string>
+    <string name="pro_badge">PRO</string>
+    <string name="pro_owned_badge">구매됨</string>
+    <string name="pro_thanks">AppGasto를 지원해 주셔서 감사합니다! 모든 Pro 기능이 활성화되었습니다.</string>
+    <string name="pro_error">구매를 완료할 수 없습니다. 다시 시도해 주세요.</string>
+    <string name="pro_grace">상세 예산은 유예 기간 중입니다(%1$d일 남음). 유지하려면 Pro를 구매하세요.</string>
+    <string name="pro_scan_limit">월 스캔 한도 %1$d회에 도달했습니다. Pro로 업그레이드하면 무제한입니다.</string>
+    <string name="pro_scan_count">스캔 (%1$d/%2$d)</string>
 </resources>

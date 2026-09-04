@@ -171,4 +171,22 @@
     <string name="later">Qhipaman</string>
     <string name="update_error">Musuqyay pantasqa: %s</string>
     <string name="update_no_changelog">Manam cambiosqa qillqasqachu kachkan</string>
+    <!-- AppGasto Pro -->
+    <string name="pro_title">AppGasto Pro</string>
+    <string name="pro_desc">Huk laya qullqiywan tukuyta kichay</string>
+    <string name="pro_benefit_advanced">Rakinakapaq ñawpaq qullqa</string>
+    <string name="pro_benefit_scan">Manam sayk'ichu recibos qawachiy</string>
+    <string name="pro_benefit_csv">Manam sayk'ichu CSV apachiy</string>
+    <string name="pro_benefit_backup">Sapa p'unchaw backup + recibos fotokuna (qatiq hamman)</string>
+    <string name="pro_benefit_support">App ruwayta yanapay</string>
+    <string name="pro_buy">Rantiy</string>
+    <string name="pro_restore">Rantisqita kutichiy</string>
+    <string name="pro_owned">Ñan Pro kanki</string>
+    <string name="pro_badge">PRO</string>
+    <string name="pro_owned_badge">Rantisqa</string>
+    <string name="pro_thanks">¡AppGasto yanapaysqamankupaq gracias! Tukuy Pro ruwanakuna llamk'achkan.</string>
+    <string name="pro_error">Manam atikunchu rantisqa tukunchu. Watakunata ñawichiy.</string>
+    <string name="pro_grace">Ñawpaq qullqa gracia pachapin (wakin %1$d p'unchaw). Pro rantiy uyariqpaq.</string>
+    <string name="pro_scan_limit">Killapi %1$d qawachiy sayk'iychik chayamurqa. Pro rantiy manam sayk'iychu.</string>
+    <string name="pro_scan_count">Qawachiy (%1$d/%2$d)</string>
 </resources>

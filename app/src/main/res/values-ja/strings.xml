@@ -171,4 +171,22 @@
     <string name="later">後で</string>
     <string name="update_error">アップデートエラー: %s</string>
     <string name="update_no_changelog">変更履歴はありません</string>
+    <!-- AppGasto Pro -->
+    <string name="pro_title">AppGasto Pro</string>
+    <string name="pro_desc">1回の支払いですべてをアンロック</string>
+    <string name="pro_benefit_advanced">カテゴリ別の詳細予算</string>
+    <string name="pro_benefit_scan">レシートのスキャン無制限</string>
+    <string name="pro_benefit_csv">CSVエクスポート無制限</string>
+    <string name="pro_benefit_backup">毎日の自動バックアップ＋レシート写真（近日公開）</string>
+    <string name="pro_benefit_support">アプリの開発を応援</string>
+    <string name="pro_buy">購入</string>
+    <string name="pro_restore">購入を復元</string>
+    <string name="pro_owned">Proユーザーです</string>
+    <string name="pro_badge">PRO</string>
+    <string name="pro_owned_badge">購入済み</string>
+    <string name="pro_thanks">AppGastoをご支援いただきありがとうございます！Pro機能がすべて有効です。</string>
+    <string name="pro_error">購入を完了できませんでした。もう一度お試しください。</string>
+    <string name="pro_grace">詳細予算は猶予期間中です（残り%1$d日）。継続するにはProをご購入ください。</string>
+    <string name="pro_scan_limit">月間スキャン上限%1$d回に達しました。Proにアップグレードすると無制限になります。</string>
+    <string name="pro_scan_count">スキャン（%1$d/%2$d）</string>
 </resources>

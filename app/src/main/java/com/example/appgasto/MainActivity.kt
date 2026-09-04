@@ -14,6 +14,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
+import com.example.appgasto.billing.BillingManager
 import com.example.appgasto.data.repository.PreferencesRepository
 import com.example.appgasto.domain.model.FontScale
 import com.example.appgasto.domain.model.ThemeMode
@@ -30,6 +31,14 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var preferencesRepository: PreferencesRepository
 
+    @Inject
+    lateinit var billingManager: BillingManager
+
+    override fun onResume() {
+        super.onResume()
+        billingManager.requery()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -38,6 +47,7 @@ class MainActivity : AppCompatActivity() {
         setContent {
             val preferences by preferencesRepository.preferencesFlow
                 .collectAsState(initial = null)
+            val billingState by billingManager.state.collectAsState()
 
             val isDark = when (preferences?.themeMode) {
                 ThemeMode.LIGHT -> false
@@ -72,11 +82,15 @@ class MainActivity : AppCompatActivity() {
                             )
                         }
                         else -> {
+                            val isProEffective = prefs.isPro || billingState.isPro ||
+                                System.currentTimeMillis() < prefs.advancedGraceUntil
+                            val advancedBudgetVisible = prefs.advancedBudgetEnabled && isProEffective
                             AppNavigation(
                                 navController = navController,
                                 isDark = isDark,
                                 isMatrix = isMatrix,
-                                advancedBudgetEnabled = prefs?.advancedBudgetEnabled ?: false
+                                advancedBudgetEnabled = advancedBudgetVisible,
+                                advancedBudgetUnlocked = isProEffective
                             )
                         }
                     }

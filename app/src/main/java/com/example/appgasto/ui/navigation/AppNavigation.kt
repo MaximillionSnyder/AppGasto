@@ -21,7 +21,8 @@ fun AppNavigation(
     navController: NavHostController,
     isDark: Boolean,
     isMatrix: Boolean = false,
-    advancedBudgetEnabled: Boolean = false
+    advancedBudgetEnabled: Boolean = false,
+    advancedBudgetUnlocked: Boolean = true
 ) {
     NavHost(
         navController = navController,
@@ -32,6 +33,7 @@ fun AppNavigation(
                 isDark = isDark,
                 isMatrix = isMatrix,
                 advancedBudgetEnabled = advancedBudgetEnabled,
+                advancedBudgetUnlocked = advancedBudgetUnlocked,
                 onNavigateToAdd = { navController.navigate(Routes.addExpense()) },
                 onNavigateToEdit = { expenseId -> navController.navigate(Routes.addExpense(expenseId)) }
             )

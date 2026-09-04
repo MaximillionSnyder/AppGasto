@@ -70,8 +70,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.IntentSenderRequest
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.appgasto.R
+import com.example.appgasto.billing.BillingViewModel
+import com.example.appgasto.data.repository.PreferencesRepository
 import com.example.appgasto.domain.model.Currency
 import com.example.appgasto.ui.components.CategorySelector
+import com.example.appgasto.ui.settings.ProPaywallDialog
 import com.example.appgasto.ui.theme.GradientEnd
 import com.example.appgasto.ui.theme.GradientStart
 import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions
@@ -98,6 +101,9 @@ fun AddEditScreen(
     var noteExpanded by remember { mutableStateOf(false) }
     val amountFocusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
+    val billingViewModel: BillingViewModel = hiltViewModel()
+    val billingState by billingViewModel.state.collectAsState()
+    var showProDialog by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val scanLauncher = rememberLauncherForActivityResult(
@@ -192,6 +198,11 @@ fun AddEditScreen(
 
                 OutlinedButton(
                     onClick = {
+                        val isPro = state.isPro || billingState.isPro
+                        if (!isPro && state.scanCount >= PreferencesRepository.SCAN_MONTHLY_LIMIT) {
+                            showProDialog = true
+                            return@OutlinedButton
+                        }
                         val options = GmsDocumentScannerOptions.Builder()
                             .setGalleryImportAllowed(true)
                             .setResultFormats(GmsDocumentScannerOptions.RESULT_FORMAT_JPEG)
@@ -222,7 +233,10 @@ fun AddEditScreen(
                             contentDescription = null,
                             modifier = Modifier.padding(end = 8.dp)
                         )
-                        Text(stringResource(R.string.scan_receipt))
+                        Text(
+                            if (state.isPro || billingState.isPro) stringResource(R.string.scan_receipt)
+                            else stringResource(R.string.pro_scan_count, state.scanCount, PreferencesRepository.SCAN_MONTHLY_LIMIT)
+                        )
                     }
                 }
 
@@ -287,6 +301,19 @@ fun AddEditScreen(
                     ) {
                         DatePicker(state = datePickerState)
                     }
+                }
+
+                if (showProDialog) {
+                    ProPaywallDialog(
+                        isPro = state.isPro || billingState.isPro,
+                        priceText = billingState.priceText,
+                        connecting = billingState.connecting,
+                        purchaseInProgress = billingState.purchaseInProgress,
+                        purchaseError = billingState.purchaseError,
+                        onBuy = { activity -> billingViewModel.launchProPurchase(activity) },
+                        onRestore = { billingViewModel.restore() },
+                        onDismiss = { showProDialog = false }
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
