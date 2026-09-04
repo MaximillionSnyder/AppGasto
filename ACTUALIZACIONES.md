@@ -60,7 +60,7 @@ navigationCompose = "2.9.2"   # verificar última estable
 
 | Componente | Actual | Última estable | Estado |
 |-----------|--------|----------------|:------:|
-| Hilt | 2.60.1 | 2.60.1 | `[x]` sep 2026 (requerido para Kotlin 2.2) |
+| Hilt | 2.58 | 2.60.1 | `[x]` sep 2026 (2.59+ requiere AGP 9; requerido para Kotlin 2.2) |
 | JUnit | 4.13.2 | 4.13.2 | ✅ Actual |
 | Espresso | 3.6.1 | 3.6.1 | ✅ Actual |
 | AppCompat | 1.7.0 | 1.7.0 | ✅ Actual |
