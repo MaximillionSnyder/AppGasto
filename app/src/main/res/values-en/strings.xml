@@ -235,7 +235,7 @@
     <string name="pro_benefit_scan">Unlimited receipt scanning</string>
     <string name="pro_benefit_csv">Unlimited CSV export</string>
     <string name="pro_benefit_backup">Daily auto-backup + receipt photos (coming soon)</string>
-    <string name="pro_benefit_support">Support the app's development</string>
+    <string name="pro_benefit_support">Support the app\'s development</string>
     <string name="pro_buy">Buy</string>
     <string name="pro_restore">Restore purchase</string>
     <string name="pro_owned">You are Pro</string>

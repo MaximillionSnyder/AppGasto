@@ -178,14 +178,14 @@
     <string name="pro_benefit_scan">Scansione illimitata delle ricevute</string>
     <string name="pro_benefit_csv">Esportazione CSV illimitata</string>
     <string name="pro_benefit_backup">Backup automatico giornaliero + foto ricevute (in arrivo)</string>
-    <string name="pro_benefit_support">Supporta lo sviluppo dell'app</string>
+    <string name="pro_benefit_support">Supporta lo sviluppo dell\'app</string>
     <string name="pro_buy">Acquista</string>
     <string name="pro_restore">Ripristina acquisto</string>
     <string name="pro_owned">Sei già Pro</string>
     <string name="pro_badge">PRO</string>
     <string name="pro_owned_badge">Acquistato</string>
     <string name="pro_thanks">Grazie per supportare AppGasto! Tutte le funzioni Pro sono attive.</string>
-    <string name="pro_error">Impossibile completare l'acquisto. Riprova.</string>
+    <string name="pro_error">Impossibile completare l\'acquisto. Riprova.</string>
     <string name="pro_grace">Il budget avanzato è in periodo di grazia (%1$d giorni rimasti). Passa a Pro per tenerlo.</string>
     <string name="pro_scan_limit">Hai raggiunto il limite mensile di %1$d scansioni. Passa a Pro per scansioni illimitate.</string>
     <string name="pro_scan_count">Scansiona (%1$d/%2$d)</string>
