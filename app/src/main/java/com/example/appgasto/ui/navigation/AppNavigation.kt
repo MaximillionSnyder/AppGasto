@@ -11,6 +11,7 @@ import com.example.appgasto.ui.add.AddEditScreen
 object Routes {
     const val MAIN = "main"
     const val ADD = "add?expenseId={expenseId}"
+    const val RECEIPTS = "receipts"
 
     fun addExpense(expenseId: Long? = null) =
         if (expenseId != null) "add?expenseId=$expenseId" else "add"
@@ -35,7 +36,14 @@ fun AppNavigation(
                 advancedBudgetEnabled = advancedBudgetEnabled,
                 advancedBudgetUnlocked = advancedBudgetUnlocked,
                 onNavigateToAdd = { navController.navigate(Routes.addExpense()) },
-                onNavigateToEdit = { expenseId -> navController.navigate(Routes.addExpense(expenseId)) }
+                onNavigateToEdit = { expenseId -> navController.navigate(Routes.addExpense(expenseId)) },
+                onNavigateToReceipts = { navController.navigate(Routes.RECEIPTS) }
+            )
+        }
+
+        composable(Routes.RECEIPTS) {
+            com.example.appgasto.ui.receipts.ReceiptsScreen(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
 

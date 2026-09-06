@@ -234,7 +234,7 @@
     <string name="pro_benefit_advanced">Advanced category budgets</string>
     <string name="pro_benefit_scan">Unlimited receipt scanning</string>
     <string name="pro_benefit_csv">Unlimited CSV export</string>
-    <string name="pro_benefit_backup">Daily auto-backup + receipt photos (coming soon)</string>
+    <string name="pro_benefit_backup">Daily auto-backup + receipt photos</string>
     <string name="pro_benefit_support">Support the app\'s development</string>
     <string name="pro_buy">Buy</string>
     <string name="pro_restore">Restore purchase</string>
@@ -246,4 +246,13 @@
     <string name="pro_grace">Advanced budget is in a grace period (%1$d days left). Get Pro to keep it.</string>
     <string name="pro_scan_limit">You reached the monthly limit of %1$d scans. Upgrade to Pro for unlimited scans.</string>
     <string name="pro_scan_count">Scan (%1$d/%2$d)</string>
+
+    <!-- Archived receipts (private, in-app only) -->
+    <string name="receipts_title">My receipts</string>
+    <string name="receipts_description">Photos stored only in this app</string>
+    <string name="receipts_empty">No saved receipts</string>
+    <string name="receipts_empty_hint">Scan a receipt and tap Save to archive it here</string>
+    <string name="receipt_attached">Receipt attached</string>
+    <string name="receipt_attached_desc">It will be archived in the app when you tap Save</string>
+    <string name="receipt_delete_confirm">Delete this receipt from the archive? This cannot be undone.</string>
 </resources>

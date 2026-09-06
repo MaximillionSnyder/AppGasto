@@ -4,10 +4,12 @@
         <include domain="database" path="appgasto_database" />
         <include domain="sharedpref" path="com.example.appgasto_preferences.xml" />
         <include domain="file" path="backups/" />
+        <include domain="file" path="receipts/" />
     </cloud-backup>
     <device-transfer>
         <include domain="database" path="appgasto_database" />
         <include domain="sharedpref" path="com.example.appgasto_preferences.xml" />
         <include domain="file" path="backups/" />
+        <include domain="file" path="receipts/" />
     </device-transfer>
 </data-extraction-rules>

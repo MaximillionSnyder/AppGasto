@@ -9,8 +9,8 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
-    entities = [Expense::class, Category::class, ExchangeRateEntity::class, CategoryBudget::class],
-    version = 4,
+    entities = [Expense::class, Category::class, ExchangeRateEntity::class, CategoryBudget::class, Receipt::class],
+    version = 5,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -20,6 +20,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
     abstract fun exchangeRateDao(): ExchangeRateDao
     abstract fun categoryBudgetDao(): CategoryBudgetDao
+    abstract fun receiptDao(): ReceiptDao
 
     companion object {
         const val DATABASE_NAME = "appgasto_database"
@@ -61,13 +62,32 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS receipts (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        fileName TEXT NOT NULL,
+                        createdAt TEXT,
+                        amount REAL,
+                        currency TEXT,
+                        merchant TEXT,
+                        expenseId INTEGER
+                    )
+                    """.trimIndent()
+                )
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_receipts_createdAt ON receipts(createdAt)")
+            }
+        }
+
         fun create(context: Context): AppDatabase {
             return Room.databaseBuilder(
                 context.applicationContext,
                 AppDatabase::class.java,
                 DATABASE_NAME
             )
-                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                 .addCallback(SeedCallback())
                 .build()
         }

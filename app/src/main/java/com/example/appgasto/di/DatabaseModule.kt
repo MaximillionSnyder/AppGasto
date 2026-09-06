@@ -42,4 +42,9 @@ object DatabaseModule {
     fun provideCategoryBudgetDao(database: AppDatabase): CategoryBudgetDao {
         return database.categoryBudgetDao()
     }
+
+    @Provides
+    fun provideReceiptDao(database: AppDatabase): com.example.appgasto.data.local.ReceiptDao {
+        return database.receiptDao()
+    }
 }

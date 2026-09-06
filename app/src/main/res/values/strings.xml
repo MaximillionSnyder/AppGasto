@@ -242,7 +242,7 @@
     <string name="pro_benefit_advanced">Presupuesto avanzado por categorías</string>
     <string name="pro_benefit_scan">Escaneo ilimitado de recibos</string>
     <string name="pro_benefit_csv">Exportación a CSV ilimitada</string>
-    <string name="pro_benefit_backup">Auto-backup diario + fotos de recibos (próximamente)</string>
+    <string name="pro_benefit_backup">Auto-backup diario + fotos de recibos</string>
     <string name="pro_benefit_support">Apoya el desarrollo de la app</string>
     <string name="pro_buy">Comprar</string>
     <string name="pro_restore">Restaurar compra</string>
@@ -254,4 +254,13 @@
     <string name="pro_grace">Presupuesto avanzado en período de gracia (%1$d días restantes). Activa Pro para mantenerlo.</string>
     <string name="pro_scan_limit">Alcanzaste el límite de %1$d escaneos del mes. Pásate a Pro para escaneos ilimitados.</string>
     <string name="pro_scan_count">Escanear (%1$d/%2$d)</string>
+
+    <!-- Recibos archivados (privados, solo en la app) -->
+    <string name="receipts_title">Mis recibos</string>
+    <string name="receipts_description">Fotos guardadas solo en esta app</string>
+    <string name="receipts_empty">Sin recibos guardados</string>
+    <string name="receipts_empty_hint">Escanea un recibo y pulsa Guardar para archivarlo aquí</string>
+    <string name="receipt_attached">Recibo adjunto</string>
+    <string name="receipt_attached_desc">Se archivará en la app al pulsar Guardar</string>
+    <string name="receipt_delete_confirm">¿Eliminar este recibo del archivo? Esta acción no se puede deshacer.</string>
 </resources>

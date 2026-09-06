@@ -37,7 +37,8 @@ fun MainPagerScreen(
     advancedBudgetEnabled: Boolean = false,
     advancedBudgetUnlocked: Boolean = true,
     onNavigateToAdd: () -> Unit,
-    onNavigateToEdit: (Long) -> Unit
+    onNavigateToEdit: (Long) -> Unit,
+    onNavigateToReceipts: () -> Unit = {}
 ) {
     val pagerState = rememberPagerState(pageCount = { if (advancedBudgetEnabled) 5 else 4 })
     val scope = rememberCoroutineScope()
@@ -102,7 +103,8 @@ fun MainPagerScreen(
                 )
                 3 -> SettingsScreen(
                     isDark = isDark,
-                    embeddedInPager = true
+                    embeddedInPager = true,
+                    onNavigateToReceipts = onNavigateToReceipts
                 )
                 4 -> AdvancedBudgetScreen(
                     isDark = isDark,

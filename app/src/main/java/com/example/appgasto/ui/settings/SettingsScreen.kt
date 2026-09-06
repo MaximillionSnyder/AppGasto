@@ -39,6 +39,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.TableChart
 import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material3.Button
@@ -106,6 +107,7 @@ fun SettingsScreen(
     isDark: Boolean,
     onNavigateBack: () -> Unit = {},
     embeddedInPager: Boolean = false,
+    onNavigateToReceipts: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -327,6 +329,11 @@ fun SettingsScreen(
                         }
                     }
                 }
+            )
+
+            Spacer(modifier = Modifier.height(Dimens.spaceMd))
+            ReceiptsSettingsSection(
+                onReceiptsClick = onNavigateToReceipts
             )
 
             Spacer(modifier = Modifier.height(Dimens.spaceMd))
@@ -966,6 +973,25 @@ private fun AppearanceSettingsSection(
                 else -> stringResource(R.string.lang_system)
             },
             onClick = onLanguageClick
+        )
+    }
+}
+
+@Composable
+private fun ReceiptsSettingsSection(
+    onReceiptsClick: () -> Unit
+) {
+    SettingsSection(
+        title = stringResource(R.string.receipts_title),
+        icon = Icons.Default.ReceiptLong,
+        iconColor = MaterialTheme.colorScheme.primary
+    ) {
+        SettingsRow(
+            icon = Icons.Default.ReceiptLong,
+            iconColor = MaterialTheme.colorScheme.primary,
+            title = stringResource(R.string.receipts_title),
+            subtitle = stringResource(R.string.receipts_description),
+            onClick = onReceiptsClick
         )
     }
 }

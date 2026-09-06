@@ -45,6 +45,8 @@ data class AddEditUiState(
     val isScanning: Boolean = false,
     val isPro: Boolean = false,
     val scanCount: Int = 0,
+    val hasPendingReceipt: Boolean = false,
+    val pendingReceiptPath: String? = null,
     val error: String? = null
 )
 
@@ -54,13 +56,18 @@ class AddEditViewModel @Inject constructor(
     private val expenseRepository: ExpenseRepository,
     private val exchangeRateRepository: ExchangeRateRepository,
     private val receiptOcrService: ReceiptOcrService,
-    private val preferencesRepository: PreferencesRepository
+    private val preferencesRepository: PreferencesRepository,
+    private val receiptRepository: com.example.appgasto.data.receipts.ReceiptRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddEditUiState())
     val uiState: StateFlow<AddEditUiState> = _uiState.asStateFlow()
 
+    private var pendingReceiptTmp: java.io.File? = null
+
     fun loadExpense(expenseId: Long?) {
+        pendingReceiptTmp?.let { old -> viewModelScope.launch { receiptRepository.discardTemp(old) } }
+        pendingReceiptTmp = null
         viewModelScope.launch {
             val categories = expenseRepository.getAllCategories().first()
             val prefs = preferencesRepository.preferencesFlow.first()
@@ -72,7 +79,9 @@ class AddEditViewModel @Inject constructor(
                 currency = baseCurrency,
                 isPro = prefs.isPro,
                 scanCount = scanCount,
-                isLoading = false
+                isLoading = false,
+                hasPendingReceipt = false,
+                pendingReceiptPath = null
             )
 
             if (expenseId != null) {
@@ -138,6 +147,13 @@ class AddEditViewModel @Inject constructor(
                 return@launch
             }
             _uiState.value = _uiState.value.copy(isScanning = true, error = null)
+            // Copia privada temporal (la Uri del escáner caduca). El archivo
+            // definitivo solo se crea al pulsar Guardar.
+            val stagedTmp = runCatching { receiptRepository.stageTemp(imageUri) }.getOrNull()
+            if (stagedTmp != null) {
+                pendingReceiptTmp?.let { runCatching { receiptRepository.discardTemp(it) } }
+                pendingReceiptTmp = stagedTmp
+            }
             try {
                 val data = receiptOcrService.parseReceiptImage(imageUri)
                 val current = _uiState.value
@@ -156,7 +172,9 @@ class AddEditViewModel @Inject constructor(
                     note = data.merchant ?: current.note,
                     isPro = prefs.isPro,
                     scanCount = if (newPrefs.scanCountMonth == currentMonth) newPrefs.scanCount else current.scanCount + 1,
-                    isScanning = false
+                    isScanning = false,
+                    hasPendingReceipt = pendingReceiptTmp != null,
+                    pendingReceiptPath = pendingReceiptTmp?.absolutePath
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
@@ -221,13 +239,37 @@ class AddEditViewModel @Inject constructor(
                     note = state.note.ifBlank { null },
                     createdAt = createdAt
                 )
-                if (state.isEditing) {
+                val savedExpenseId: Long = if (state.isEditing) {
                     expenseRepository.updateExpense(expense)
+                    state.expenseId ?: 0L
                 } else {
                     expenseRepository.insertExpense(expense)
                 }
+                // Archivar la foto SOLO al guardar (decisión de producto).
+                // La fila de recibo sobrevive al borrado del gasto.
+                val tmpToCommit = pendingReceiptTmp
+                if (tmpToCommit != null) {
+                    runCatching {
+                        receiptRepository.commitTemp(
+                            tmpToCommit,
+                            com.example.appgasto.data.receipts.ReceiptRepository.Snapshot(
+                                createdAt = createdAt,
+                                amount = amount,
+                                currency = currency,
+                                merchant = state.note.ifBlank { null },
+                                expenseId = savedExpenseId.takeIf { it != 0L }
+                            )
+                        )
+                    }
+                    pendingReceiptTmp = null
+                }
                 ExpenseWidget.updateAll(context)
-                _uiState.value = _uiState.value.copy(isSaving = false, isSaved = true)
+                _uiState.value = _uiState.value.copy(
+                    isSaving = false,
+                    isSaved = true,
+                    hasPendingReceipt = false,
+                    pendingReceiptPath = null
+                )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
@@ -239,6 +281,24 @@ class AddEditViewModel @Inject constructor(
 
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
+    }
+
+    fun removePendingReceipt() {
+        viewModelScope.launch {
+            pendingReceiptTmp?.let { receiptRepository.discardTemp(it) }
+            pendingReceiptTmp = null
+            _uiState.value = _uiState.value.copy(hasPendingReceipt = false, pendingReceiptPath = null)
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        val tmp = pendingReceiptTmp
+        // Si se sale sin guardar, el temporal no se archiva.
+        if (tmp != null && _uiState.value.isSaved.not()) {
+            // onCleared no puede usar viewModelScope; borrado best-effort.
+            runCatching { if (tmp.exists()) tmp.delete() }
+        }
     }
 
     fun setScanError() {
